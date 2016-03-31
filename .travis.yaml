@@ -1,0 +1,13 @@
+language: go
+
+install:
+
+
+services:
+
+
+before_script:
+
+script:
+  go test ./dcmdata
+
