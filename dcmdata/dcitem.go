@@ -168,9 +168,9 @@ func (item *DcmItem) ComputeGroupLengthAndPadding(glenc E_GrpLenEncoding,
 		var lastGrp uint16 = 0x0000
 		var actGrp uint16
 		var actGLElem *DcmUnsignedLong
-		var paddingGL *DcmUnsignedLong
-		var grplen uint32
-		var sublen uint32
+		//	var paddingGL *DcmUnsignedLong
+		//	var grplen uint32
+		//	var sublen uint32
 		var groupLengthExceeded = false
 
 		/* determine the current seek mode and set the list pointer to the first element */
@@ -242,7 +242,7 @@ func (item *DcmItem) ComputeGroupLengthAndPadding(glenc E_GrpLenEncoding,
 						/* padding element we want to remember the padding element so that the */
 						/* group length of this element can be stored later */
 						if (padenc == EPD_withPadding) && (actGrp == 0xFFFC) {
-							paddingGL = NewDcmUnsignedLong(do.GetTag(), 0)
+							//				paddingGL = NewDcmUnsignedLong(do.GetTag(), 0)
 						}
 						/* if actGLElem contains a valid pointer it was set in one of the last iterations */
 						/* to the group lenght element of the last group. We need to write the current computed */
@@ -251,7 +251,7 @@ func (item *DcmItem) ComputeGroupLengthAndPadding(glenc E_GrpLenEncoding,
 						if actGLElem != nil {
 							if groupLengthExceeded != true {
 								// do not use putUint32() in order to make sure that the resulting VM is really 1
-								actGLElem.
+								//				actGLElem.
 
 							}
 

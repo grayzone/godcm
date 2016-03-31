@@ -1,13 +1,17 @@
 language: go
 
+go:
+  - tip
+
 install:
 
 
 services:
 
 
+
 before_script:
 
 script:
-  go test ./dcmdata
+  go test -v ./...
 
