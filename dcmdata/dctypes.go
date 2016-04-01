@@ -52,3 +52,18 @@ const (
 	/// add padding tags
 	EPD_withPadding = 2
 )
+
+/// mode for file reading
+
+type E_FileReadMode int
+
+const (
+	/// auto detect: fileformat or dataset
+	ERM_autoDetect = 0
+	/// read as dataset (assume no meta header present)
+	ERM_dataset = 1
+	/// read file format only, refuse if no meta-header
+	ERM_fileOnly = 2
+	/// read meta-header only, do not read the dataset
+	ERM_metaOnly = 3
+)

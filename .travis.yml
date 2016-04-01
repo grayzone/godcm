@@ -1,12 +1,12 @@
 language: go
 
 go:
-  - tip
+ - tip
 
 
 before_script:
-  - go vet -v ./...
+ - go vet -v ./...
 
 script:
-  go test -v ./...
+ - go test -v ./...
 
