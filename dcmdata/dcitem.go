@@ -220,7 +220,7 @@ func (item *DcmItem) ComputeGroupLengthAndPadding(glenc E_GrpLenEncoding,
 						if (do.GetETag() == 0x0000) && (do.Ident() != EVR_UL) {
 							item.elementList.Remove()
 							vr := NewDcmVR(EVR_UL)
-							tagUL := NewDcmTag(actGrp, 0x0000, *vr)
+							tagUL := NewDcmTagWithGEV(actGrp, 0x0000, *vr)
 							dUL := NewDcmUnsignedLong(*tagUL, 0)
 
 							item.elementList.Insert(&dUL.DcmObject, ELP_prev)
@@ -232,7 +232,7 @@ func (item *DcmItem) ComputeGroupLengthAndPadding(glenc E_GrpLenEncoding,
 
 							// Create GroupLength element
 							vr := NewDcmVR(EVR_UL)
-							tagUL := NewDcmTag(actGrp, 0x0000, *vr)
+							tagUL := NewDcmTagWithGEV(actGrp, 0x0000, *vr)
 							// insert new GroupLength element
 							dUL := NewDcmUnsignedLong(*tagUL, 0)
 							item.elementList.Insert(&dUL.DcmObject, ELP_prev)

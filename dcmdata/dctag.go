@@ -4,6 +4,8 @@ import "github.com/grayzone/godcm/ofstd"
 
 const DcmTag_ERROR_TagName = "Unknown Tag & Data"
 
+var DCM_ItemTag = DcmTag{}
+
 type DcmTag struct {
 	DcmTagKey
 	DcmVR                            /// VR of this attribute tag
@@ -12,10 +14,12 @@ type DcmTag struct {
 	errorFlag      ofstd.OFCondition /// current error code, EC_Normal if a valid VR for the tag is known
 }
 
-func (tag *DcmTag) init() {
+func NewDcmTag() *DcmTag {
+	var tag DcmTag
 	tag.DcmVR.SetVR(DcmEVR(EVR_UNKNOWN))
 	tag.errorFlag = EC_InvalidTag
-	tag.tagName = ""
+	//	tag.tagName = ""
+	return &tag
 }
 
 /** constructor.
@@ -25,7 +29,7 @@ func (tag *DcmTag) init() {
  *  @param e tag element
  *  @param avr VR
  */
-func NewDcmTag(g uint16, e uint16, avr DcmVR) *DcmTag {
+func NewDcmTagWithGEV(g uint16, e uint16, avr DcmVR) *DcmTag {
 	var tag DcmTag
 	tag.SetByValue(g, e)
 	tag.SetVR(avr)

@@ -5,8 +5,17 @@ type DcmFileFormat struct {
 	fileReadMode E_FileReadMode
 }
 
+func NewDcmFileFormat() *DcmFileFormat {
+	fo := DcmFileFormat{fileReadMode: ERM_autoDetect}
+
+	//	fo.DcmSequenceOfItems.itemList.Insert(obj, pos)
+
+	return &fo
+
+}
+
 func (fo *DcmFileFormat) SetReadMode(readMode E_FileReadMode) {
-	fo.fileReadMode = readMode
+	//	fo.fileReadMode = readMode
 }
 
 func (fo *DcmFileFormat) GetReadMode() E_FileReadMode {
@@ -24,7 +33,7 @@ func (fo *DcmFileFormat) GetDataset() DcmDataset {
 
 func (fo *DcmFileFormat) LoadFile(filename string, readXfer E_TransferSyntax, groupLength E_GrpLenEncoding, maxReadLength uint32, readMode E_FileReadMode) {
 	if readMode == ERM_dataset {
-		//	fo.GetDataset().
+		//		fo.GetDataset().
 
 	}
 }

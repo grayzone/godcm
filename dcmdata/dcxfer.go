@@ -40,7 +40,7 @@ const (
 	/// Implicit VR Big Endian (pseudo transfer syntax that does not really exist)
 	EXS_BigEndianImplicit = 1
 	/// Explicit VR Little Endian
-	EXS_LittleEndianExplicit = 2
+	EXS_LittleEndianExplicit E_TransferSyntax = 2
 	/// Explicit VR Big Endian
 	EXS_BigEndianExplicit = 3
 	/// JPEG Baseline (lossy)
