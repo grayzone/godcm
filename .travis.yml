@@ -3,14 +3,9 @@ language: go
 go:
   - tip
 
-install:
-
-
-services:
-
-
 
 before_script:
+  - go vet -v ./...
 
 script:
   go test -v ./...
