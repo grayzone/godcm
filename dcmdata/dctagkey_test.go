@@ -15,17 +15,6 @@ func TestNewDcmTagKey(t *testing.T) {
 	}
 }
 
-func TestDcmTagKey(t *testing.T) {
-	var v DcmTagKey
-	v.init()
-	if v.group != 0xffff {
-		t.Error("excepted 0xffff, got ", v.group)
-	}
-	if v.element != 0xffff {
-		t.Error("excepted 0xffff, got ", v.element)
-	}
-}
-
 func TestSetDcmTagKeyByKey(t *testing.T) {
 	oril := DcmTagKey{group: 0x0001, element: 0x0001}
 	var v DcmTagKey
@@ -50,8 +39,7 @@ func TestSetDcmTagKeyByValue(t *testing.T) {
 }
 
 func TestSetGroup(t *testing.T) {
-	var v DcmTagKey
-	v.init()
+	v := NewDcmTagKey()
 	v.SetGroup(0x0001)
 	if v.group != 0x0001 {
 		t.Error("excepted 0x0001, got ", v.group)
@@ -62,8 +50,7 @@ func TestSetGroup(t *testing.T) {
 }
 
 func TestSetElement(t *testing.T) {
-	var v DcmTagKey
-	v.init()
+	v := NewDcmTagKey()
 	v.SetElement(0x0001)
 	if v.group != 0xffff {
 		t.Error("excepted 0xffff, got ", v.group)
@@ -226,8 +213,7 @@ func TestHash(t *testing.T) {
 }
 
 func TestToString(t *testing.T) {
-	var v DcmTagKey
-	v.init()
+	v := NewDcmTagKey()
 	if v.ToString() != "(????,????)" {
 		t.Error("excepted (????,????), got ", v.ToString())
 	}
