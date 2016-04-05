@@ -14,7 +14,7 @@ before_script:
 script:
 # - go test -v -bench=. ./...
 # - echo "start to run code coverage script."
- - echo "mode: count" >> profile.cov
+ - echo "mode:\ count" >> profile.cov
  - go test -v -covermode=count -coverprofile=profile_tmp.cov ./dcmdata
  - cat profile.cov
  - cat profile_tmp.cov
