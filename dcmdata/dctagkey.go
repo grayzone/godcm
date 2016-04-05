@@ -10,11 +10,6 @@ type DcmTagKey struct {
 	element uint16
 }
 
-func (dtk *DcmTagKey) init() {
-	dtk.group = 0xffff
-	dtk.element = 0xffff
-}
-
 func NewDcmTagKey() *DcmTagKey {
 	return &DcmTagKey{group: 0xffff, element: 0xffff}
 }
