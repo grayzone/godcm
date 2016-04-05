@@ -12,10 +12,13 @@ before_script:
  - go vet -v ./...
 
 script:
- - go test -v -bench=. ./...
- - echo "start to run code coverage script."
- - echo "mode:count" >> profile.cov
+# - go test -v -bench=. ./...
+# - echo "start to run code coverage script."
+ - echo "mode: count" >> profile.cov
  - go test -v -covermode=count -coverprofile=profile_tmp.cov ./dcmdata
+ - cat profile.cov
+ - cat profile_tmp.cov
  - tail -n +2 profile_tmp.cov >> profile.cov
+ - cat profile.cov
  - $HOME/gopath/bin/goveralls -coverprofile=profile.cov -service=travis-ci
  - rm -rf profile_tmp.cov
