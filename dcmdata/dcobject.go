@@ -218,7 +218,7 @@ func (o *DcmObject) GetTag() DcmTag {
  *  @param gtag new attribute group tag
  */
 func (o *DcmObject) SetGTag(g uint16) {
-	o.tag.Group = g
+	o.tag.group = g
 }
 
 /** assign a new Value Representation (VR) to this object. This operation

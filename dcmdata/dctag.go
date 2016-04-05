@@ -17,14 +17,13 @@ var (
 
 	DCM_ItemDelimitationItemTag     = DcmTag{DcmTagKey: DCM_ItemDelimitationItem, DcmVR: *NewDcmVR(EVR_na)}
 	DCM_SequenceDelimitationItemTag = DcmTag{DcmTagKey: DCM_SequenceDelimitationItem, DcmVR: *NewDcmVR(EVR_na)}
-	DCM_InternalUseTag              = DcmTag{DcmTagKey: DcmTagKey{Group: 0xfffe, Element: 0xfffe}, DcmVR: *NewDcmVR(EVR_UNKNOWN)}
+	DCM_InternalUseTag              = DcmTag{DcmTagKey: DcmTagKey{0xfffe, 0xfffe}, DcmVR: *NewDcmVR(EVR_UNKNOWN)}
 )
 
 func NewDcmTag() *DcmTag {
 	var tag DcmTag
-	tag.DcmVR.SetVR(DcmEVR(EVR_UNKNOWN))
+	tag.vr = EVR_UNKNOWN
 	tag.errorFlag = EC_InvalidTag
-	//	tag.tagName = ""
 	return &tag
 }
 
@@ -38,7 +37,7 @@ func NewDcmTag() *DcmTag {
 func NewDcmTagWithGEV(g uint16, e uint16, avr DcmVR) *DcmTag {
 	var tag DcmTag
 	tag.Set(g, e)
-	tag.SetVR(avr)
+	tag.DcmVR = avr
 	tag.errorFlag = ofstd.EC_Normal
 	return &tag
 }
@@ -73,7 +72,7 @@ func (tag *DcmTag) GetVRName() string {
  *  @return tag group
  */
 func (tag *DcmTag) GetGTag() uint16 {
-	return tag.DcmTagKey.Group
+	return tag.DcmTagKey.group
 }
 
 /** returns tag element
