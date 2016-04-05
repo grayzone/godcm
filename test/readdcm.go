@@ -1,5 +1,5 @@
-package main
+package test
 
-func main() {
-
+func Demo() int {
+	return 1
 }
