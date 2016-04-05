@@ -3,64 +3,23 @@ package dcmdata
 import "fmt"
 
 /// macro for an "undefined" attribute tag that is never used in DICOM
-var DCM_UndefinedTagKey = DcmTagKey{group: 0xffff, element: 0xffff}
+var DCM_UndefinedTagKey = DcmTagKey{Group: 0xffff, Element: 0xffff}
 
 type DcmTagKey struct {
-	group   uint16
-	element uint16
+	Group   uint16
+	Element uint16
 }
 
 func NewDcmTagKey() *DcmTagKey {
-	return &DcmTagKey{group: 0xffff, element: 0xffff}
+	return &DcmTagKey{Group: 0xffff, Element: 0xffff}
 }
 
-/** set value to given tag key
- *  @param key attribute tag to copy
- */
-func (dtk *DcmTagKey) SetByKey(key DcmTagKey) {
-	dtk.group = key.group
-	dtk.element = key.element
-}
-
-/** set value to given group and element
- *  @param g group
- *  @param e element
- */
-func (dtk *DcmTagKey) SetByValue(group uint16, element uint16) {
-	dtk.group = group
-	dtk.element = element
-}
-
-/** set group to given number
- *  @param g group
- */
-func (dtk *DcmTagKey) SetGroup(group uint16) {
-	dtk.group = group
-}
-
-/** set element to given number
- *  @param e element
- */
-func (dtk *DcmTagKey) SetElement(element uint16) {
-	dtk.element = element
-}
-
-/** returns group number
- *  @return returns the group number of the tag key
- */
-func (dtk *DcmTagKey) GetGroup() uint16 {
-	return dtk.group
-}
-
-/** returns element number
- *  @return Returns the element number of the tag key
- */
-func (dtk *DcmTagKey) GetElement() uint16 {
-	return dtk.element
+func (dtk *DcmTagKey) Set(g, e uint16) {
+	dtk.Group, dtk.Element = g, e
 }
 
 func (dtk *DcmTagKey) Equal(key DcmTagKey) bool {
-	return (dtk.group == key.GetGroup()) && (dtk.element == key.GetElement())
+	return (dtk.Group == key.Group) && (dtk.Element == key.Element)
 }
 
 /** returns true, if group is valid (permitted in DICOM files).
@@ -68,7 +27,7 @@ func (dtk *DcmTagKey) Equal(key DcmTagKey) bool {
  *  @return returns OFTrue if tag key has a valid group number.
  */
 func (dtk *DcmTagKey) HasValidGroup() bool {
-	if ((dtk.group & 1) != 0) && ((dtk.group <= 7) || (dtk.group == 0xFFFF)) {
+	if ((dtk.Group & 1) != 0) && ((dtk.Group <= 7) || (dtk.Group == 0xFFFF)) {
 		return false
 	}
 	return true
@@ -79,7 +38,7 @@ func (dtk *DcmTagKey) HasValidGroup() bool {
  *  @return returns OFTrue if tag key is a valid group length element
  */
 func (dtk *DcmTagKey) IsGroupLength() bool {
-	return (dtk.element == 0) && dtk.HasValidGroup()
+	return (dtk.Element == 0) && dtk.HasValidGroup()
 }
 
 /** returns true if the tag key is private, ie. whether it has an odd group
@@ -87,7 +46,7 @@ func (dtk *DcmTagKey) IsGroupLength() bool {
  *  @return returns OFTrue if group is private and valid.
  */
 func (dtk *DcmTagKey) IsPrivate() bool {
-	return ((dtk.group & 1) != 0) && dtk.HasValidGroup()
+	return ((dtk.Group & 1) != 0) && dtk.HasValidGroup()
 }
 
 /** returns true, if tag is a private reservation tag
@@ -96,7 +55,7 @@ func (dtk *DcmTagKey) IsPrivate() bool {
  *  @return returns OFTrue if tag key is a private reservation key
  */
 func (dtk *DcmTagKey) IsPrivateReservation() bool {
-	return dtk.IsPrivate() && dtk.element >= 0x10 && dtk.element <= 0xFF
+	return dtk.IsPrivate() && dtk.Element >= 0x10 && dtk.Element <= 0xFF
 }
 
 /** generate a simple hash code for this attribute tag,
@@ -104,7 +63,7 @@ func (dtk *DcmTagKey) IsPrivateReservation() bool {
  *  @return hash code for this tag
  */
 func (dtk *DcmTagKey) Hash() uint32 {
-	return ((uint32(int(dtk.GetGroup())<<16) & 0xffff0000) | (uint32(int(dtk.GetElement()) & 0xffff)))
+	return ((uint32(int(dtk.Group)<<16) & 0xffff0000) | (uint32(int(dtk.Element) & 0xffff)))
 }
 
 /** convert tag key to string having the form "(gggg,eeee)".
@@ -112,10 +71,10 @@ func (dtk *DcmTagKey) Hash() uint32 {
  */
 func (dtk *DcmTagKey) ToString() string {
 	var result string
-	if dtk.group == 0xFFFF && dtk.element == 0xFFFF {
+	if dtk.Group == 0xFFFF && dtk.Element == 0xFFFF {
 		result = "(????,????)"
 	} else {
-		result = fmt.Sprintf("(%04x,%04x)", dtk.group, dtk.element)
+		result = fmt.Sprintf("(%04x,%04x)", dtk.Group, dtk.Element)
 	}
 	return result
 }
@@ -126,36 +85,36 @@ func (dtk *DcmTagKey) ToString() string {
  */
 func (dtk *DcmTagKey) IsSignableTag() bool {
 	//no group length tags (element number of 0000)
-	if dtk.element == 0x0000 {
+	if dtk.Element == 0x0000 {
 		return false
 	}
 	// no Length to End Tag
-	if (dtk.group == 0x0008) && (dtk.element == 0x0001) {
+	if (dtk.Group == 0x0008) && (dtk.Element == 0x0001) {
 		return false
 	}
 
 	//no tags with group number less than 0008
-	if dtk.group < 0x0008 {
+	if dtk.Group < 0x0008 {
 		return false
 	}
 
 	//no tags from group FFFA (digital signatures sequence)
-	if dtk.group == 0xFFFA {
+	if dtk.Group == 0xFFFA {
 		return false
 	}
 
 	// no MAC Parameters sequence
-	if (dtk.group == 0x4ffe) && (dtk.element == 0x0001) {
+	if (dtk.Group == 0x4ffe) && (dtk.Element == 0x0001) {
 		return false
 	}
 
 	//no Data Set trailing Padding
-	if (dtk.group == 0xfffc) && (dtk.element == 0xfffc) {
+	if (dtk.Group == 0xfffc) && (dtk.Element == 0xfffc) {
 		return false
 	}
 
 	//no Sequence or Item Delimitation Tag
-	if (dtk.group == 0xfffe) && ((dtk.element == 0xe00d) || (dtk.element == 0xe0dd)) {
+	if (dtk.Group == 0xfffe) && ((dtk.Element == 0xe00d) || (dtk.Element == 0xe0dd)) {
 		return false
 	}
 	return true

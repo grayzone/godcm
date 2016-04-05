@@ -4,8 +4,6 @@ import "github.com/grayzone/godcm/ofstd"
 
 const DcmTag_ERROR_TagName = "Unknown Tag & Data"
 
-var DCM_ItemTag = DcmTag{}
-
 type DcmTag struct {
 	DcmTagKey
 	DcmVR                            /// VR of this attribute tag
@@ -13,6 +11,14 @@ type DcmTag struct {
 	privateCreator string            /// private creator code, remains NULL unless setPrivateCreator() is called
 	errorFlag      ofstd.OFCondition /// current error code, EC_Normal if a valid VR for the tag is known
 }
+
+var (
+	DCM_ItemTag = DcmTag{DcmTagKey: DCM_Item, DcmVR: *NewDcmVR(EVR_na)}
+
+	DCM_ItemDelimitationItemTag     = DcmTag{DcmTagKey: DCM_ItemDelimitationItem, DcmVR: *NewDcmVR(EVR_na)}
+	DCM_SequenceDelimitationItemTag = DcmTag{DcmTagKey: DCM_SequenceDelimitationItem, DcmVR: *NewDcmVR(EVR_na)}
+	DCM_InternalUseTag              = DcmTag{DcmTagKey: DcmTagKey{Group: 0xfffe, Element: 0xfffe}, DcmVR: *NewDcmVR(EVR_UNKNOWN)}
+)
 
 func NewDcmTag() *DcmTag {
 	var tag DcmTag
@@ -31,7 +37,7 @@ func NewDcmTag() *DcmTag {
  */
 func NewDcmTagWithGEV(g uint16, e uint16, avr DcmVR) *DcmTag {
 	var tag DcmTag
-	tag.SetByValue(g, e)
+	tag.Set(g, e)
 	tag.SetVR(avr)
 	tag.errorFlag = ofstd.EC_Normal
 	return &tag
@@ -67,14 +73,14 @@ func (tag *DcmTag) GetVRName() string {
  *  @return tag group
  */
 func (tag *DcmTag) GetGTag() uint16 {
-	return tag.DcmTagKey.GetGroup()
+	return tag.DcmTagKey.Group
 }
 
 /** returns tag element
  *  @return tag element
  */
 func (tag *DcmTag) GetETag() uint16 {
-	return tag.DcmTagKey.GetElement()
+	return tag.DcmTagKey.Element
 }
 
 /** returns a copy of the tag key by value

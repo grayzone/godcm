@@ -34,7 +34,7 @@ type DcmEVR int
 const (
 
 	/// application entity title
-	EVR_AE = iota
+	EVR_AE DcmEVR = iota
 
 	/// age string
 	EVR_AS
@@ -252,10 +252,6 @@ type DcmVR struct {
 
 func NewDcmVR(v DcmEVR) *DcmVR {
 	return &DcmVR{v}
-}
-
-func (v *DcmVR) init() {
-	v.vr = EVR_UNKNOWN
 }
 
 /** assign new VR value by name

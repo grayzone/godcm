@@ -66,8 +66,8 @@ type DcmDictEntry struct {
 
 func NewDcmDictEntry(g uint16, e uint16, vr DcmVR, nam string, vmMin int, vmMax int, vers string, doCopyStrings bool, pcreator string) *DcmDictEntry {
 	entry := new(DcmDictEntry)
-	entry.group = g
-	entry.element = e
+	entry.Group = g
+	entry.Element = e
 	entry.tagName = nam
 	entry.valueRepresentation = vr
 	entry.valueMultiplicityMin = vmMin
@@ -75,7 +75,7 @@ func NewDcmDictEntry(g uint16, e uint16, vr DcmVR, nam string, vmMin int, vmMax 
 	entry.standardVersion = vers
 	entry.privateCreator = pcreator
 	entry.stringsAreCopies = doCopyStrings
-	entry.upperKey.SetByValue(g, e)
+	entry.upperKey = DcmTagKey{g, e}
 	entry.groupRangeRestriction = DcmDictRange_Unspecified
 	entry.elementRangeRestriction = DcmDictRange_Unspecified
 	return entry
@@ -96,8 +96,8 @@ func NewDcmDictEntry(g uint16, e uint16, vr DcmVR, nam string, vmMin int, vmMax 
  */
 func NewDcmDictEntryForRepeatingTags(g uint16, e uint16, ug uint16, ue uint16, vr DcmVR, nam string, vmMin int, vmMax int, vers string, doCopyStrings bool, pcreator string) *DcmDictEntry {
 	entry := new(DcmDictEntry)
-	entry.group = g
-	entry.element = e
+	entry.Group = g
+	entry.Element = e
 	entry.tagName = nam
 	entry.valueRepresentation = vr
 	entry.valueMultiplicityMin = vmMin
@@ -105,7 +105,7 @@ func NewDcmDictEntryForRepeatingTags(g uint16, e uint16, ug uint16, ue uint16, v
 	entry.standardVersion = vers
 	entry.privateCreator = pcreator
 	entry.stringsAreCopies = doCopyStrings
-	entry.upperKey.SetByValue(ug, ue)
+	entry.upperKey = DcmTagKey{ug, ue}
 	entry.groupRangeRestriction = DcmDictRange_Unspecified
 	entry.elementRangeRestriction = DcmDictRange_Unspecified
 	return entry
@@ -175,7 +175,7 @@ func (entry *DcmDictEntry) SetUpper(key DcmTagKey) {
  *  @param ug upper limit for tag group
  */
 func (entry *DcmDictEntry) SetUpperGroup(ug uint16) {
-	entry.upperKey.SetGroup(ug)
+	entry.upperKey.Group = ug
 }
 
 /** converts entry into repeating tag entry by defining an upper limit
@@ -183,17 +183,17 @@ func (entry *DcmDictEntry) SetUpperGroup(ug uint16) {
  *  @param ue upper limit for tag element
  */
 func (entry *DcmDictEntry) SetUpperElement(ue uint16) {
-	entry.upperKey.SetElement(ue)
+	entry.upperKey.Element = ue
 }
 
 /// returns upper limit for tag group
 func (entry *DcmDictEntry) GetUpperGroup() uint16 {
-	return entry.upperKey.GetGroup()
+	return entry.upperKey.Group
 }
 
 /// returns upper limit for tag element
 func (entry *DcmDictEntry) GetUpperElement() uint16 {
-	return entry.upperKey.GetElement()
+	return entry.upperKey.Element
 }
 
 /// returns attribute tag as DcmTagKey object by value
@@ -208,12 +208,12 @@ func (entry *DcmDictEntry) GetUpperKey() DcmTagKey {
 
 /// returns true if entry is has a repeating group
 func (entry *DcmDictEntry) IsRepeatingGroup() bool {
-	return (entry.GetGroup() != entry.GetUpperGroup())
+	return (entry.Group != entry.GetUpperGroup())
 }
 
 /// returns true if entry is has a repeating element
 func (entry *DcmDictEntry) IsRepeatingElement() bool {
-	return (entry.GetElement() != entry.GetUpperElement())
+	return (entry.Element != entry.GetUpperElement())
 }
 
 /// returns true if entry is repeating (group or element)
@@ -272,21 +272,21 @@ func (entry *DcmDictEntry) PrivateCreatorMatch(s string) bool {
  *  @return true if this entry contains the given tag for the given private creator
  */
 func (entry *DcmDictEntry) Contains(key DcmTagKey, privCreator string) bool {
-	if (entry.GetGroupRangeRestriction() == DcmDictRange_Even) && dcm_is_odd(key.GetGroup()) {
+	if (entry.GetGroupRangeRestriction() == DcmDictRange_Even) && dcm_is_odd(key.Group) {
 		return false
-	} else if (entry.GetGroupRangeRestriction() == DcmDictRange_Odd) && dcm_is_even(key.GetGroup()) {
+	} else if (entry.GetGroupRangeRestriction() == DcmDictRange_Odd) && dcm_is_even(key.Group) {
 		return false
-	} else if (entry.GetElementRangeRestriction() == DcmDictRange_Even) && dcm_is_odd(key.GetElement()) {
+	} else if (entry.GetElementRangeRestriction() == DcmDictRange_Even) && dcm_is_odd(key.Element) {
 		return false
-	} else if (entry.GetElementRangeRestriction() == DcmDictRange_Odd) && dcm_is_even(key.GetElement()) {
+	} else if (entry.GetElementRangeRestriction() == DcmDictRange_Odd) && dcm_is_even(key.Element) {
 		return false
 	} else if !entry.PrivateCreatorMatch(privCreator) {
 		return false
 	} else {
-		groupMatches := dcm_inrange(key.GetGroup(), entry.GetGroup(), entry.GetUpperGroup())
-		found := groupMatches && dcm_inrange(key.GetElement(), entry.GetElement(), entry.GetUpperElement())
+		groupMatches := dcm_inrange(key.Group, entry.Group, entry.GetUpperGroup())
+		found := groupMatches && dcm_inrange(key.Element, entry.Element, entry.GetUpperElement())
 		if !found && groupMatches {
-			found = dcm_inrange(key.GetElement()&0xFF, entry.GetElement(), entry.GetUpperElement())
+			found = dcm_inrange(key.Element&0xFF, entry.Element, entry.GetUpperElement())
 		}
 		return found
 	}
@@ -306,9 +306,9 @@ func (entry *DcmDictEntry) ContainsTagName(name string) bool { /* this contains 
  *  @return true if this object is subset of e
  */
 func (entry *DcmDictEntry) Subset(e DcmDictEntry) bool { /* this is a subset of key */
-	return ((entry.GetGroup() >= e.GetGroup()) &&
+	return ((entry.Group >= e.Group) &&
 		(entry.GetUpperGroup() <= e.GetUpperGroup()) &&
-		(entry.GetElement() >= e.GetElement()) &&
+		(entry.Element >= e.Element) &&
 		(entry.GetUpperElement() <= e.GetUpperElement()) &&
 		entry.PrivateCreatorMatch(e.privateCreator))
 }
@@ -318,9 +318,9 @@ func (entry *DcmDictEntry) Subset(e DcmDictEntry) bool { /* this is a subset of 
  *  @return true if objects describe the same tag range
  */
 func (entry *DcmDictEntry) SetEQ(e DcmDictEntry) bool { /* this is set equal to key */
-	return ((entry.GetGroup() == e.GetGroup()) &&
+	return ((entry.Group == e.Group) &&
 		(entry.GetUpperGroup() == e.GetUpperGroup()) &&
-		(entry.GetElement() == e.GetElement()) &&
+		(entry.Element == e.Element) &&
 		(entry.GetUpperElement() == e.GetUpperElement()) &&
 		(entry.GetGroupRangeRestriction() == e.GetGroupRangeRestriction()) &&
 		(entry.GetElementRangeRestriction() == e.GetElementRangeRestriction()) &&

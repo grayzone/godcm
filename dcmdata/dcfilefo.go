@@ -7,6 +7,7 @@ type DcmFileFormat struct {
 
 func NewDcmFileFormat() *DcmFileFormat {
 	fo := DcmFileFormat{fileReadMode: ERM_autoDetect}
+	//	fo.DcmObject.tag(DCM_InternalUseTag)
 
 	//	fo.DcmSequenceOfItems.itemList.Insert(obj, pos)
 
@@ -15,7 +16,7 @@ func NewDcmFileFormat() *DcmFileFormat {
 }
 
 func (fo *DcmFileFormat) SetReadMode(readMode E_FileReadMode) {
-	//	fo.fileReadMode = readMode
+	fo.fileReadMode = readMode
 }
 
 func (fo *DcmFileFormat) GetReadMode() E_FileReadMode {

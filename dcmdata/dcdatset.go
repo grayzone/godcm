@@ -9,9 +9,9 @@ import (
 type DcmDataset struct {
 	DcmItem
 
-	originalXfer E_TransferSyntax /// original transfer syntax of the dataset
+	OriginalXfer E_TransferSyntax /// original transfer syntax of the dataset
 
-	currentXfer E_TransferSyntax /// current transfer syntax of the dataset
+	CurrentXfer E_TransferSyntax /// current transfer syntax of the dataset
 
 }
 

@@ -8,5 +8,6 @@ before_script:
  - go vet -v ./...
 
 script:
- - go test -v ./...
+ - go test -v ./... -bench=.
+
 
