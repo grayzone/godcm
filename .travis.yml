@@ -13,7 +13,7 @@ before_script:
 
 script:
  - go test -v -bench=. ./...
- - echo "mode: count" > profile.cov
+ - echo 'mode: count' >> profile.cov
  - go test -v -covermode=count -coverprofile=profile_tmp.cov ./dcmdata
  - tail -n +2 profile_tmp.cov >> profile.cov
  - $HOME/gopath/bin/goveralls -coverprofile=profile.cov -service=travis-ci
