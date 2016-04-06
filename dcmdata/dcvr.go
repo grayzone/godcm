@@ -167,13 +167,14 @@ const (
 )
 
 func (evr DcmEVR) String() string {
+	var result string
 
 	for i := 0; i < DcmVRDict_DIM; i++ {
 		if evr == dcmVRDict[i].vr {
-			return dcmVRDict[i].vrstr
+			result = dcmVRDict[i].vrstr
 		}
 	}
-	return ""
+	return result
 
 }
 

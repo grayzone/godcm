@@ -959,3 +959,74 @@ func TestIsEquivalent(t *testing.T) {
 		}
 	}
 }
+
+func TestVRToString(t *testing.T) {
+	cases := []struct {
+		in   DcmEVR
+		want string
+	}{
+		{EVR_AE, "EVR_AE"},
+		{EVR_AS, "EVR_AS"},
+		{EVR_AT, "EVR_AT"},
+		{EVR_CS, "EVR_CS"},
+		/*
+			{EVR_DA, "EVR_DA", "DA", 1, DCMVR_PROP_ISASTRING, 8, 10},
+			{EVR_DS, "EVR_DS", "DS", 1, DCMVR_PROP_ISASTRING, 0, 16},
+			{EVR_DT, "EVR_DT", "DT", 1, DCMVR_PROP_ISASTRING, 0, 26},
+			{EVR_FL, "EVR_FL", "FL", 4, DCMVR_PROP_NONE, 4, 4},
+			{EVR_FD, "EVR_FD", "FD", 8, DCMVR_PROP_NONE, 8, 8},
+			{EVR_IS, "EVR_IS", "IS", 1, DCMVR_PROP_ISASTRING, 0, 12},
+			{EVR_LO, "EVR_LO", "LO", 1, DCMVR_PROP_ISASTRING, 0, 64},
+			{EVR_LT, "EVR_LT", "LT", 1, DCMVR_PROP_ISASTRING, 0, 10240},
+			{EVR_OB, "EVR_OB", "OB", 4, DCMVR_PROP_EXTENDEDLENGTHENCODING, 0, DCM_UndefinedLength},
+			{EVR_OF, "EVR_OF", "OF", 4, DCMVR_PROP_EXTENDEDLENGTHENCODING, 0, DCM_UndefinedLength},
+			{EVR_OW, "EVR_OW", "OW", 4, DCMVR_PROP_EXTENDEDLENGTHENCODING, 0, DCM_UndefinedLength},
+			{EVR_PN, "EVR_PN", "PN", 1, DCMVR_PROP_ISASTRING, 0, 64},
+			{EVR_SH, "EVR_SH", "SH", 1, DCMVR_PROP_ISASTRING, 0, 16},
+			{EVR_SL, "EVR_SL", "SL", 4, DCMVR_PROP_NONE, 4, 4},
+			{EVR_SQ, "EVR_SQ", "SQ", 0, DCMVR_PROP_EXTENDEDLENGTHENCODING, 0, DCM_UndefinedLength},
+			{EVR_SS, "EVR_SS", "SS", 4, DCMVR_PROP_NONE, 2, 2},
+			{EVR_ST, "EVR_ST", "ST", 1, DCMVR_PROP_ISASTRING, 0, 1024},
+			{EVR_TM, "EVR_TM", "TM", 1, DCMVR_PROP_ISASTRING, 0, 16},
+			{EVR_UI, "EVR_UI", "UI", 1, DCMVR_PROP_ISASTRING, 0, 64},
+			{EVR_UL, "EVR_UL", "UL", 4, DCMVR_PROP_NONE, 4, 4},
+			{EVR_US, "EVR_US", "US", 4, DCMVR_PROP_NONE, 2, 2},
+			{EVR_UT, "EVR_UT", "UT", 1, DCMVR_PROP_ISASTRING | DCMVR_PROP_EXTENDEDLENGTHENCODING, 0, DCM_UndefinedLength},
+			{EVR_ox, "EVR_ox", "ox", 4, DCMVR_PROP_NONSTANDARD | DCMVR_PROP_EXTENDEDLENGTHENCODING, 0, DCM_UndefinedLength},
+			{EVR_xs, "EVR_xs", "xs", 4, DCMVR_PROP_NONSTANDARD, 2, 2},
+			{EVR_lt, "EVR_lt", "lt", 4, DCMVR_PROP_NONSTANDARD | DCMVR_PROP_EXTENDEDLENGTHENCODING, 0, DCM_UndefinedLength},
+			{EVR_na, "EVR_na", "na", 0, DCMVR_PROP_NONSTANDARD, 0, 0},
+			{EVR_up, "EVR_up", "up", 4, DCMVR_PROP_NONSTANDARD, 4, 4},
+
+			{EVR_item, "EVR_item", "it_EVR_item", 0, DCMVR_PROP_NONSTANDARD | DCMVR_PROP_INTERNAL, 0, 0},
+			{EVR_metainfo, "EVR_metainfo", "mi_EVR_metainfo", 0, DCMVR_PROP_NONSTANDARD | DCMVR_PROP_INTERNAL, 0, 0},
+			{EVR_dataset, "EVR_dataset", "ds_EVR_dataset", 0, DCMVR_PROP_NONSTANDARD | DCMVR_PROP_INTERNAL, 0, 0},
+			{EVR_fileFormat, "EVR_fileFormat", "ff_EVR_fileFormat", 0, DCMVR_PROP_NONSTANDARD | DCMVR_PROP_INTERNAL, 0, 0},
+			{EVR_dicomDir, "EVR_dicomDir", "dd_EVR_dicomDir", 0, DCMVR_PROP_NONSTANDARD | DCMVR_PROP_INTERNAL, 0, 0},
+			{EVR_dirRecord, "EVR_dirRecord", "dr_EVR_dirRecord", 0, DCMVR_PROP_NONSTANDARD | DCMVR_PROP_INTERNAL, 0, 0},
+
+			{EVR_pixelSQ, "EVR_pixelSQ", "ps_EVR_pixelSQ", 4, DCMVR_PROP_NONSTANDARD | DCMVR_PROP_INTERNAL, 0, DCM_UndefinedLength},
+
+			{EVR_pixelItem, "EVR_pixelItem", "pi", 4, DCMVR_PROP_NONSTANDARD, 0, DCM_UndefinedLength},
+
+			{EVR_UNKNOWN, "EVR_UNKNOWN", "??", 4, DCMVR_PROP_NONSTANDARD | DCMVR_PROP_INTERNAL | DCMVR_PROP_EXTENDEDLENGTHENCODING, 0, DCM_UndefinedLength},
+
+			{EVR_UN, "EVR_UN", "UN", 4, DCMVR_PROP_EXTENDEDLENGTHENCODING, 0, DCM_UndefinedLength},
+
+			{EVR_PixelData, "EVR_PixelData", "PixelData", 0, DCMVR_PROP_INTERNAL, 0, DCM_UndefinedLength},
+
+			{EVR_OverlayData, "EVR_OverlayData", "OverlayData", 0, DCMVR_PROP_INTERNAL, 0, DCM_UndefinedLength},
+
+			{EVR_UNKNOWN2B, "EVR_UNKNOWN2B", "??", 4, DCMVR_PROP_NONSTANDARD | DCMVR_PROP_INTERNAL, 0, DCM_UndefinedLength},
+
+		*/
+	}
+
+	for _, c := range cases {
+		got := c.in.String()
+		if got != c.want {
+			t.Errorf("String(%q) == %v, want %v", c.in, got, c.want)
+		}
+	}
+
+}
