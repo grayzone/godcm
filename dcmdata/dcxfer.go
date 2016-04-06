@@ -121,16 +121,17 @@ const (
 )
 
 func (bo E_ByteOrder) String() string {
+	var result string
 	switch bo {
 	case EBO_unknown:
-		return "EBO_unknown"
+		result = "EBO_unknown"
 	case EBO_LittleEndian:
-		return "EBO_LittleEndian"
+		result = "EBO_LittleEndian"
 	case EBO_BigEndian:
-		return "EBO_BigEndian"
+		result = "EBO_BigEndian"
 	default:
-		return ""
 	}
+	return result
 }
 
 /** enumeration of VR encoding options

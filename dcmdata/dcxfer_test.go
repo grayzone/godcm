@@ -41,3 +41,22 @@ func TestNewDcmXfer(t *testing.T) {
 	}
 
 }
+
+func TestDcmxferToString(t *testing.T) {
+
+	cases := []struct {
+		in   E_ByteOrder
+		want string
+	}{
+		{EBO_unknown, "EBO_unknown"},
+		{EBO_LittleEndian, "EBO_LittleEndian"},
+		{EBO_BigEndian, "EBO_BigEndian"},
+	}
+	for _, c := range cases {
+		got := c.in.String()
+		if got != c.want {
+			t.Errorf("String(%d), want %q got %q", c.in, c.want, got)
+		}
+	}
+
+}
