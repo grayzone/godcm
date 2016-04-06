@@ -28,7 +28,7 @@ func (entry *DcmPrivateTagCacheEntry) GetPrivateCreator() string {
  *    OFFalse otherwise.
  */
 func (entry *DcmPrivateTagCacheEntry) IsPrivateCreatorFor(tk DcmTagKey) bool {
-	return (entry.tagKey.group == tk.group) && ((entry.tagKey.Element << 8) == (tk.Element & 0xFF00))
+	return (entry.tagKey.group == tk.group) && ((entry.tagKey.element << 8) == (tk.element & 0xFF00))
 
 }
 

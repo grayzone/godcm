@@ -67,7 +67,7 @@ type DcmDictEntry struct {
 func NewDcmDictEntry(g uint16, e uint16, vr DcmVR, nam string, vmMin int, vmMax int, vers string, doCopyStrings bool, pcreator string) *DcmDictEntry {
 	entry := new(DcmDictEntry)
 	entry.group = g
-	entry.Element = e
+	entry.element = e
 	entry.tagName = nam
 	entry.valueRepresentation = vr
 	entry.valueMultiplicityMin = vmMin
@@ -97,7 +97,7 @@ func NewDcmDictEntry(g uint16, e uint16, vr DcmVR, nam string, vmMin int, vmMax 
 func NewDcmDictEntryForRepeatingTags(g uint16, e uint16, ug uint16, ue uint16, vr DcmVR, nam string, vmMin int, vmMax int, vers string, doCopyStrings bool, pcreator string) *DcmDictEntry {
 	entry := new(DcmDictEntry)
 	entry.group = g
-	entry.Element = e
+	entry.element = e
 	entry.tagName = nam
 	entry.valueRepresentation = vr
 	entry.valueMultiplicityMin = vmMin
@@ -182,8 +182,8 @@ func (entry *DcmDictEntry) SetUpperGroup(ug uint16) {
  *  for tag element
  *  @param ue upper limit for tag element
  */
-func (entry *DcmDictEntry) SetUpperElement(ue uint16) {
-	entry.upperKey.Element = ue
+func (entry *DcmDictEntry) SetUpperelement(ue uint16) {
+	entry.upperKey.element = ue
 }
 
 /// returns upper limit for tag group
@@ -193,7 +193,7 @@ func (entry *DcmDictEntry) GetUpperGroup() uint16 {
 
 /// returns upper limit for tag element
 func (entry *DcmDictEntry) GetUpperElement() uint16 {
-	return entry.upperKey.Element
+	return entry.upperKey.element
 }
 
 /// returns attribute tag as DcmTagKey object by value
@@ -213,7 +213,7 @@ func (entry *DcmDictEntry) IsRepeatingGroup() bool {
 
 /// returns true if entry is has a repeating element
 func (entry *DcmDictEntry) IsRepeatingElement() bool {
-	return (entry.Element != entry.GetUpperElement())
+	return (entry.element != entry.GetUpperElement())
 }
 
 /// returns true if entry is repeating (group or element)
@@ -276,17 +276,17 @@ func (entry *DcmDictEntry) Contains(key DcmTagKey, privCreator string) bool {
 		return false
 	} else if (entry.GetGroupRangeRestriction() == DcmDictRange_Odd) && dcm_is_even(key.group) {
 		return false
-	} else if (entry.GetElementRangeRestriction() == DcmDictRange_Even) && dcm_is_odd(key.Element) {
+	} else if (entry.GetElementRangeRestriction() == DcmDictRange_Even) && dcm_is_odd(key.element) {
 		return false
-	} else if (entry.GetElementRangeRestriction() == DcmDictRange_Odd) && dcm_is_even(key.Element) {
+	} else if (entry.GetElementRangeRestriction() == DcmDictRange_Odd) && dcm_is_even(key.element) {
 		return false
 	} else if !entry.PrivateCreatorMatch(privCreator) {
 		return false
 	} else {
 		groupMatches := dcm_inrange(key.group, entry.group, entry.GetUpperGroup())
-		found := groupMatches && dcm_inrange(key.Element, entry.Element, entry.GetUpperElement())
+		found := groupMatches && dcm_inrange(key.element, entry.element, entry.GetUpperElement())
 		if !found && groupMatches {
-			found = dcm_inrange(key.Element&0xFF, entry.Element, entry.GetUpperElement())
+			found = dcm_inrange(key.element&0xFF, entry.element, entry.GetUpperElement())
 		}
 		return found
 	}
@@ -308,7 +308,7 @@ func (entry *DcmDictEntry) ContainsTagName(name string) bool { /* this contains 
 func (entry *DcmDictEntry) Subset(e DcmDictEntry) bool { /* this is a subset of key */
 	return ((entry.group >= e.group) &&
 		(entry.GetUpperGroup() <= e.GetUpperGroup()) &&
-		(entry.Element >= e.Element) &&
+		(entry.element >= e.element) &&
 		(entry.GetUpperElement() <= e.GetUpperElement()) &&
 		entry.PrivateCreatorMatch(e.privateCreator))
 }
@@ -320,7 +320,7 @@ func (entry *DcmDictEntry) Subset(e DcmDictEntry) bool { /* this is a subset of 
 func (entry *DcmDictEntry) SetEQ(e DcmDictEntry) bool { /* this is set equal to key */
 	return ((entry.group == e.group) &&
 		(entry.GetUpperGroup() == e.GetUpperGroup()) &&
-		(entry.Element == e.Element) &&
+		(entry.element == e.element) &&
 		(entry.GetUpperElement() == e.GetUpperElement()) &&
 		(entry.GetGroupRangeRestriction() == e.GetGroupRangeRestriction()) &&
 		(entry.GetElementRangeRestriction() == e.GetElementRangeRestriction()) &&

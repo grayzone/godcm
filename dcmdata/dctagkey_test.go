@@ -5,13 +5,45 @@ import (
 	"testing"
 )
 
+func TestSetDcmTagKey(t *testing.T) {
+	var v DcmTagKey
+	v.Set(0x0001, 0x0001)
+	if v.group != 0x0001 {
+		t.Error("excepted 0x0001, got ", v.group)
+	}
+	if v.element != 0x0001 {
+		t.Error("excepted 0x0001, got ", v.element)
+	}
+
+}
+
 func TestNewDcmTagKey(t *testing.T) {
 	var v = NewDcmTagKey()
 	if v.group != 0xffff {
 		t.Error("excepted 0xffff, got ", v.group)
 	}
-	if v.Element != 0xffff {
-		t.Error("excepted 0xffff, got ", v.Element)
+	if v.element != 0xffff {
+		t.Error("excepted 0xffff, got ", v.element)
+	}
+}
+
+func TestHasValidGroup(t *testing.T) {
+	cases := []struct {
+		in   DcmTagKey
+		want bool
+	}{
+		{*NewDcmTagKey(), false},
+		{DcmTagKey{0x0001, 0x0001}, false},
+		{DcmTagKey{0x0003, 0x0001}, false},
+		{DcmTagKey{0x0005, 0x0001}, false},
+		{DcmTagKey{0x0007, 0x0001}, false},
+		{DcmTagKey{0x0009, 0x0001}, true},
+	}
+	for _, c := range cases {
+		got := c.in.HasValidGroup()
+		if got != c.want {
+			t.Errorf("%v HasValidGroup(), want %v got %v", c.in, c.want, got)
+		}
 	}
 }
 
@@ -32,12 +64,38 @@ func BenchmarkHasValidGroup(b *testing.B) {
 	}
 }
 
+func TestIsGroupLength(t *testing.T) {
+	cases := []struct {
+		in   DcmTagKey
+		want bool
+	}{
+		{*NewDcmTagKey(), false},
+		{DcmTagKey{0x0001, 0x0001}, false},
+		{DcmTagKey{0x0001, 0x0000}, false},
+		{DcmTagKey{0x0003, 0x0001}, false},
+		{DcmTagKey{0x0003, 0x0000}, false},
+		{DcmTagKey{0x0005, 0x0001}, false},
+		{DcmTagKey{0x0005, 0x0000}, false},
+		{DcmTagKey{0x0007, 0x0001}, false},
+		{DcmTagKey{0x0007, 0x0000}, false},
+		{DcmTagKey{0x0009, 0x0001}, false},
+		{DcmTagKey{0x0009, 0x0000}, true},
+	}
+	for _, c := range cases {
+		got := c.in.IsGroupLength()
+		if got != c.want {
+			t.Errorf("%v IsGroupLength(), want %v got %v", c.in, c.want, got)
+		}
+	}
+
+}
+
 func BenchmarkIsGroupLength(b *testing.B) {
 	for i := 0x0000; i <= 0xFFFF; i++ {
 		for j := 0x0000; j <= 0xFFFF; j++ {
 			var v DcmTagKey
 			v.group = uint16(i)
-			v.Element = uint16(j)
+			v.element = uint16(j)
 			if j == 0x0000 {
 				switch v.group {
 				case 1, 3, 5, 7, 0xFFFF:
@@ -67,6 +125,31 @@ func BenchmarkIsGroupLength(b *testing.B) {
 	}
 }
 
+func TestIsPrivate(t *testing.T) {
+	cases := []struct {
+		in   DcmTagKey
+		want bool
+	}{
+		{*NewDcmTagKey(), false},
+		{DcmTagKey{0x0001, 0x0001}, false},
+		{DcmTagKey{0x0002, 0x0001}, false},
+		{DcmTagKey{0x0003, 0x0001}, false},
+		{DcmTagKey{0x0004, 0x0001}, false},
+		{DcmTagKey{0x0005, 0x0001}, false},
+		{DcmTagKey{0x0006, 0x0001}, false},
+		{DcmTagKey{0x0007, 0x0001}, false},
+		{DcmTagKey{0x0008, 0x0001}, false},
+		{DcmTagKey{0x0009, 0x0001}, true},
+	}
+	for _, c := range cases {
+		got := c.in.IsPrivate()
+		if got != c.want {
+			t.Errorf("%v IsPrivate(), want %v got %v", c.in, c.want, got)
+		}
+	}
+
+}
+
 func BenchmarkIsPrivate(b *testing.B) {
 	for i := 0x0000; i <= 0xFFFF; i++ {
 		var v DcmTagKey
@@ -92,11 +175,37 @@ func BenchmarkIsPrivate(b *testing.B) {
 	}
 }
 
+func TestIsPrivateReservation(t *testing.T) {
+	cases := []struct {
+		in   DcmTagKey
+		want bool
+	}{
+		{*NewDcmTagKey(), false},
+		{DcmTagKey{0x0001, 0x0001}, false},
+		{DcmTagKey{0x0002, 0x0001}, false},
+		{DcmTagKey{0x0003, 0x0001}, false},
+		{DcmTagKey{0x0004, 0x0001}, false},
+		{DcmTagKey{0x0005, 0x0001}, false},
+		{DcmTagKey{0x0006, 0x0001}, false},
+		{DcmTagKey{0x0007, 0x0001}, false},
+		{DcmTagKey{0x0008, 0x0001}, false},
+		{DcmTagKey{0x0009, 0x0001}, false},
+		{DcmTagKey{0x0009, 0x0011}, true},
+	}
+	for _, c := range cases {
+		got := c.in.IsPrivateReservation()
+		if got != c.want {
+			t.Errorf("%v IsPrivateReservation(), want %v got %v", c.in, c.want, got)
+		}
+	}
+
+}
+
 func BenchmarkIsPrivateReservation(b *testing.B) {
 	for i := 0x0000; i <= 0xFFFF; i++ {
 		for j := 0x0000; j <= 0xFFFF; j++ {
 			v := DcmTagKey{uint16(i), uint16(j)}
-			if v.Element >= 0x0010 && v.Element <= 0x00FF {
+			if v.element >= 0x0010 && v.element <= 0x00FF {
 				switch v.group {
 				case 1, 3, 5, 7, 0xFFFF:
 					if v.IsPrivateReservation() != false {
@@ -155,9 +264,42 @@ func TestToString(t *testing.T) {
 		t.Error("excepted (????,????), got ", v.ToString())
 	}
 	v.group = 0x001F
-	v.Element = 0x002F
+	v.element = 0x002F
 	if strings.ToUpper(v.ToString()) != "(001F,002F)" {
 		t.Error("excepted (001F,002F), got ", v.ToString())
+	}
+}
+
+func TestIsSignableTag(t *testing.T) {
+	cases := []struct {
+		in   DcmTagKey
+		want bool
+	}{
+		{*NewDcmTagKey(), true},
+		{DcmTagKey{0x0001, 0x0001}, false},
+		{DcmTagKey{0x0002, 0x0001}, false},
+		{DcmTagKey{0x0003, 0x0001}, false},
+		{DcmTagKey{0x0004, 0x0001}, false},
+		{DcmTagKey{0x0005, 0x0001}, false},
+		{DcmTagKey{0x0006, 0x0001}, false},
+		{DcmTagKey{0x0007, 0x0001}, false},
+		{DcmTagKey{0x0008, 0x0001}, false},
+		{DcmTagKey{0x0009, 0x0001}, true},
+		{DcmTagKey{0x0009, 0x0011}, true},
+		{DcmTagKey{0xFFFA, 0x0011}, false},
+		{DcmTagKey{0x4ffe, 0x0011}, true},
+		{DcmTagKey{0x4ffe, 0x0001}, false},
+		{DcmTagKey{0xfffc, 0xfffc}, false},
+		{DcmTagKey{0xfffc, 0x0001}, true},
+		{DcmTagKey{0xFFFe, 0xe00d}, false},
+		{DcmTagKey{0xFFFe, 0xe0dd}, false},
+		{DcmTagKey{0xFFFe, 0x0001}, true},
+	}
+	for _, c := range cases {
+		got := c.in.IsSignableTag()
+		if got != c.want {
+			t.Errorf("%v IsSignableTag(), want %v got %v", c.in, c.want, got)
+		}
 	}
 }
 
@@ -166,11 +308,11 @@ func BenchmarkIsSignableTag(b *testing.B) {
 		for j := 0x0000; j <= 0xFFFF; j++ {
 			v := DcmTagKey{uint16(i), uint16(j)}
 
-			if v.Element == 0x0000 {
+			if v.element == 0x0000 {
 				if v.IsSignableTag() != false {
 					b.Error(v, "excepted false, got ", v.IsSignableTag())
 				}
-			} else if (v.group == 0x0008) && (v.Element == 0x0001) {
+			} else if (v.group == 0x0008) && (v.element == 0x0001) {
 				if v.IsSignableTag() != false {
 					b.Error(v, "excepted false, got ", v.IsSignableTag())
 				}
@@ -182,15 +324,15 @@ func BenchmarkIsSignableTag(b *testing.B) {
 				if v.IsSignableTag() != false {
 					b.Error(v, "excepted false, got ", v.IsSignableTag())
 				}
-			} else if (v.group == 0x4FFE) && (v.Element == 0x0001) {
+			} else if (v.group == 0x4FFE) && (v.element == 0x0001) {
 				if v.IsSignableTag() != false {
 					b.Error(v, "excepted false, got ", v.IsSignableTag())
 				}
-			} else if (v.group == 0xFFFC) && (v.Element == 0xFFFC) {
+			} else if (v.group == 0xFFFC) && (v.element == 0xFFFC) {
 				if v.IsSignableTag() != false {
 					b.Error(v, "excepted false, got ", v.IsSignableTag())
 				}
-			} else if (v.group == 0xFFFE) && ((v.Element == 0xE00D) || (v.Element == 0xE0DD)) {
+			} else if (v.group == 0xFFFE) && ((v.element == 0xE00D) || (v.element == 0xE0DD)) {
 				if v.IsSignableTag() != false {
 					b.Error(v, "excepted false, got ", v.IsSignableTag())
 				}

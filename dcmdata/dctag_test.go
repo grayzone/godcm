@@ -6,6 +6,27 @@ import (
 	"github.com/grayzone/godcm/ofstd"
 )
 
+func TestNewDcmTag(t *testing.T) {
+	cases := []struct {
+		want *DcmTag
+	}{
+		{&DcmTag{DcmVR: DcmVR{vr: EVR_UNKNOWN}, errorFlag: EC_InvalidTag}},
+	}
+	for _, c := range cases {
+		got := NewDcmTag()
+		if (got.vr != c.want.vr) || (got.errorFlag.Text() != c.want.errorFlag.Text()) {
+			t.Errorf("NewDcmTag() == want %v got %v", c.want, got)
+		}
+	}
+}
+
+func TestNewDcmTagWithGEV(t *testing.T) {
+	//	in_g uint16
+	//	in_e uint16
+	//	in_vr DcmVR
+
+}
+
 func TestDcmTagSetVR(t *testing.T) {
 	cases := []struct {
 		in        DcmVR

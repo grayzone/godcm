@@ -79,7 +79,7 @@ func (tag *DcmTag) GetGTag() uint16 {
  *  @return tag element
  */
 func (tag *DcmTag) GetETag() uint16 {
-	return tag.DcmTagKey.Element
+	return tag.DcmTagKey.element
 }
 
 /** returns a copy of the tag key by value

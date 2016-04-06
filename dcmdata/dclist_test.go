@@ -11,7 +11,7 @@ func TestEmpty(t *testing.T) {
 
 	for _, c := range cases {
 		var l DcmList
-		t.Log(l)
+		//		t.Log(l)
 		got := l.Empty()
 		if got != c.want {
 			t.Errorf("Empty(), want '%v' got '%v'", c.want, got)
