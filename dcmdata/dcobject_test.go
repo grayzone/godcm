@@ -99,3 +99,97 @@ func TestDcmObjectTransferEnd(t *testing.T) {
 		}
 	}
 }
+
+func TestDcmObjectContainsUnknownVR(t *testing.T) {
+	cases := []struct {
+		in   DcmObject
+		want bool
+	}{
+		{DcmObject{tag: *NewDcmTag()}, true},
+	}
+	for _, c := range cases {
+		got := c.in.ContainsUnknownVR()
+		if got != c.want {
+			t.Errorf("ContainsUnknownVR() == want %v got %v", c.want, got)
+		}
+	}
+}
+
+func TestDcmObjectIsEmpty(t *testing.T) {
+	cases := []struct {
+		in   bool
+		want bool
+	}{
+		{true, true},
+		{false, true},
+	}
+	for _, c := range cases {
+		var obj DcmObject
+		got := obj.IsEmpty(c.in)
+		if got != c.want {
+			t.Errorf("IsEmpty() == want %v got %v", c.want, got)
+		}
+	}
+}
+
+func TestDcmObjectIsLeaf(t *testing.T) {
+	cases := []struct {
+		in   DcmObject
+		want bool
+	}{
+		{DcmObject{tag: *NewDcmTag()}, false},
+	}
+	for _, c := range cases {
+		got := c.in.IsLeaf()
+		if got != c.want {
+			t.Errorf("IsLeaf() == want %v got %v", c.want, got)
+		}
+	}
+}
+
+func TestDcmObjectGetLengthField(t *testing.T) {
+	cases := []struct {
+		in   DcmObject
+		want uint32
+	}{
+		{DcmObject{tag: *NewDcmTag()}, 0},
+	}
+	for _, c := range cases {
+		got := c.in.GetLengthField()
+		if got != c.want {
+			t.Errorf("GetLengthField() == want %v got %v", c.want, got)
+		}
+	}
+}
+
+func TestDcmObjectCalcElementLength(t *testing.T) {
+	cases := []struct {
+		in_1 E_TransferSyntax
+		in_2 E_EncodingType
+		want uint32
+	}{
+		{EXS_Unknown, EET_ExplicitLength, 0},
+	}
+	for _, c := range cases {
+		var obj DcmObject
+		got := obj.CalcElementLength(c.in_1, c.in_2)
+		if got != c.want {
+			t.Errorf("CalcElementLength() == want %v got %v", c.want, got)
+		}
+	}
+}
+
+func TestDcmObjectIdent(t *testing.T) {
+	cases := []struct {
+		in   DcmObject
+		want DcmEVR
+	}{
+		{DcmObject{tag: *NewDcmTag()}, EVR_UNKNOWN},
+	}
+	for _, c := range cases {
+		got := c.in.Ident()
+		if got != c.want {
+			t.Errorf("Ident() == want %v got %v", c.want, got)
+		}
+	}
+}
