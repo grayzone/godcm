@@ -21,9 +21,21 @@ func TestNewDcmTag(t *testing.T) {
 }
 
 func TestNewDcmTagWithGEV(t *testing.T) {
-	//	in_g uint16
-	//	in_e uint16
-	//	in_vr DcmVR
+
+	cases := []struct {
+		in_g  uint16
+		in_e  uint16
+		in_vr DcmVR
+		want  *DcmTag
+	}{
+		{0x0001, 0x0001, DcmVR{vr: EVR_AE}, &DcmTag{DcmTagKey: DcmTagKey{group: 0x0001, element: 0x0001}, DcmVR: DcmVR{vr: EVR_AE}, errorFlag: ofstd.EC_Normal}},
+	}
+	for _, c := range cases {
+		got := NewDcmTagWithGEV(c.in_g, c.in_e, c.in_vr)
+		if (got.group != c.want.group) || (got.element != c.want.element) || (got.vr != c.want.vr) || (got.errorFlag.Text() != c.want.errorFlag.Text()) {
+			t.Errorf("NewDcmTagWithGEV() == want %v got %v", c.want, got)
+		}
+	}
 
 }
 
@@ -172,4 +184,23 @@ func TestIsSignable(t *testing.T) {
 			t.Errorf("%v IsSignable()== %v, want %v ", c.in, got, c.want)
 		}
 	}
+}
+
+func TestIsUnknownVR(t *testing.T) {
+	cases := []struct {
+		in   DcmTag
+		want bool
+	}{
+		{DcmTag{DcmVR: DcmVR{vr: EVR_AE}}, false},
+		{DcmTag{DcmVR: DcmVR{vr: EVR_UNKNOWN}}, true},
+		{DcmTag{DcmVR: DcmVR{vr: EVR_UNKNOWN2B}}, true},
+		{DcmTag{DcmVR: DcmVR{vr: EVR_UN}}, true},
+	}
+	for _, c := range cases {
+		got := c.in.IsUnknownVR()
+		if got != c.want {
+			t.Errorf("%v IsUnknownVR()== %v, want %v ", c.in, got, c.want)
+		}
+	}
+
 }

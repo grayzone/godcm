@@ -43,7 +43,6 @@ func NewDcmTagWithGEV(g uint16, e uint16, avr DcmVR) *DcmTag {
 
 	tag.errorFlag = ofstd.EC_Normal
 	return &tag
-
 }
 
 /// set specific VR
