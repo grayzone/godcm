@@ -15,8 +15,8 @@ type DcmListNode struct {
 	objNodeValue *DcmObject
 }
 
-func NewDcmListNode(obj DcmObject) *DcmListNode {
-	return &DcmListNode{nil, nil, &obj}
+func NewDcmListNode(obj *DcmObject) *DcmListNode {
+	return &DcmListNode{nil, nil, obj}
 }
 
 /// return pointer to object maintained by this list node
@@ -85,11 +85,11 @@ func (l *DcmList) Card() uint32 {
 func (dl *DcmList) Append(obj *DcmObject) *DcmObject {
 	if obj != nil {
 		if dl.Empty() { // list is empty !
-			dl.currentNode = NewDcmListNode(*obj)
+			dl.currentNode = NewDcmListNode(obj)
 			dl.firstNode = dl.currentNode
 			dl.lastNode = dl.currentNode
 		} else {
-			node := NewDcmListNode(*obj)
+			node := NewDcmListNode(obj)
 			node.nextNode = dl.firstNode
 			dl.firstNode.prevNode = node
 			dl.currentNode = node
@@ -107,11 +107,11 @@ func (dl *DcmList) Append(obj *DcmObject) *DcmObject {
 func (dl *DcmList) Prepend(obj *DcmObject) *DcmObject {
 	if obj != nil {
 		if dl.Empty() { // list is empty !
-			dl.currentNode = NewDcmListNode(*obj)
+			dl.currentNode = NewDcmListNode(obj)
 			dl.firstNode = dl.currentNode
 			dl.lastNode = dl.currentNode
 		} else {
-			node := NewDcmListNode(*obj)
+			node := NewDcmListNode(obj)
 			node.nextNode = dl.firstNode
 			dl.firstNode.prevNode = node
 			dl.currentNode = node
@@ -131,7 +131,7 @@ func (dl *DcmList) Prepend(obj *DcmObject) *DcmObject {
 func (dl *DcmList) Insert(obj *DcmObject, pos E_ListPos) *DcmObject {
 	if obj != nil {
 		if dl.Empty() { // list is empty !
-			dl.currentNode = NewDcmListNode(*obj)
+			dl.currentNode = NewDcmListNode(obj)
 			dl.firstNode = dl.currentNode
 			dl.lastNode = dl.currentNode
 			dl.cardinality = dl.cardinality + 1
@@ -145,7 +145,7 @@ func (dl *DcmList) Insert(obj *DcmObject, pos E_ListPos) *DcmObject {
 				// there are successors to be determined
 				dl.Append(obj) // cardinality++;
 			} else if pos == ELP_prev { // insert before current node
-				node := NewDcmListNode(*obj)
+				node := NewDcmListNode(obj)
 				if dl.currentNode.prevNode == nil {
 					dl.firstNode = node // insert at the beginning
 				} else {
@@ -158,7 +158,7 @@ func (dl *DcmList) Insert(obj *DcmObject, pos E_ListPos) *DcmObject {
 				dl.cardinality = dl.cardinality + 1
 			} else { //( pos==ELP_next || pos==ELP_atpos )
 				// insert after current node
-				node := NewDcmListNode(*obj)
+				node := NewDcmListNode(obj)
 				if dl.currentNode.nextNode == nil {
 					dl.lastNode = node // append to the end
 				} else {

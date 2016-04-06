@@ -24,6 +24,7 @@ func NewDcmTag() *DcmTag {
 	var tag DcmTag
 	tag.vr = EVR_UNKNOWN
 	tag.errorFlag = EC_InvalidTag
+	tag.DcmTagKey = *NewDcmTagKey()
 	return &tag
 }
 
@@ -75,14 +76,14 @@ func (tag *DcmTag) GetVRName() string {
  *  @return tag group
  */
 func (tag *DcmTag) GetGTag() uint16 {
-	return tag.DcmTagKey.group
+	return tag.group
 }
 
 /** returns tag element
  *  @return tag element
  */
 func (tag *DcmTag) GetETag() uint16 {
-	return tag.DcmTagKey.element
+	return tag.element
 }
 
 /** returns a copy of the tag key by value

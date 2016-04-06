@@ -198,14 +198,14 @@ func (item *DcmItem) ComputeGroupLengthAndPadding(glenc E_GrpLenEncoding,
 				/*  (ii) the caller specified that we want to add or remove padding elements and the current */
 				/*      element's tag shows that it is a padding element (tag is (0xfffc,0xfffc) */
 				/* then we want to delete the current (group length or padding) element */
-				if ((glenc == EGL_withGL || glenc == EGL_withoutGL) && do.GetETag() == 0x0000) || ((padenc != EPD_noChange) && (do.GetTag().DcmTagKey == DCM_DataSetTrailingPadding)) {
+				if ((glenc == EGL_withGL || glenc == EGL_withoutGL) && do.tag.element == 0x0000) || ((padenc != EPD_noChange) && (do.tag.DcmTagKey == DCM_DataSetTrailingPadding)) {
 					seekmode = ELP_atpos // remove advances 1 element forward -> make next seek() work
 				} else if (glenc == EGL_withGL) || (glenc == EGL_recalcGL) {
 					/* if the above mentioned conditions are not met but the caller specified that we want to add group */
 					/* length tags for every group or that we want to recalculate values for existing group length tags */
 
 					/* we need to determine the current element's group number */
-					actGrp = do.GetGTag()
+					actGrp = do.tag.group
 
 					/* and if the group number is different from the last remembered group number or */
 					/* if this id the very first element that is treated then we've found a new group */
@@ -217,7 +217,7 @@ func (item *DcmItem) ComputeGroupLengthAndPadding(glenc E_GrpLenEncoding,
 						/* if the current element is a group length element and its data type */
 						/* is not UL replace this element with one that has a UL datatype since */
 						/* group length elements are supposed to have this data type */
-						if (do.GetETag() == 0x0000) && (do.Ident() != EVR_UL) {
+						if (do.tag.element == 0x0000) && (do.Ident() != EVR_UL) {
 							item.elementList.Remove()
 							vr := NewDcmVR(EVR_UL)
 							tagUL := NewDcmTagWithGEV(actGrp, 0x0000, *vr)

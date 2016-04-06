@@ -192,74 +192,11 @@ func (o *DcmObject) TransferEnd() {
 	o.fTransferState = ERW_notInitialized
 }
 
-/** return the group number of the attribute tag for this object
- *  @return group number of the attribute tag for this object
- */
-func (o *DcmObject) GetGTag() uint16 {
-	return o.tag.GetGTag()
-}
-
-/** return the element number of the attribute tag for this object
- *  @return element number of the attribute tag for this object
- */
-func (o *DcmObject) GetETag() uint16 {
-	return o.tag.GetETag()
-}
-
-/** return const reference to the attribute tag for this object
- *  @return const reference to the attribute tag for this object
- */
-func (o *DcmObject) GetTag() DcmTag {
-	return o.tag
-}
-
-/** assign group tag (but not element tag) of the attribute tag for this object.
- *  This is sometimes useful when creating repeating group elements.
- *  @param gtag new attribute group tag
- */
-func (o *DcmObject) SetGTag(g uint16) {
-	o.tag.group = g
-}
-
-/** assign a new Value Representation (VR) to this object. This operation
- *  is only supported for very few subclasses derived from this class,
- *  in particular for classes handling pixel data which may either be
- *  of OB or OW value representation.
- *  @param vr value representation
- *  @return EC_Normal if successful, an error code otherwise
- */
-func (o *DcmObject) SetVR(vr DcmEVR) ofstd.OFCondition {
-	return EC_IllegalCall
-
-}
-
-/** returns true if the current object may be included in a digital signature
- *  @return true if signable, false otherwise
- */
-func (o *DcmObject) IsSignable() bool {
-	return o.tag.IsSignable()
-}
-
 /** returns true if the object contains an element with Unknown VR at any nesting level
  *  @return true if the object contains an element with Unknown VR, false otherwise
  */
 func (o *DcmObject) ContainsUnknownVR() bool {
 	return o.tag.IsUnknownVR()
-}
-
-/** check if this object contains non-ASCII characters
- *  @param checkAllStrings not used in this class
- *  @return always returns false, i.e. no extended characters used
- */
-func (o *DcmObject) ContainsExtendedCharacters(checkAllStrings bool) bool {
-	return false
-}
-
-/** check if this object is affected by SpecificCharacterSet
- *  @return always returns false, i.e. not affected by SpecificCharacterSet
- */
-func (o *DcmObject) IsAffectedBySpecificCharacterSet() bool {
-	return false
 }
 
 /** check if this object is empty

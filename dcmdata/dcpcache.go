@@ -45,7 +45,7 @@ type DcmPrivateTagCache struct {
  *  Otherwise, the cache remains unmodified.
  */
 func (cache *DcmPrivateTagCache) UpdateCache(obj DcmObject) {
-	tag := obj.GetTag()
+	tag := obj.tag
 	if obj.IsLeaf() && ((tag.GetGTag() & 1) == 1) && (tag.GetETag() <= 0xFF) && (tag.GetETag() >= 0x10) {
 		var elem DcmElement
 		elem.DcmObject = obj
