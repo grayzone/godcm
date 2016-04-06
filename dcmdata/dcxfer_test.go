@@ -108,3 +108,58 @@ func TestIsExplicitVR(t *testing.T) {
 	}
 
 }
+
+func TestSizeofTagHeader(t *testing.T) {
+	cases := []struct {
+		base E_TransferSyntax
+		in   DcmEVR
+		want uint32
+	}{
+		{EXS_LittleEndianImplicit, EVR_AE, 8},
+		{EXS_BigEndianExplicit, EVR_AE, 8},
+		{EXS_BigEndianExplicit, EVR_UT, 12},
+
+		/*
+			{EXS_BigEndianImplicit, false},
+			{EXS_LittleEndianExplicit, true},
+			{EXS_BigEndianExplicit, true},
+			{EXS_JPEGProcess1TransferSyntax, true},
+			{EXS_JPEGProcess2_4TransferSyntax, true},
+			{EXS_JPEGProcess3_5TransferSyntax, true},
+			{EXS_JPEGProcess6_8TransferSyntax, true},
+			{EXS_JPEGProcess7_9TransferSyntax, true},
+			{EXS_JPEGProcess10_12TransferSyntax, true},
+			{EXS_JPEGProcess11_13TransferSyntax, true},
+			{EXS_JPEGProcess14TransferSyntax, true},
+			{EXS_JPEGProcess15TransferSyntax, true},
+			{EXS_JPEGProcess16_18TransferSyntax, true},
+			{EXS_JPEGProcess17_19TransferSyntax, true},
+			{EXS_JPEGProcess20_22TransferSyntax, true},
+			{EXS_JPEGProcess21_23TransferSyntax, true},
+			{EXS_JPEGProcess24_26TransferSyntax, true},
+			{EXS_JPEGProcess25_27TransferSyntax, true},
+			{EXS_JPEGProcess28TransferSyntax, true},
+			{EXS_JPEGProcess29TransferSyntax, true},
+			{EXS_JPEGProcess14SV1TransferSyntax, true},
+			{EXS_RLELossless, true},
+			{EXS_JPEGLSLossless, true},
+			{EXS_JPEGLSLossy, true},
+			{EXS_DeflatedLittleEndianExplicit, true},
+			{EXS_JPEG2000osslessOnly, true},
+			{EXS_JPEG2000, true},
+			{EXS_MPEG2MainProfileAtMainLevel, true},
+			{EXS_MPEG2MainProfileAtHighLevel, true},
+			{EXS_JPEG2000MulticomponentLosslessOnly, true},
+			{EXS_JPEG2000Multicomponent, true},
+			{EXS_JPIPReferenced, true},
+			{EXS_JPIPReferencedDeflate, true},
+		*/
+	}
+	for _, c := range cases {
+		got := NewDcmXfer(c.base).SizeofTagHeader(c.in)
+		if got != c.want {
+			t.Errorf("%v SizeofTagHeader(%v), want %v got %v", c.base, c.in, c.want, got)
+		}
+	}
+
+}

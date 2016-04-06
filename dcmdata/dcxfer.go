@@ -582,20 +582,15 @@ func (xfer *DcmXfer) IsExplicitVR() bool {
 }
 
 func (xfer *DcmXfer) SizeofTagHeader(evr DcmEVR) uint32 {
-	var result uint32
-	if xfer.IsExplicitVR() {
-		// some VRs have an extended format
-		var vr DcmVR
-		vr.SetVR(evr)
-		if vr.UsesExtendedLengthEncoding() {
-			result = 12 // for Tag, Length, VR und reserved
-		} else {
-			result = 8 // for Tag, Length und VR
-		}
-
-	} else {
-		// all implicit VRs have the same format
-		result = 8 // for Tag und Length
+	// all implicit VRs have the same format
+	if !xfer.IsExplicitVR() {
+		return 8 // for Tag und Length
 	}
-	return result
+	// some VRs have an extended format
+	var vr DcmVR
+	vr.SetVR(evr)
+	if vr.UsesExtendedLengthEncoding() {
+		return 12 // for Tag, Length, VR und reserved
+	}
+	return 8 // for Tag, Length und VR
 }
