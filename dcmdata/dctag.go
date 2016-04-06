@@ -36,10 +36,14 @@ func NewDcmTag() *DcmTag {
  */
 func NewDcmTagWithGEV(g uint16, e uint16, avr DcmVR) *DcmTag {
 	var tag DcmTag
-	tag.Set(g, e)
+
+	tag.group = g
+	tag.element = e
 	tag.DcmVR = avr
+
 	tag.errorFlag = ofstd.EC_Normal
 	return &tag
+
 }
 
 /// set specific VR
@@ -104,33 +108,6 @@ func (tag *DcmTag) GetTagName() string {
 	return result
 }
 
-/** returns the current private creator string for this object
- *  if any, NULL otherwise.
- *  @return creator code if present, NULL otherwise
- */
-func (tag *DcmTag) GetPrivateCreator() string {
-	return tag.privateCreator
-}
-
-/** assigns a private creator code and deletes a possibly
- *  cached attribute name since the attribute name could
- *  change if a different private creator code is used.
- *  @param privCreator private creator code, may be NULL
- */
-func (tag *DcmTag) SetPrivateCreator(privCreator string) {
-	tag.privateCreator = privCreator
-}
-
-/** performs a look-up of the VR for the current tag key in the dictionary,
- *  under consideration of the private creator (if defined).
- *  If a dictionary entry is found, the VR of this object is copied
- *  from the dictionary entry, otherwise the VR remains unmodified.
- */
-func (tag *DcmTag) LookupVRinDictionary() {
-	// to be continued
-
-}
-
 /** returns true if a data element with the given tag and VR
  *  can be digitally signed, false otherwise
  *  @return true if signable, false otherwise
@@ -156,11 +133,6 @@ func (tag *DcmTag) IsUnknownVR() bool {
 	return result
 }
 
-/// returns current status flag
-func (tag *DcmTag) Error() ofstd.OFCondition {
-	return tag.errorFlag
-}
-
 /** convert the given string to a DICOM tag value
  *  @param name name or tag of the attribute to be searched for.
  *    If the name of the attribute is given the spelling has to be consistent
@@ -172,9 +144,3 @@ func (tag *DcmTag) Error() ofstd.OFCondition {
  *    remains unchanged.
  *  @return status, EC_Normal upon success, an error code otherwise
  */
-
-func (tag *DcmTag) FindTagFromName(name string) ofstd.OFCondition {
-	result := ofstd.EC_IllegalParameter
-	// to be continued
-	return result
-}

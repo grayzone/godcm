@@ -153,7 +153,23 @@ func TestGetTagName(t *testing.T) {
 	for _, c := range cases {
 		got := c.in.GetTagName()
 		if got != c.want {
-			t.Errorf("GetTagName()== %q, want %q ", got, c.want)
+			t.Errorf("GetTagName()== %v, want %v ", got, c.want)
+		}
+	}
+}
+
+func TestIsSignable(t *testing.T) {
+	cases := []struct {
+		in   DcmTag
+		want bool
+	}{
+		{DcmTag{DcmTagKey: DcmTagKey{0x0010, 0x001F}}, true},
+		{DcmTag{DcmTagKey: DcmTagKey{0xFFFF, 0x0010}}, true},
+	}
+	for _, c := range cases {
+		got := c.in.IsSignable()
+		if got != c.want {
+			t.Errorf("%v IsSignable()== %v, want %v ", c.in, got, c.want)
 		}
 	}
 }

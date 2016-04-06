@@ -276,6 +276,7 @@ func TestIsSignableTag(t *testing.T) {
 		want bool
 	}{
 		{*NewDcmTagKey(), true},
+		{DcmTagKey{0x0001, 0x0000}, false},
 		{DcmTagKey{0x0001, 0x0001}, false},
 		{DcmTagKey{0x0002, 0x0001}, false},
 		{DcmTagKey{0x0003, 0x0001}, false},
