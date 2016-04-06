@@ -129,7 +129,6 @@ func (bo E_ByteOrder) String() string {
 		result = "EBO_LittleEndian"
 	case EBO_BigEndian:
 		result = "EBO_BigEndian"
-	default:
 	}
 	return result
 }
