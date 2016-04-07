@@ -18,6 +18,3 @@ func NewDcmMetaInfo() *DcmMetaInfo {
 
 	return &mi
 }
-
-func (mi *DcmMetaInfo) Read(instream []byte) {
-}

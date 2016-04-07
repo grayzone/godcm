@@ -76,11 +76,3 @@ func (e *DcmElement) CalcElementLength(xfer E_TransferSyntax, enctype E_Encoding
 		return headerLength + elemLength
 	}
 }
-
-/** replace the element value by a copy of the given raw data block
- *  @param value new attribute value
- *  @param length length of new attribute value in bytes
- *  @return EC_Normal upon success, an error code otherwise
- */
-
-func (e *DcmElement)PutValue(interface{}, )
