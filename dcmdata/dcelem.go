@@ -1,8 +1,6 @@
 package dcmdata
 
 import (
-	"C"
-
 	"github.com/grayzone/godcm/ofstd"
 )
 
