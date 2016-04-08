@@ -40,7 +40,15 @@ func NewDcmElement(tag DcmTag, l uint32) *DcmElement {
 
 }
 
-func (e *DcmElement) GetString(val *string) ofstd.OFCondition { // for strings
+/** get a pointer to the element value of the current element as type string.
+ *  Requires element to be of corresponding VR, otherwise an error is returned.
+ *  This method does not copy, but returns a pointer to the element value,
+ *  which remains under control of this object and is valid only until the next
+ *  read, write or put operation.
+ *  @param val pointer to value returned in this parameter upon success
+ *  @return EC_Normal upon success, an error code otherwise
+ */
+func (e *DcmElement) GetString(val string) ofstd.OFCondition { // for strings
 	e.errorFlag = EC_IllegalCall
 	return e.errorFlag
 }
@@ -53,7 +61,8 @@ func (e *DcmElement) GetString(val *string) ofstd.OFCondition { // for strings
  *  @return value length of DICOM element
  */
 func (e *DcmElement) GetLength(xfer E_TransferSyntax, enctype E_EncodingType) uint32 {
-	return e.GetLengthField()
+
+	return e.length
 }
 
 /** calculate the length of this DICOM element when encoded with the
@@ -68,7 +77,13 @@ func (e *DcmElement) GetLength(xfer E_TransferSyntax, enctype E_EncodingType) ui
  */
 func (e *DcmElement) CalcElementLength(xfer E_TransferSyntax, enctype E_EncodingType) uint32 {
 	xferSyn := NewDcmXfer(xfer)
-	headerLength := xferSyn.SizeofTagHeader(e.GetVR())
+	vr := e.GetVR()
+	if (vr == EVR_UNKNOWN2B) || (vr == EVR_na) {
+		vr = EVR_UN
+	}
+
+	headerLength := xferSyn.SizeofTagHeader(vr)
+
 	elemLength := e.GetLength(xfer, enctype)
 	if ofstd.Check32BitAddOverflow(headerLength, elemLength) {
 		return DCM_UndefinedLength

@@ -50,7 +50,7 @@ func (cache *DcmPrivateTagCache) UpdateCache(obj DcmObject) {
 		var elem DcmElement
 		elem.DcmObject = obj
 		var c string
-		status := elem.GetString(&c)
+		status := elem.GetString(c)
 		if status.Good() {
 			entry := DcmPrivateTagCacheEntry{tag.GetXTag(), c}
 			cache.list = append(cache.list, entry)
