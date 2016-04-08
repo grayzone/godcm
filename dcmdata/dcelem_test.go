@@ -56,15 +56,17 @@ func TestDcmElementGetLength(t *testing.T) {
 
 func TestDcmElementCalcElementLength(t *testing.T) {
 	cases := []struct {
+		in_0 DcmElement
 		in_1 E_TransferSyntax
 		in_2 E_EncodingType
 		want uint32
 	}{
-		{EXS_LittleEndianImplicit, EET_UndefinedLength, 8},
+		{DcmElement{}, EXS_LittleEndianImplicit, EET_UndefinedLength, 8},
+		{DcmElement{DcmObject: DcmObject{tag: DcmTag{DcmVR: DcmVR{EVR_UNKNOWN2B}}}}, EXS_LittleEndianImplicit, EET_UndefinedLength, 8},
+		{DcmElement{DcmObject: DcmObject{tag: DcmTag{DcmVR: DcmVR{EVR_na}}}}, EXS_LittleEndianImplicit, EET_UndefinedLength, 8},
 	}
 	for _, c := range cases {
-		var e DcmElement
-		got := e.CalcElementLength(c.in_1, c.in_2)
+		got := c.in_0.CalcElementLength(c.in_1, c.in_2)
 		if got != c.want {
 			t.Errorf("CalcElementLength() == want %v got %v", c.want, got)
 		}
