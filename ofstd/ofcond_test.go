@@ -10,6 +10,8 @@ func TestOfstdString(t *testing.T) {
 		want string
 	}{
 		{OF_ok, "OF_ok"},
+		{OF_error, "OF_error"},
+		{OF_failure, "OF_failure"},
 	}
 	for _, c := range cases {
 		got := c.in.String()

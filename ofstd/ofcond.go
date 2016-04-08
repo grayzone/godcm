@@ -14,15 +14,16 @@ const (
 )
 
 func (s OFStatus) String() string {
+	var result string
 	switch s {
 	case OF_ok:
-		return "OF_ok"
+		result = "OF_ok"
 	case OF_error:
-		return "OF_error"
+		result = "OF_error"
 	case OF_failure:
-		return "OF_failure"
+		result = "OF_failure"
 	}
-	return ""
+	return result
 }
 
 type OFCondition struct {
