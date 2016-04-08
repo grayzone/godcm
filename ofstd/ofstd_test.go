@@ -15,7 +15,7 @@ func TestCheck32BitAddOverflow(t *testing.T) {
 	for _, c := range cases {
 		got := Check32BitAddOverflow(c.in_1, c.in_2)
 		if got != c.want {
-			t.Errorf("Check32BitAddOverflow(), want %q got %q", c.want, got)
+			t.Errorf("Check32BitAddOverflow(), want %v got %v", c.want, got)
 		}
 	}
 }
