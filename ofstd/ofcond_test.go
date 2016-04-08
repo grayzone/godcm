@@ -4,7 +4,7 @@ import (
 	"testing"
 )
 
-func TestofstdString(t *testing.T) {
+func TestOfstdString(t *testing.T) {
 	cases := []struct {
 		in   OFStatus
 		want string
