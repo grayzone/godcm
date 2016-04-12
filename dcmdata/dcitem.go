@@ -8,7 +8,13 @@ import (
 
 type DcmItem struct {
 	DcmObject
-	elementList *DcmList
+	elementList         *DcmList
+	lastElementComplete bool
+	fStartPosition      int
+}
+
+func NewDcmItem(tag DcmTag, len uint32) *DcmItem {
+	return &DcmItem{*NewDcmObject(tag, len), nil, true, 0}
 }
 
 /** Virtual object copying. This method can be used for DcmObject

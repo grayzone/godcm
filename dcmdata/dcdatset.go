@@ -15,6 +15,20 @@ type DcmDataset struct {
 
 }
 
+func NewDcmDataset() *DcmDataset {
+	var result DcmDataset
+	result.DcmItem = *NewDcmItem(DCM_ItemTag, DCM_UndefinedLength)
+	result.OriginalXfer = EXS_Unknown
+
+	// the default transfer syntax is explicit VR with local endianness
+	if GLocalByteOrder == EBO_BigEndian {
+		result.CurrentXfer = EXS_BigEndianExplicit
+	} else {
+		result.CurrentXfer = EXS_LittleEndianExplicit
+	}
+	return &result
+}
+
 /** load object from a DICOM file.
  *  This method only supports DICOM objects stored as a dataset, i.e. without meta header.
  *  Use DcmFileFormat::loadFile() to load files with meta header.

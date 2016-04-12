@@ -5,6 +5,21 @@ import (
 	"testing"
 )
 
+func TestNewDcmDataset(t *testing.T) {
+	cases := []struct {
+		want *DcmDataset
+	}{
+		{&DcmDataset{DcmItem: *NewDcmItem(DCM_ItemTag, DCM_UndefinedLength), OriginalXfer: EXS_Unknown, CurrentXfer: EXS_LittleEndianExplicit}},
+	}
+	for _, c := range cases {
+		got := NewDcmDataset()
+		if *got != *c.want {
+			t.Errorf("NewDcmDataset() == want %v got %v", c.want, got)
+		}
+	}
+
+}
+
 func TestDcdatsetLoadFile(t *testing.T) {
 	cases := []struct {
 		in_0 DcmDataset
