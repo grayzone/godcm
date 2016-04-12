@@ -63,6 +63,15 @@ type DcmList struct {
 	cardinality uint32
 }
 
+func NewDcmList() *DcmList {
+	var result DcmList
+	result.firstNode = nil
+	result.lastNode = nil
+	result.currentNode = nil
+	result.cardinality = 0
+	return &result
+}
+
 /// return true if list is empty, false otherwise
 func (l *DcmList) Empty() bool {
 	return l.firstNode == nil
