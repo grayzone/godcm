@@ -9,9 +9,9 @@ install:
 before_script:
  - go get golang.org/x/tools/cmd/cover
  - go get github.com/mattn/goveralls
- - go vet -v ./...
 
 script:
+ - go vet -v ./...
 # - go test -v -bench=. ./...
  - go test -v -covermode=count -coverprofile=profile_tmp.cov ./dcmdata
  - tail -n +1 profile_tmp.cov >> profile.cov

@@ -19,19 +19,53 @@ func TestNewDcmListNode(t *testing.T) {
 	}
 }
 
-func TestEmpty(t *testing.T) {
+func TestDcmListNodeValue(t *testing.T) {
 	cases := []struct {
-		want bool
+		in   *DcmListNode
+		want *DcmObject
 	}{
-		{true},
+		{&DcmListNode{}, nil},
 	}
 
 	for _, c := range cases {
-		var l DcmList
-		//		t.Log(l)
-		got := l.Empty()
+		got := c.in.Value()
+
+		if got != c.want {
+			t.Errorf("Value(), want '%v' got '%v'", c.want, got)
+		}
+	}
+}
+
+func TestEmpty(t *testing.T) {
+	cases := []struct {
+		in   DcmList
+		want bool
+	}{
+		{DcmList{}, true},
+	}
+
+	for _, c := range cases {
+
+		got := c.in.Empty()
 		if got != c.want {
 			t.Errorf("Empty(), want '%v' got '%v'", c.want, got)
+		}
+	}
+
+}
+
+func TestDcmListValid(t *testing.T) {
+	cases := []struct {
+		in   DcmList
+		want bool
+	}{
+		{DcmList{}, false},
+	}
+
+	for _, c := range cases {
+		got := c.in.Valid()
+		if got != c.want {
+			t.Errorf("Valid(), want '%v' got '%v'", c.want, got)
 		}
 	}
 
