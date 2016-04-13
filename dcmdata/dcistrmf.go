@@ -59,3 +59,55 @@ func (p *DcmFileProducer) Eos() bool {
 	size, _ := p.file_.Seek(0, os.SEEK_CUR)
 	return size == p.size_
 }
+
+func (p *DcmFileProducer) Avail() int64 {
+	if p.file_ == nil {
+		return 0
+	}
+	size, _ := p.file_.Seek(0, os.SEEK_CUR)
+	return p.size_ - size
+}
+
+func (p *DcmFileProducer) Read(buflen int64) ([]byte, int64) {
+	var result int64
+	if !p.Good() || (p.file_ == nil) || (buflen == 0) {
+		return nil, result
+	}
+	buf := make([]byte, buflen)
+	r, _ := p.file_.Read(buf)
+	result = int64(r)
+	return buf, result
+}
+
+func (p *DcmFileProducer) Skip(skiplen int64) int64 {
+	var result int64
+	if !p.Good() || (p.file_ == nil) || (skiplen == 0) {
+		return result
+	}
+	pos, _ := p.file_.Seek(0, os.SEEK_CUR)
+	if p.size_-pos < skiplen {
+		result = p.size_ - pos
+	} else {
+		result = skiplen
+	}
+	_, err := p.file_.Seek(result, os.SEEK_CUR)
+	if err != nil {
+		p.status_ = ofstd.MakeOFCondition(OFM_dcmdata, 18, ofstd.OF_error, err.Error())
+	}
+	return result
+}
+
+func (p *DcmFileProducer) Putback(num int64) {
+	if !p.Good() || (p.file_ == nil) || (num == 0) {
+		return
+	}
+	pos, _ := p.file_.Seek(0, os.SEEK_CUR)
+	if num > pos {
+		p.status_ = EC_PutbackFailed // tried to putback before start of file
+		return
+	}
+	_, err := p.file_.Seek(-num, os.SEEK_CUR)
+	if err != nil {
+		p.status_ = ofstd.MakeOFCondition(OFM_dcmdata, 18, ofstd.OF_error, err.Error())
+	}
+}
