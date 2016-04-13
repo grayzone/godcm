@@ -1,8 +1,9 @@
 package dcmdata
 
 import (
-	"github.com/grayzone/godcm/ofstd"
 	"os"
+
+	"github.com/grayzone/godcm/ofstd"
 )
 
 type DcmFileProducer struct {
@@ -13,7 +14,6 @@ type DcmFileProducer struct {
 }
 
 type DcmInputFileStream struct {
-	DcmInputStream
 	producer_ DcmFileProducer
 	filename_ string
 	file_     *os.File
