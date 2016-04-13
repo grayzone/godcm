@@ -1,12 +1,10 @@
 package dcmdata
 
-import "github.com/grayzone/godcm/config"
-
 /// implementation version name for this version of the toolkit
-const OFFIS_DTK_IMPLEMENTATION_VERSION_NAME = "OFFIS_DCMTK_" + config.PACKAGE_VERSION_NUMBER
+const OFFIS_DTK_IMPLEMENTATION_VERSION_NAME = "OFFIS_DCMTK_GODCM"
 
 /// implementation version name for this version of the toolkit, used for files received in "bit preserving" mode
-const OFFIS_DTK_IMPLEMENTATION_VERSION_NAME2 = "OFFIS_DCMBP_" + config.PACKAGE_VERSION_NUMBER
+const OFFIS_DTK_IMPLEMENTATION_VERSION_NAME2 = "OFFIS_DCMBP_GODCM"
 
 /// UID root for DCMTK, registered for OFFIS with DIN in Germany
 const OFFIS_UID_ROOT = "1.2.276.0.7230010.3"
