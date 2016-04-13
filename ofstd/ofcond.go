@@ -51,6 +51,10 @@ func NewOFCondition(m uint16, c uint16, s OFStatus, t string) *OFCondition {
 	return &OFCondition{m, c, s, t}
 }
 
+func MakeOFCondition(m uint16, c uint16, s OFStatus, t string) OFCondition {
+	return OFCondition{m, c, s, t}
+}
+
 /// returns the module identifier for this object.
 func (c *OFCondition) Module() uint16 {
 	return c.module

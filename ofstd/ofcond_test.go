@@ -40,6 +40,24 @@ func TestNewOFCondition(t *testing.T) {
 
 }
 
+func TestMakeOFCondition(t *testing.T) {
+	cases := []struct {
+		in_m uint16
+		in_c uint16
+		in_s OFStatus
+		in_t string
+		want OFCondition
+	}{
+		{0, 0, OF_ok, "test", OFCondition{0, 0, OF_ok, "test"}},
+	}
+	for _, c := range cases {
+		got := MakeOFCondition(c.in_m, c.in_c, c.in_s, c.in_t)
+		if got != c.want {
+			t.Errorf("MakeOFCondition() == want %v got %v", c.want, got)
+		}
+	}
+
+}
 func TestOFConditionModule(t *testing.T) {
 	cases := []struct {
 		in   OFCondition
