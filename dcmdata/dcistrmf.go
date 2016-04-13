@@ -14,11 +14,12 @@ type DcmFileProducer struct {
 }
 
 type DcmInputFileStream struct {
-	producer_ DcmFileProducer
-	filename_ string
-	file_     *os.File
-	size_     int64
-	status_   ofstd.OFCondition
+	filename string
+	file     *os.File
+	size     int64
+	status   ofstd.OFCondition
+	tell     int64
+	mark     int64
 }
 
 func NewDcmFileProducer(filename string, offset int64) *DcmFileProducer {
@@ -118,7 +119,96 @@ func (p *DcmFileProducer) Putback(num int64) {
 
 func NewDcmInputFileStream(filename string, offset int64) *DcmInputFileStream {
 	var result DcmInputFileStream
-	result.producer_ = *NewDcmFileProducer(filename, offset)
-	result.filename_ = filename
+	result.filename = filename
+	result.status = ofstd.EC_Normal
+	err := result.Open(filename)
+	if err != nil {
+		result.status = ofstd.MakeOFCondition(OFM_dcmdata, 18, ofstd.OF_error, err.Error())
+		return &result
+	}
+	result.size, _ = result.file.Seek(0, os.SEEK_END)
+	_, err = result.file.Seek(offset, os.SEEK_SET)
+	if err != nil {
+		result.status = ofstd.MakeOFCondition(OFM_dcmdata, 18, ofstd.OF_error, err.Error())
+		return &result
+	}
 	return &result
+}
+
+func (s *DcmInputFileStream) Open(filename string) error {
+	var err error
+	s.file, err = os.Open(filename)
+	return err
+}
+
+func (s *DcmInputFileStream) Close() error {
+	return s.file.Close()
+}
+
+func (s *DcmInputFileStream) Good() bool {
+	return s.status.Good()
+}
+
+func (s *DcmInputFileStream) Status() ofstd.OFCondition {
+	return s.status
+}
+
+func (s *DcmInputFileStream) Eos() bool {
+	if s.file == nil {
+		return true
+	}
+	size, _ := s.file.Seek(0, os.SEEK_CUR)
+	return size == s.size
+}
+
+func (s *DcmInputFileStream) Avail() int64 {
+	if s.file == nil {
+		return 0
+	}
+	size, _ := s.file.Seek(0, os.SEEK_CUR)
+	return s.size - size
+}
+
+func (s *DcmInputFileStream) Read(buflen int64) ([]byte, int64) {
+	var result int64
+	if !s.Good() || (s.file == nil) || (buflen == 0) {
+		return nil, result
+	}
+	buf := make([]byte, buflen)
+	r, _ := s.file.Read(buf)
+	result = int64(r)
+	return buf, result
+}
+
+func (s *DcmInputFileStream) Skip(skiplen int64) int64 {
+	var result int64
+	if !s.Good() || (s.file == nil) || (skiplen == 0) {
+		return result
+	}
+	pos, _ := s.file.Seek(0, os.SEEK_CUR)
+	if s.size-pos < skiplen {
+		result = s.size - pos
+	} else {
+		result = skiplen
+	}
+	_, err := s.file.Seek(result, os.SEEK_CUR)
+	if err != nil {
+		s.status = ofstd.MakeOFCondition(OFM_dcmdata, 18, ofstd.OF_error, err.Error())
+	}
+	return result
+}
+
+func (s *DcmInputFileStream) Putback(num int64) {
+	if !s.Good() || (s.file == nil) || (num == 0) {
+		return
+	}
+	pos, _ := s.file.Seek(0, os.SEEK_CUR)
+	if num > pos {
+		s.status = EC_PutbackFailed // tried to putback before start of file
+		return
+	}
+	_, err := s.file.Seek(-num, os.SEEK_CUR)
+	if err != nil {
+		s.status = ofstd.MakeOFCondition(OFM_dcmdata, 18, ofstd.OF_error, err.Error())
+	}
 }

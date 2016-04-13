@@ -22,20 +22,11 @@ type DcmInputStreamFactory struct {
 }
 
 type DcmInputStream struct {
-	current_ DcmProducer
-	tell     int64
-	mark     int64
+	tell int64
+	mark int64
 }
 
 func NewDcmInputStream() *DcmInputStream {
 	var result DcmInputStream
 	return &result
-}
-
-func (s *DcmInputStream) Good() bool {
-	return s.current_.Good()
-}
-
-func (s *DcmInputStream) Status() ofstd.OFCondition {
-	return s.current_.Status()
 }
