@@ -43,5 +43,13 @@ func NewDcmDataset() *DcmDataset {
  *  @return status, EC_Normal if successful, an error code otherwise
  */
 func (ds *DcmDataset) LoadFile(filename string, readXfer E_TransferSyntax, groupLength E_GrpLenEncoding, maxReadLength uint32) ofstd.OFCondition {
-	return ofstd.EC_Normal
+	err := ofstd.EC_InvalidFilename
+	if len(filename) == 0 {
+		return err
+	}
+	//	fileStream := DcmInputFileStream(filename, 0)
+
+	//	err = fileStream
+
+	return err
 }

@@ -29,7 +29,7 @@ func TestDcdatsetLoadFile(t *testing.T) {
 		in_4 uint32
 		want ofstd.OFCondition
 	}{
-		{DcmDataset{}, "", EXS_Unknown, EGL_noChange, DCM_MaxReadLength, ofstd.EC_Normal},
+		{DcmDataset{}, "", EXS_Unknown, EGL_noChange, DCM_MaxReadLength, ofstd.EC_InvalidFilename},
 	}
 	for _, c := range cases {
 		got := c.in_0.LoadFile(c.in_1, c.in_2, c.in_3, c.in_4)

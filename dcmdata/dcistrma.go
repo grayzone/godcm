@@ -9,7 +9,7 @@ type DcmProducer interface {
 	Status() ofstd.OFCondition
 	Eos() bool
 	Avail() int64
-	Read(buf []byte, buflen int64) int64
+	Read(buflen int64) ([]byte, int64)
 	Skip(skiplen int64) int64
 	Putback(num int64)
 }
@@ -22,7 +22,20 @@ type DcmInputStreamFactory struct {
 }
 
 type DcmInputStream struct {
-	current_ *DcmProducer
-	tell_    int64
-	mark_    int64
+	current_ DcmProducer
+	tell     int64
+	mark     int64
+}
+
+func NewDcmInputStream() *DcmInputStream {
+	var result DcmInputStream
+	return &result
+}
+
+func (s *DcmInputStream) Good() bool {
+	return s.current_.Good()
+}
+
+func (s *DcmInputStream) Status() ofstd.OFCondition {
+	return s.current_.Status()
 }

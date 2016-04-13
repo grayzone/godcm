@@ -200,3 +200,25 @@ func TestDcmFileProducerPutback(t *testing.T) {
 	}
 
 }
+
+func TestNewDcmInputFileStream(t *testing.T) {
+	cases := []struct {
+		in_1 string
+		in_2 int64
+		want *DcmInputFileStream
+	}{
+		{"", 0, &DcmInputFileStream{producer_: DcmFileProducer{status_: ofstd.MakeOFCondition(OFM_dcmdata, 18, ofstd.OF_error, "open : The system cannot find the file specified."), size_: 0}}},
+		{gettestdatafolder() + "GH220.dcm", 0, &DcmInputFileStream{producer_: DcmFileProducer{status_: ofstd.EC_Normal, size_: 454}}},
+		{gettestdatafolder() + "GH223.dcm", 0, &DcmInputFileStream{producer_: DcmFileProducer{status_: ofstd.EC_Normal, size_: 702}}},
+		{gettestdatafolder() + "GH133.dcm", 0, &DcmInputFileStream{producer_: DcmFileProducer{status_: ofstd.EC_Normal, size_: 2980438}}},
+	}
+	for _, c := range cases {
+		got := NewDcmInputFileStream(c.in_1, c.in_2)
+		defer got.producer_.Close()
+		defer c.want.producer_.Close()
+
+		if (got.producer_.size_ != c.want.producer_.size_) || (got.producer_.status_.Status() != c.want.producer_.status_.Status()) {
+			t.Errorf("NewDcmInputFileStream(%v,%v) == want %v got %v", c.in_1, c.in_2, c.want, got)
+		}
+	}
+}

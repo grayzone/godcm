@@ -6,6 +6,7 @@ import (
 )
 
 type DcmFileProducer struct {
+	DcmProducer
 	file_   *os.File
 	status_ ofstd.OFCondition
 	size_   int64
@@ -14,7 +15,10 @@ type DcmFileProducer struct {
 type DcmInputFileStream struct {
 	DcmInputStream
 	producer_ DcmFileProducer
-	filename  string
+	filename_ string
+	file_     *os.File
+	size_     int64
+	status_   ofstd.OFCondition
 }
 
 func NewDcmFileProducer(filename string, offset int64) *DcmFileProducer {
@@ -110,4 +114,11 @@ func (p *DcmFileProducer) Putback(num int64) {
 	if err != nil {
 		p.status_ = ofstd.MakeOFCondition(OFM_dcmdata, 18, ofstd.OF_error, err.Error())
 	}
+}
+
+func NewDcmInputFileStream(filename string, offset int64) *DcmInputFileStream {
+	var result DcmInputFileStream
+	result.producer_ = *NewDcmFileProducer(filename, offset)
+	result.filename_ = filename
+	return &result
 }

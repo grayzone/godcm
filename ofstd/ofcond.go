@@ -37,15 +37,18 @@ type OFCondition struct {
  *  All constants defined here use module number 0 which is reserved for
  *  global definitions. Other constants are defined elsewhere.
  */
+var (
+	/// condition constant: successful completion
+	EC_Normal = MakeOFCondition(0, 0, OF_ok, "Normal")
 
-/// condition constant: successful completion
-var EC_Normal = OFCondition{0, 0, OF_ok, "Normal"}
+	/// condition constant: error, function called with illegal parameters
+	EC_IllegalParameter = MakeOFCondition(0, 1, OF_error, "Illegal parameter")
 
-/// condition constant: error, function called with illegal parameters
-var EC_IllegalParameter = OFCondition{0, 1, OF_error, "Illegal parameter"}
+	/// condition constant: failure, memory exhausted
+	EC_MemoryExhausted = MakeOFCondition(0, 2, OF_failure, "Virtual Memory exhausted")
 
-/// condition constant: failure, memory exhausted
-var EC_MemoryExhausted = OFCondition{0, 2, OF_failure, "Virtual Memory exhausted"}
+	EC_InvalidFilename = MakeOFCondition(0, 10, OF_error, "Invalid filename")
+)
 
 func NewOFCondition(m uint16, c uint16, s OFStatus, t string) *OFCondition {
 	return &OFCondition{m, c, s, t}
