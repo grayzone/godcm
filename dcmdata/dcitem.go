@@ -119,3 +119,69 @@ func (item *DcmItem) CalcElementLength(xfer E_TransferSyntax, enctype E_Encoding
 
 	return itemlen
 }
+
+func (item *DcmItem) Clear() ofstd.OFCondition {
+	item.errorFlag = ofstd.EC_Normal
+	if item.elementList != nil {
+		item.elementList.DeleteAllElements()
+	}
+	item.setLengthField(0)
+	return item.errorFlag
+}
+
+func (item *DcmItem) ComputeGroupLengthAndPadding(glenc E_GrpLenEncoding, padenc E_PaddingEncoding, xfer E_TransferSyntax, enctype E_EncodingType, padlen uint32, subPadlen uint32, instanceLength uint32) ofstd.OFCondition {
+	if (padenc == EPD_withPadding && ((padlen%2) != 0 || (subPadlen%2) != 0)) || ((glenc == EGL_recalcGL || glenc == EGL_withGL || padenc == EPD_withPadding) && xfer == EXS_Unknown) {
+		return EC_IllegalCall
+	}
+	if glenc == EGL_noChange && padenc == EPD_noChange {
+		return ofstd.EC_Normal
+	}
+
+	err := ofstd.EC_Normal
+	if item.elementList.Empty() {
+		return err
+	}
+	xferSyn := NewDcmXfer(xfer)
+	seekmode := ELP_next
+	item.elementList.Seek(ELP_first)
+	lastGrp := uint16(0x0000)
+	beginning := true
+	for err.Good() && (item.elementList.Seek(seekmode) != nil) {
+		seekmode = ELP_next
+		d := item.elementList.Get(ELP_atpos)
+		if d.GetVR() == EVR_SQ {
+			templen := instanceLength + xferSyn.SizeofTagHeader(EVR_SQ)
+			t := NewDcmItem(d.tag, 0)
+			t.ComputeGroupLengthAndPadding(glenc, padenc, xfer, enctype, subPadlen, subPadlen, templen)
+		}
+		if !err.Good() {
+			continue
+		}
+		if ((glenc == EGL_withGL || glenc == EGL_withoutGL) && d.GetETag() == 0x0000) || (padenc != EPD_noChange && d.GetTag().DcmTagKey == DCM_DataSetTrailingPadding) {
+			item.elementList.Remove()
+			seekmode = ELP_atpos
+		} else if glenc == EGL_withGL || glenc == EGL_recalcGL {
+			actGrp := d.GetGTag()
+
+			if actGrp != lastGrp || beginning {
+				beginning = false
+
+				if d.GetETag() == 0x0000 && d.Ident() != EVR_UL {
+					item.elementList.Remove()
+					tagUL := NewDcmTagWithGEV(actGrp, 0x0000, DcmVR{EVR_UL})
+					obj := NewDcmObject(*tagUL, 0)
+					item.elementList.Insert(obj, ELP_prev)
+
+					//			obj.SetParent(*obj)
+				} else if glenc == EGL_withGL {
+					tagUL := NewDcmTagWithGEV(actGrp, 0x0000, DcmVR{EVR_UL})
+					obj := NewDcmObject(*tagUL, 0)
+					item.elementList.Insert(obj, ELP_prev)
+				}
+			}
+
+		}
+	}
+
+	return err
+}

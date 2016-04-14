@@ -47,9 +47,41 @@ func (ds *DcmDataset) LoadFile(filename string, readXfer E_TransferSyntax, group
 	if len(filename) == 0 {
 		return err
 	}
-	//	fileStream := DcmInputFileStream(filename, 0)
+	fileStream := NewDcmInputFileStream(filename, 0)
+
+	err = fileStream.Status()
+	if !err.Good() {
+		return err
+	}
+	err = ds.Clear()
+
+	if !err.Good() {
+		return err
+	}
+	ds.TransferInit()
+	err = ds.Read(fileStream, readXfer, groupLength, maxReadLength)
+	ds.TransferEnd()
 
 	//	err = fileStream
 
 	return err
+}
+
+func (ds *DcmDataset) Read(instream *DcmInputFileStream, xfer E_TransferSyntax, glenc E_GrpLenEncoding, maxReadLength uint32) ofstd.OFCondition {
+	ds.errorFlag = instream.Status()
+
+	if ds.errorFlag.Good() && instream.Eos() {
+		ds.errorFlag = EC_EndOfStream
+	} else if ds.errorFlag.Good() && ds.GetTransferState() != ERW_ready {
+
+	}
+
+	if ds.errorFlag.Good() || ds.errorFlag == EC_EndOfStream {
+		ds.errorFlag = ofstd.EC_Normal
+
+		ds.SetTransferState(ERW_ready)
+	}
+
+	return ds.errorFlag
+
 }

@@ -230,7 +230,5 @@ func (s *DcmInputFileStream) Putback(nums ...int64) {
 		s.tell = s.mark
 	case 1:
 		s.putbackstring(nums[0])
-	default:
 	}
-
 }

@@ -136,6 +136,8 @@ type DcmObject struct {
 	fTransferredBytes uint32
 	/// error flag for this object.
 	errorFlag ofstd.OFCondition
+
+	parent *DcmObject
 }
 
 /** constructor.
@@ -168,12 +170,26 @@ func (o *DcmObject) IsaString() bool {
 	return o.tag.IsaString()
 }
 
+/** set the current transfer state of this object during serialization/deserialization
+ *  @param newState new transfer state of this object
+ */
+func (o *DcmObject) SetTransferState(newState E_TransferState) {
+	o.fTransferState = newState
+}
+
 /** return the current transfer (read/write) state of this object.
  *  @return transfer state of this object
  */
-
-func (o *DcmObject) TransferState() E_TransferState {
+func (o *DcmObject) GetTransferState() E_TransferState {
 	return o.fTransferState
+}
+
+func (o *DcmObject) SetParent(parent *DcmObject) {
+	o.parent = parent
+}
+
+func (o *DcmObject) GetParent() *DcmObject {
+	return o.parent
 }
 
 /** initialize the transfer state of this object. This method must be called
@@ -199,6 +215,18 @@ func (o *DcmObject) ContainsUnknownVR() bool {
 	return o.tag.IsUnknownVR()
 }
 
+func (o *DcmObject) GetGTag() uint16 {
+	return o.tag.GetGTag()
+}
+
+func (o *DcmObject) GetETag() uint16 {
+	return o.tag.GetETag()
+}
+
+func (o *DcmObject) GetTag() DcmTag {
+	return o.tag
+}
+
 /** check if this object is empty
  *  @param normalize normalize value before checking (ignore non-significant characters)
  *  @return true if object is empty, i.e. has no value, false otherwise
@@ -215,6 +243,10 @@ func (o *DcmObject) IsEmpty(normalize bool) bool {
  */
 func (o *DcmObject) IsLeaf() bool {
 	return false
+}
+
+func (o *DcmObject) setLengthField(val uint32) {
+	o.length = val
 }
 
 /** return the current value of the Length field (which is different from the functionality

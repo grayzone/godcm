@@ -38,3 +38,17 @@ func NewDcmSequenceOfItems(tag DcmTag, l uint32, readAsUN bool) *DcmSequenceOfIt
 	sq.readAsUN_ = readAsUN
 	return &sq
 }
+
+func (sq *DcmSequenceOfItems) ComputeGroupLengthAndPadding(glenc E_GrpLenEncoding, padenc E_PaddingEncoding, xfer E_TransferSyntax, enctype E_EncodingType, padlen uint32, subPadlen uint32, instanceLength uint32) ofstd.OFCondition {
+	err := ofstd.EC_Normal
+	if sq.itemList.Empty() {
+		return err
+	}
+	sq.itemList.Seek(ELP_first)
+	for err.Good() && (sq.itemList.Seek(ELP_next) != nil) {
+		d := sq.itemList.Get(ELP_atpos)
+		item := NewDcmItem(d.tag, 0)
+		err = item.ComputeGroupLengthAndPadding(glenc, padenc, xfer, enctype, padlen, subPadlen, instanceLength)
+	}
+	return err
+}

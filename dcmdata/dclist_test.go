@@ -238,3 +238,21 @@ func TestDcmListSeekTo(t *testing.T) {
 	}
 
 }
+
+func TestDcmListDeleteAllElements(t *testing.T) {
+	cases := []struct {
+		in   *DcmList
+		want *DcmList
+	}{
+		{NewDcmList(), &DcmList{nil, nil, nil, 0}},
+	}
+
+	for _, c := range cases {
+		c.in.DeleteAllElements()
+		got := c.in
+		if *got != *c.want {
+			t.Errorf("%v DeleteAllElements(), want '%v' got '%v' ", c.in, c.want, got)
+		}
+	}
+
+}
