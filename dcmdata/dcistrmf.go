@@ -1,9 +1,9 @@
 package dcmdata
 
 import (
-	"os"
-
 	"github.com/grayzone/godcm/ofstd"
+	_ "log"
+	"os"
 )
 
 type DcmFileProducer struct {
@@ -153,6 +153,14 @@ func (s *DcmInputFileStream) Status() ofstd.OFCondition {
 	return s.status
 }
 
+func (s *DcmInputFileStream) Tell() int64 {
+	return s.tell
+}
+
+func (s *DcmInputFileStream) Mark() {
+	s.mark = s.tell
+}
+
 func (s *DcmInputFileStream) Eos() bool {
 	if s.file == nil {
 		return true
@@ -177,6 +185,7 @@ func (s *DcmInputFileStream) Read(buflen int64) ([]byte, int64) {
 	buf := make([]byte, buflen)
 	r, _ := s.file.Read(buf)
 	result = int64(r)
+	s.tell += result
 	return buf, result
 }
 
@@ -195,10 +204,11 @@ func (s *DcmInputFileStream) Skip(skiplen int64) int64 {
 	if err != nil {
 		s.status = ofstd.MakeOFCondition(OFM_dcmdata, 18, ofstd.OF_error, err.Error())
 	}
+	s.tell += result
 	return result
 }
 
-func (s *DcmInputFileStream) Putback(num int64) {
+func (s *DcmInputFileStream) putbackstring(num int64) {
 	if !s.Good() || (s.file == nil) || (num == 0) {
 		return
 	}
@@ -211,4 +221,16 @@ func (s *DcmInputFileStream) Putback(num int64) {
 	if err != nil {
 		s.status = ofstd.MakeOFCondition(OFM_dcmdata, 18, ofstd.OF_error, err.Error())
 	}
+}
+
+func (s *DcmInputFileStream) Putback(nums ...int64) {
+	switch len(nums) {
+	case 0:
+		s.putbackstring(s.tell - s.mark)
+		s.tell = s.mark
+	case 1:
+		s.putbackstring(nums[0])
+	default:
+	}
+
 }

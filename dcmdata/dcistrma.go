@@ -22,11 +22,13 @@ type DcmInputStreamFactory struct {
 }
 
 type DcmInputStream struct {
-	tell int64
-	mark int64
+	current DcmProducer
+	tell    int64
+	mark    int64
 }
 
-func NewDcmInputStream() *DcmInputStream {
+func NewDcmInputStream(initial *DcmProducer) *DcmInputStream {
 	var result DcmInputStream
+	result.current = *initial
 	return &result
 }

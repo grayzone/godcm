@@ -202,29 +202,27 @@ func TestDcmFileProducerPutback(t *testing.T) {
 
 }
 
-/*
 func TestNewDcmInputFileStream(t *testing.T) {
 	cases := []struct {
 		in_1 string
 		in_2 int64
 		want *DcmInputFileStream
 	}{
-		{"", 0, &DcmInputFileStream{producer_: DcmFileProducer{status_: ofstd.MakeOFCondition(OFM_dcmdata, 18, ofstd.OF_error, "open : The system cannot find the file specified."), size_: 0}}},
-		{gettestdatafolder() + "GH220.dcm", 0, &DcmInputFileStream{producer_: DcmFileProducer{status_: ofstd.EC_Normal, size_: 454}}},
-		{gettestdatafolder() + "GH223.dcm", 0, &DcmInputFileStream{producer_: DcmFileProducer{status_: ofstd.EC_Normal, size_: 702}}},
-		{gettestdatafolder() + "GH133.dcm", 0, &DcmInputFileStream{producer_: DcmFileProducer{status_: ofstd.EC_Normal, size_: 2980438}}},
+		{"", 0, &DcmInputFileStream{status: ofstd.MakeOFCondition(OFM_dcmdata, 18, ofstd.OF_error, "open : The system cannot find the file specified."), size: 0}},
+		{gettestdatafolder() + "GH220.dcm", 0, &DcmInputFileStream{status: ofstd.EC_Normal, size: 454}},
+		{gettestdatafolder() + "GH223.dcm", 0, &DcmInputFileStream{status: ofstd.EC_Normal, size: 702}},
+		{gettestdatafolder() + "GH133.dcm", 0, &DcmInputFileStream{status: ofstd.EC_Normal, size: 2980438}},
 	}
 	for _, c := range cases {
 		got := NewDcmInputFileStream(c.in_1, c.in_2)
-		defer got.producer_.Close()
-		defer c.want.producer_.Close()
+		defer got.Close()
+		defer c.want.Close()
 
-		if (got.producer_.size_ != c.want.producer_.size_) || (got.producer_.status_.Status() != c.want.producer_.status_.Status()) {
+		if (got.size != c.want.size) || (got.status.Status() != c.want.status.Status()) {
 			t.Errorf("NewDcmInputFileStream(%v,%v) == want %v got %v", c.in_1, c.in_2, c.want, got)
 		}
 	}
 }
-*/
 
 func TestDcmInputFileStreamGood(t *testing.T) {
 	cases := []struct {
@@ -363,7 +361,7 @@ func TestDcmInputFileStreamSkip(t *testing.T) {
 
 }
 
-func TestDcmInputFileStreamPutback(t *testing.T) {
+func TestDcmInputFileStreamPutback1(t *testing.T) {
 	cases := []struct {
 		in_0 *DcmInputFileStream
 		in_1 int64
@@ -384,6 +382,34 @@ func TestDcmInputFileStreamPutback(t *testing.T) {
 
 		if got != c.want {
 			t.Errorf(" %v Putback(%v) == want %v got %v ", c.in_0, c.in_1, c.want, got)
+		}
+	}
+
+}
+
+func TestDcmInputFileStreamPutback2(t *testing.T) {
+	cases := []struct {
+		in_0    *DcmInputFileStream
+		in_skip int64
+		want    int64
+	}{
+		{NewDcmInputFileStream("", 0), 0, 0},
+		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 100), 1, 100},
+		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 0), 454, 0},
+		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 100), 453, 100},
+		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 10), 455, 10},
+		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 100), 10, 100},
+		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 10), 9, 10},
+	}
+	for _, c := range cases {
+		c.in_0.Mark()
+		c.in_0.Skip(c.in_skip)
+		c.in_0.Putback()
+		got, _ := c.in_0.file.Seek(0, os.SEEK_CUR)
+		defer c.in_0.Close()
+
+		if got != c.want {
+			t.Errorf(" %v Putback() == want %v got %v ", c.in_0, c.want, got)
 		}
 	}
 
