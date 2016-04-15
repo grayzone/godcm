@@ -53,7 +53,24 @@ func TestDcmObjectIsaString(t *testing.T) {
 
 }
 
-func TestDcmObjectTransferState(t *testing.T) {
+func TestDcmObjectSetTransferState(t *testing.T) {
+	cases := []struct {
+		in_0 DcmObject
+		in_1 E_TransferState
+		want E_TransferState
+	}{
+		{DcmObject{tag: *NewDcmTag()}, ERW_ready, ERW_ready},
+	}
+	for _, c := range cases {
+		c.in_0.SetTransferState(c.in_1)
+		got := c.in_0.GetTransferState()
+		if got != c.want {
+			t.Errorf("%v SetTransferState(%v) == want %v got %v", c.in_0, c.in_1, c.want, got)
+		}
+	}
+}
+
+func TestDcmObjectGetTransferState(t *testing.T) {
 	cases := []struct {
 		in   DcmObject
 		want E_TransferState
@@ -61,12 +78,11 @@ func TestDcmObjectTransferState(t *testing.T) {
 		{DcmObject{tag: *NewDcmTag()}, ERW_init},
 	}
 	for _, c := range cases {
-		got := c.in.TransferState()
+		got := c.in.GetTransferState()
 		if got != c.want {
-			t.Errorf("TransferState() == want %v got %v", c.want, got)
+			t.Errorf("GetTransferState() == want %v got %v", c.want, got)
 		}
 	}
-
 }
 
 func TestDcmObjectTransferInit(t *testing.T) {
@@ -111,6 +127,51 @@ func TestDcmObjectContainsUnknownVR(t *testing.T) {
 		got := c.in.ContainsUnknownVR()
 		if got != c.want {
 			t.Errorf("ContainsUnknownVR() == want %v got %v", c.want, got)
+		}
+	}
+}
+
+func TestDcmObjectGetGTag(t *testing.T) {
+	cases := []struct {
+		in   DcmObject
+		want uint16
+	}{
+		{DcmObject{tag: *NewDcmTag()}, 0xffff},
+	}
+	for _, c := range cases {
+		got := c.in.GetGTag()
+		if got != c.want {
+			t.Errorf("GetGTag() == want %v got %v", c.want, got)
+		}
+	}
+}
+
+func TestDcmObjectGetETag(t *testing.T) {
+	cases := []struct {
+		in   DcmObject
+		want uint16
+	}{
+		{DcmObject{tag: *NewDcmTag()}, 0xffff},
+	}
+	for _, c := range cases {
+		got := c.in.GetETag()
+		if got != c.want {
+			t.Errorf("GetETag() == want %v got %v", c.want, got)
+		}
+	}
+}
+
+func TestDcmObjectGetTag(t *testing.T) {
+	cases := []struct {
+		in   DcmObject
+		want DcmTag
+	}{
+		{DcmObject{tag: *NewDcmTag()}, DcmTag{DcmTagKey: DcmTagKey{0xffff, 0xffff}}},
+	}
+	for _, c := range cases {
+		got := c.in.GetTag()
+		if got.DcmTagKey != c.want.DcmTagKey {
+			t.Errorf("GetTag() == want %v got %v", c.want, got)
 		}
 	}
 }

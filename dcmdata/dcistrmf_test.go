@@ -391,25 +391,27 @@ func TestDcmInputFileStreamPutback2(t *testing.T) {
 	cases := []struct {
 		in_0    *DcmInputFileStream
 		in_skip int64
-		want    int64
+		want_1  int64
+		want_2  int64
 	}{
-		{NewDcmInputFileStream("", 0), 0, 0},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 100), 1, 100},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 0), 454, 0},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 100), 453, 100},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 10), 455, 10},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 100), 10, 100},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 10), 9, 10},
+		{NewDcmInputFileStream("", 0), 0, 0, 0},
+		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 100), 1, 1, 100},
+		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 0), 454, 454, 0},
+		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 100), 453, 354, 100},
+		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 10), 455, 444, 10},
+		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 100), 10, 10, 100},
+		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 10), 9, 9, 10},
 	}
 	for _, c := range cases {
 		c.in_0.Mark()
 		c.in_0.Skip(c.in_skip)
+		got_1 := c.in_0.Tell()
 		c.in_0.Putback()
-		got, _ := c.in_0.file.Seek(0, os.SEEK_CUR)
+		got_2, _ := c.in_0.file.Seek(0, os.SEEK_CUR)
 		defer c.in_0.Close()
 
-		if got != c.want {
-			t.Errorf(" %v Putback() == want %v got %v ", c.in_0, c.want, got)
+		if got_1 != c.want_1 || got_2 != c.want_2 {
+			t.Errorf(" %v Putback() == want %v | %v got %v | %v", c.in_0, c.want_1, c.want_2, got_1, got_2)
 		}
 	}
 

@@ -30,19 +30,19 @@ type E_ListPos int
 const (
 
 	/// at current position in list
-	ELP_atpos = iota
+	ELP_atpos E_ListPos = 0
 
 	/// at list start
-	ELP_first
+	ELP_first E_ListPos = 1
 
 	/// at list end
-	ELP_last
+	ELP_last E_ListPos = 2
 
 	/// before current list position
-	ELP_prev
+	ELP_prev E_ListPos = 3
 
 	/// after current list position
-	ELP_next
+	ELP_next E_ListPos = 4
 )
 
 /** double-linked list class that maintains pointers to DcmObject instances.
@@ -265,4 +265,11 @@ func (l *DcmList) Seek_to(absolute_position uint32) *DcmObject {
 		l.Seek(ELP_next)
 	}
 	return l.Get(ELP_atpos)
+}
+
+func (l *DcmList) DeleteAllElements() {
+	l.firstNode = nil
+	l.lastNode = nil
+	l.currentNode = nil
+	l.cardinality = 0
 }

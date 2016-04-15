@@ -19,3 +19,20 @@ func TestNewDcmItem(t *testing.T) {
 		}
 	}
 }
+
+func TestDcmItemClear(t *testing.T) {
+	cases := []struct {
+		in   *DcmItem
+		want *DcmItem
+	}{
+		{&DcmItem{elementList: &DcmList{firstNode: NewDcmListNode(nil)}, lastElementComplete: true, fStartPosition: 0}, &DcmItem{elementList: &DcmList{}}},
+	}
+
+	for _, c := range cases {
+		c.in.Clear()
+		got := c.in
+		if *got.elementList != *c.want.elementList {
+			t.Errorf("%v Clear(), want '%v' got '%v' ", c.in, c.want, got)
+		}
+	}
+}
