@@ -144,6 +144,9 @@ func (item *DcmItem) ComputeGroupLengthAndPadding(glenc E_GrpLenEncoding, padenc
 	xferSyn := NewDcmXfer(xfer)
 	seekmode := ELP_next
 	item.elementList.Seek(ELP_first)
+	lastGrp := uint16(0x0000)
+	beginning := true
+
 	for err.Good() && (item.elementList.Seek(seekmode) != nil) {
 		seekmode = ELP_next
 		d := item.elementList.Get(ELP_atpos)
@@ -159,6 +162,24 @@ func (item *DcmItem) ComputeGroupLengthAndPadding(glenc E_GrpLenEncoding, padenc
 			item.elementList.Remove()
 			seekmode = ELP_atpos
 		} else if glenc == EGL_withGL || glenc == EGL_recalcGL {
+			actGrp := d.GetGTag()
+
+			if actGrp != lastGrp || beginning {
+				beginning = false
+
+				if d.GetETag() == 0x0000 && d.Ident() != EVR_UL {
+					item.elementList.Remove()
+					tagUL := NewDcmTagWithGEV(actGrp, 0x0000, DcmVR{EVR_UL})
+					obj := NewDcmObject(*tagUL, 0)
+					item.elementList.Insert(obj, ELP_prev)
+
+					//			obj.SetParent(*obj)
+				} else if glenc == EGL_withGL {
+					tagUL := NewDcmTagWithGEV(actGrp, 0x0000, DcmVR{EVR_UL})
+					obj := NewDcmObject(*tagUL, 0)
+					item.elementList.Insert(obj, ELP_prev)
+				}
+			}
 
 		}
 	}
