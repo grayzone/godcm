@@ -4,14 +4,17 @@ go:
  - tip
 
 install:
-
-
-before_script:
+ - go get github.com/golang/lint/golint
  - go get golang.org/x/tools/cmd/cover
  - go get github.com/mattn/goveralls
 
+
+before_script:
+
+
 script:
- - go vet -v ./...
+ - go vet -x ./...
+# - $HOME/gopath/bin/golint ./...
 # - go test -v -bench=. ./...
  - go test -v -covermode=count -coverprofile=profile_tmp.cov ./dcmdata
  - tail -n +1 profile_tmp.cov >> profile.cov
