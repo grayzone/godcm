@@ -59,6 +59,19 @@ func (s *DcmFileStream) Skip(skiplength int64) (int64, error) {
 	return result, err
 }
 
+// Putback the bytes by given length
+func (s *DcmFileStream) Putback(num int64) error {
+	if num == 0 {
+		return nil
+	}
+	pos, _ := s.FileHandler.Seek(0, os.SEEK_CUR)
+	if num > pos {
+		return errors.New("Parser failure: Putback operation failed")
+	}
+	_, err := s.FileHandler.Seek(-num, os.SEEK_CUR)
+	return err
+}
+
 // Eos is to check the end of the DICOM file.
 func (s *DcmFileStream) Eos() bool {
 	if s.FileHandler == nil {
@@ -133,6 +146,32 @@ func (s *DcmFileStream) ReadDcmVR() (string, error) {
 	return s.ReadString(2)
 }
 
+// ReadDcmElementValueLength is to get the value length of the dicom element.
+func (s *DcmFileStream) ReadDcmElementValueLength(vr string) (int64, error) {
+	var result int64
+	switch vr {
+	case "OB", "OD", "OF", "OL", "OW", "SQ", "UC", "UR", "UT", "UN":
+		// skip the reserved 2 bytes
+		_, err := s.Skip(2)
+		if err != nil {
+			return 0, err
+		}
+		l, err := s.ReadUINT32()
+		if err != nil {
+			return 0, err
+		}
+		result = int64(l)
+	default:
+		// read value length
+		l, err := s.ReadUINT16()
+		if err != nil {
+			return 0, err
+		}
+		result = int64(l)
+	}
+	return result, nil
+}
+
 // ReadDcmElementWithExplicitVR is to read the data element with explicit VR.
 func (s *DcmFileStream) ReadDcmElementWithExplicitVR() (DcmElement, error) {
 	var elem DcmElement
@@ -149,27 +188,9 @@ func (s *DcmFileStream) ReadDcmElementWithExplicitVR() (DcmElement, error) {
 		return elem, err
 	}
 
-	switch elem.VR {
-	case "OB", "OD", "OF", "OL", "OW", "SQ", "UC", "UR", "UT", "UN":
-		// skip the reserved 2 bytes
-		_, err := s.Skip(2)
-		if err != nil {
-			return elem, err
-		}
-		l, err := s.ReadUINT32()
-		if err != nil {
-			return elem, err
-		}
-		elem.Length = int64(l)
-		//		log.Println(elem.Length)
-	default:
-		// read value length
-		l, err := s.ReadUINT16()
-		if err != nil {
-			return elem, err
-		}
-		elem.Length = int64(l)
-		//		log.Println(elem.Length)
+	elem.Length, err = s.ReadDcmElementValueLength(elem.VR)
+	if err != nil {
+		return elem, err
 	}
 
 	// read element value

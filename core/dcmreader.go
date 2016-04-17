@@ -27,16 +27,14 @@ func (reader *DcmReader) ReadFile(filename string) error {
 		return err
 	}
 
-	for !reader.FileStream.Eos() {
-		elem, err := reader.FileStream.ReadDcmElementWithExplicitVR()
-		if err != nil {
-			return err
-		}
-		//		log.Println(elem)
-		reader.Dataset.Elements = append(reader.Dataset.Elements, elem)
+	//read dicom file meta information
+	var dcmfile DcmFile
+	err = dcmfile.FileMetaInfo.Read(&reader.FileStream)
+	if err != nil {
+		return err
 	}
 
-	log.Println(reader.Dataset)
+	log.Println(dcmfile.FileMetaInfo)
 
 	return nil
 }

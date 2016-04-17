@@ -38,6 +38,11 @@ func TestDcmReaderReadFileDICOM(t *testing.T) {
 		want DcmDataset
 	}{
 		{gettestdatafolder() + "GH220.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH064.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH133.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH178.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH179A.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH184.dcm", DcmDataset{}},
 	}
 	for _, c := range cases {
 		var reader DcmReader
