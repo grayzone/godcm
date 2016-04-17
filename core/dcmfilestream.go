@@ -88,8 +88,8 @@ func (s *DcmFileStream) ReadUINT16() (uint16, error) {
 	}
 	var result uint16
 	buf := bytes.NewReader(v)
-	binary.Read(buf, binary.LittleEndian, &result)
-	return result, nil
+	err = binary.Read(buf, binary.LittleEndian, &result)
+	return result, err
 }
 
 // ReadUINT32 is to read a uint32 value from the file.
@@ -100,16 +100,17 @@ func (s *DcmFileStream) ReadUINT32() (uint32, error) {
 	}
 	var result uint32
 	buf := bytes.NewReader(v)
-	binary.Read(buf, binary.LittleEndian, &result)
-	return result, nil
+	err = binary.Read(buf, binary.LittleEndian, &result)
+	return result, err
 }
 
+// ReadString is to read a string from the file.
 func (s *DcmFileStream) ReadString(slen int64) (string, error) {
 	v, err := s.Read(slen)
 	if err != nil {
 		return "", err
 	}
-	return string(v), nil
+	return string(v[:slen]), nil
 }
 
 // ReadDcmTag is to read group and element
@@ -130,4 +131,49 @@ func (s *DcmFileStream) ReadDcmTag() (DcmTag, error) {
 // ReadDcmVR is to read vr
 func (s *DcmFileStream) ReadDcmVR() (string, error) {
 	return s.ReadString(2)
+}
+
+// ReadDcmElementWithExplicitVR is to read the data element with explicit VR.
+func (s *DcmFileStream) ReadDcmElementWithExplicitVR() (DcmElement, error) {
+	var elem DcmElement
+	var err error
+	// read dicom tag
+	elem.Tag, err = s.ReadDcmTag()
+	if err != nil {
+		return elem, err
+	}
+
+	// read VR
+	elem.VR, err = s.ReadDcmVR()
+	if err != nil {
+		return elem, err
+	}
+
+	switch elem.VR {
+	case "OB", "OD", "OF", "OL", "OW", "SQ", "UC", "UR", "UT", "UN":
+		// skip the reserved 2 bytes
+		_, err := s.Skip(2)
+		if err != nil {
+			return elem, err
+		}
+		l, err := s.ReadUINT32()
+		if err != nil {
+			return elem, err
+		}
+		elem.Length = int64(l)
+		//		log.Println(elem.Length)
+	default:
+		// read value length
+		l, err := s.ReadUINT16()
+		if err != nil {
+			return elem, err
+		}
+		elem.Length = int64(l)
+		//		log.Println(elem.Length)
+	}
+
+	// read element value
+	elem.Value, err = s.ReadString(elem.Length)
+
+	return elem, err
 }

@@ -20,6 +20,7 @@ func TestDcmReaderReadFileNONDICOM(t *testing.T) {
 		want DcmDataset
 	}{
 		{"", DcmDataset{}},
+		{gettestdatafolder() + "minimumdict.xml", DcmDataset{}},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -32,23 +33,6 @@ func TestDcmReaderReadFileNONDICOM(t *testing.T) {
 }
 
 func TestDcmReaderReadFileDICOM(t *testing.T) {
-	cases := []struct {
-		in   string
-		want DcmDataset
-	}{
-		{gettestdatafolder() + "GH220.dcm", DcmDataset{}},
-	}
-	for _, c := range cases {
-		var reader DcmReader
-		err := reader.ReadFile(c.in)
-		if err != nil {
-			t.Errorf("DcmReader.ReadFile(): %s", err.Error())
-			return
-		}
-	}
-}
-
-func TestDcmReaderReadFileDICOM3(t *testing.T) {
 	cases := []struct {
 		in   string
 		want DcmDataset

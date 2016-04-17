@@ -1,7 +1,9 @@
 package core
 
-import "errors"
-import "log"
+import (
+	"errors"
+	"log"
+)
 
 // DICOM3FILEIDENTIFIER is the DiCOM index in the file header.
 const DICOM3FILEIDENTIFIER = "DICM"
@@ -25,33 +27,16 @@ func (reader *DcmReader) ReadFile(filename string) error {
 		return err
 	}
 
-	for range []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 131, 14} {
-		tag, _ := reader.FileStream.ReadDcmTag()
-		log.Println(tag)
-
-		vr, _ := reader.FileStream.ReadDcmVR()
-		log.Println(vr)
-
-		if vr == "OB" {
-			reader.FileStream.Skip(2)
-			l, _ := reader.FileStream.ReadUINT32()
-			log.Println(l)
-			s, _ := reader.FileStream.ReadString(int64(l))
-			log.Println(s)
-		} else {
-			l, _ := reader.FileStream.ReadUINT16()
-			log.Println(l)
-			s, _ := reader.FileStream.ReadString(int64(l))
-			log.Println(s)
+	for !reader.FileStream.Eos() {
+		elem, err := reader.FileStream.ReadDcmElementWithExplicitVR()
+		if err != nil {
+			return err
 		}
-
+		//		log.Println(elem)
+		reader.Dataset.Elements = append(reader.Dataset.Elements, elem)
 	}
 
-	/*
-		for !reader.FileStream.Eos() {
-
-		}
-	*/
+	log.Println(reader.Dataset)
 
 	return nil
 }
@@ -66,7 +51,6 @@ func (reader *DcmReader) IsDicom3() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	log.Println(b, string(b))
 	if string(b) == DICOM3FILEIDENTIFIER {
 		return true, nil
 	}

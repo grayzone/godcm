@@ -4,7 +4,7 @@ package core
 type DcmElement struct {
 	Tag    DcmTag
 	VR     string
-	Length int
+	Length int64
 	Value  string
 	IsMeta bool
 }

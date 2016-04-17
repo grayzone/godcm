@@ -9,6 +9,6 @@ type DcmTag struct {
 }
 
 // ToString is to convert tag to string
-func (t *DcmTag) ToString() string {
-	return fmt.Sprintf("0x%x%x", t.Group, t.Element)
+func (t DcmTag) String() string {
+	return fmt.Sprintf("0x%04x%04x", t.Group, t.Element)
 }
