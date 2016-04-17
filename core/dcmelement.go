@@ -6,5 +6,4 @@ type DcmElement struct {
 	VR     string
 	Length int64
 	Value  string
-	IsMeta bool
 }

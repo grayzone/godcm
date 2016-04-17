@@ -10,7 +10,7 @@ const DICOM3FILEIDENTIFIER = "DICM"
 
 // DcmReader is to read DICOM file
 type DcmReader struct {
-	Dataset    DcmDataset
+	Dataset    DcmDataSet
 	FileStream DcmFileStream
 }
 
@@ -34,7 +34,11 @@ func (reader *DcmReader) ReadFile(filename string) error {
 		return err
 	}
 
-	log.Println(dcmfile.FileMetaInfo)
+	//	log.Println(dcmfile.FileMetaInfo)
+
+	// read one dicom element
+	elem, err := reader.FileStream.ReadDcmElementWithExplicitVR()
+	log.Println(elem, err)
 
 	return nil
 }

@@ -17,10 +17,10 @@ func gettestdatafolder() string {
 func TestDcmReaderReadFileNONDICOM(t *testing.T) {
 	cases := []struct {
 		in   string
-		want DcmDataset
+		want DcmDataSet
 	}{
-		{"", DcmDataset{}},
-		{gettestdatafolder() + "minimumdict.xml", DcmDataset{}},
+		{"", DcmDataSet{}},
+		{gettestdatafolder() + "minimumdict.xml", DcmDataSet{}},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -35,14 +35,14 @@ func TestDcmReaderReadFileNONDICOM(t *testing.T) {
 func TestDcmReaderReadFileDICOM(t *testing.T) {
 	cases := []struct {
 		in   string
-		want DcmDataset
+		want DcmDataSet
 	}{
-		{gettestdatafolder() + "GH220.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH064.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH133.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH178.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH179A.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH184.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH220.dcm", DcmDataSet{}},
+		{gettestdatafolder() + "GH064.dcm", DcmDataSet{}},
+		{gettestdatafolder() + "GH133.dcm", DcmDataSet{}},
+		{gettestdatafolder() + "GH178.dcm", DcmDataSet{}},
+		{gettestdatafolder() + "GH179A.dcm", DcmDataSet{}},
+		{gettestdatafolder() + "GH184.dcm", DcmDataSet{}},
 	}
 	for _, c := range cases {
 		var reader DcmReader

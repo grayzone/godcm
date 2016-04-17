@@ -56,8 +56,12 @@ func (meta *DcmMetaInfo) Read(stream *DcmFileStream) error {
 		elem.VR = vr
 		elem.Length = length
 		elem.Value = value
-		elem.IsMeta = true
 		meta.Elements = append(meta.Elements, elem)
 	}
 	return nil
+}
+
+// CheckTransferSyntaxUID is to identify the Transfer Syntax used to encode the following data set.
+func (meta *DcmMetaInfo) CheckTransferSyntaxUID() {
+
 }
