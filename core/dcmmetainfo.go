@@ -107,7 +107,7 @@ func (meta *DcmMetaInfo) Read(stream *DcmFileStream) error {
 		}
 		elem, err := meta.FindDcmElement(DcmTag{group, element})
 		if err != nil {
-			log.Println(err.Error)
+			log.Println(err.Error())
 			continue
 		}
 		elem.VR = vr
