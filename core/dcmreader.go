@@ -1,9 +1,6 @@
 package core
 
-import (
-	"errors"
-	"log"
-)
+import "errors"
 
 // DICOM3FILEIDENTIFIER is the DiCOM index in the file header.
 const DICOM3FILEIDENTIFIER = "DICM"
@@ -28,17 +25,18 @@ func (reader *DcmReader) ReadFile(filename string) error {
 	}
 
 	//read dicom file meta information
-	var dcmfile DcmFile
+	dcmfile := NewDcmFile()
 	err = dcmfile.FileMetaInfo.Read(&reader.FileStream)
 	if err != nil {
 		return err
 	}
-
 	//	log.Println(dcmfile.FileMetaInfo)
 
+	dcmfile.FileMetaInfo.CheckTransferSyntaxUID()
+
 	// read one dicom element
-	elem, err := reader.FileStream.ReadDcmElementWithExplicitVR()
-	log.Println(elem, err)
+	//	elem, err := reader.FileStream.ReadDcmElementWithExplicitVR()
+	//	log.Println(elem, err)
 
 	return nil
 }
