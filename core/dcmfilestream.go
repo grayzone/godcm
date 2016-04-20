@@ -217,7 +217,7 @@ func (s *DcmFileStream) ReadDcmElementWithExplicitVR() (DcmElement, error) {
 	}
 
 	// read element value
-	elem.Value, err = s.ReadString(elem.Length)
+	elem.Value, err = s.Read(elem.Length)
 
 	return elem, err
 }
@@ -246,7 +246,7 @@ func (s *DcmFileStream) ReadDcmElementWithImplicitVR() (DcmElement, error) {
 	}
 
 	// read element value
-	elem.Value, err = s.ReadString(elem.Length)
+	elem.Value, err = s.Read(elem.Length)
 
 	if elem.Tag.Group != 0x7fe0 {
 		log.Println(elem)

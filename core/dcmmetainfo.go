@@ -61,7 +61,7 @@ func (meta *DcmMetaInfo) GetTransferSyntaxUID() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return elem.Value, nil
+	return elem.GetValueString(), nil
 }
 
 // Read meta information from file stream
@@ -101,7 +101,7 @@ func (meta *DcmMetaInfo) Read(stream *DcmFileStream) error {
 		if err != nil {
 			return err
 		}
-		value, err := stream.ReadString(length)
+		value, err := stream.Read(length)
 		if err != nil {
 			return err
 		}

@@ -60,11 +60,3 @@ func (reader *DcmReader) IsDicom3() (bool, error) {
 	}
 	return false, errors.New("Only supprot DICOM 3.0.")
 }
-
-// ReadOneDcmElement is to parse one dicom element
-func (reader *DcmReader) ReadOneDcmElement() (DcmElement, error) {
-	var elem DcmElement
-
-	return elem, nil
-
-}
