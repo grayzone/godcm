@@ -3,6 +3,7 @@ package core
 // DcmElement indentified the data element tag.
 type DcmElement struct {
 	Tag    DcmTag
+	Name   string
 	VR     string
 	Length int64
 	Value  string

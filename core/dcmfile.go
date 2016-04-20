@@ -7,9 +7,9 @@ type DcmFile struct {
 }
 
 // NewDcmFile is to create an instance of DcmFile
-func NewDcmFile()*DcmFile{
+func NewDcmFile() *DcmFile {
 	var f DcmFile
 	f.FileMetaInfo = *NewDcmMetaInfo()
-	
+
 	return &f
 }

@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
+	"log"
 	"os"
+	"strings"
 )
 
 // DcmFileStream is to read binary file to bytes.
@@ -123,7 +125,8 @@ func (s *DcmFileStream) ReadString(slen int64) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return string(v[:slen]), nil
+	str := strings.TrimRight(string(v), "\x00")
+	return str, nil
 }
 
 // ReadDcmTag is to read group and element
@@ -146,8 +149,8 @@ func (s *DcmFileStream) ReadDcmVR() (string, error) {
 	return s.ReadString(2)
 }
 
-// ReadDcmElementValueLength is to get the value length of the dicom element.
-func (s *DcmFileStream) ReadDcmElementValueLength(vr string) (int64, error) {
+// ReadValueLengthWithExplicitVR gets the value length of the dicom element with explicit VR.
+func (s *DcmFileStream) ReadValueLengthWithExplicitVR(vr string) (int64, error) {
 	var result int64
 	switch vr {
 	case "OB", "OD", "OF", "OL", "OW", "SQ", "UC", "UR", "UT", "UN":
@@ -172,7 +175,26 @@ func (s *DcmFileStream) ReadDcmElementValueLength(vr string) (int64, error) {
 	return result, nil
 }
 
-// ReadDcmElementWithExplicitVR is to read the data element with explicit VR.
+// ReadValueLengthWithImplicitVR gets the value length of the dicom element with implicit VR.
+func (s *DcmFileStream) ReadValueLengthWithImplicitVR(vr string) (int64, error) {
+	var result int64
+	l, err := s.ReadUINT32()
+	if err != nil {
+		return 0, err
+	}
+	result = int64(l)
+	return result, nil
+}
+
+// ReadDcmElement read one dicom element.
+func (s *DcmFileStream) ReadDcmElement(isExplicitVR bool) (DcmElement, error) {
+	if isExplicitVR {
+		return s.ReadDcmElementWithExplicitVR()
+	}
+	return s.ReadDcmElementWithImplicitVR()
+}
+
+// ReadDcmElementWithExplicitVR read the data element with explicit VR.
 func (s *DcmFileStream) ReadDcmElementWithExplicitVR() (DcmElement, error) {
 	var elem DcmElement
 	var err error
@@ -188,7 +210,8 @@ func (s *DcmFileStream) ReadDcmElementWithExplicitVR() (DcmElement, error) {
 		return elem, err
 	}
 
-	elem.Length, err = s.ReadDcmElementValueLength(elem.VR)
+	//read the value length
+	elem.Length, err = s.ReadValueLengthWithExplicitVR(elem.VR)
 	if err != nil {
 		return elem, err
 	}
@@ -197,4 +220,38 @@ func (s *DcmFileStream) ReadDcmElementWithExplicitVR() (DcmElement, error) {
 	elem.Value, err = s.ReadString(elem.Length)
 
 	return elem, err
+}
+
+// ReadDcmElementWithImplicitVR read the data element with implicit VR.
+func (s *DcmFileStream) ReadDcmElementWithImplicitVR() (DcmElement, error) {
+	var elem DcmElement
+	var err error
+
+	// read dciom tag
+	elem.Tag, err = s.ReadDcmTag()
+	if err != nil {
+		return elem, err
+	}
+	// get VR from Dicom Element registry
+	err = FindDcmElmentByTag(&elem)
+	if err != nil {
+		log.Println(err.Error())
+
+	}
+
+	// read the value length
+	elem.Length, err = s.ReadValueLengthWithImplicitVR(elem.VR)
+	if err != nil {
+		return elem, err
+	}
+
+	// read element value
+	elem.Value, err = s.ReadString(elem.Length)
+
+	if elem.Tag.Group != 0x7fe0 {
+		log.Println(elem)
+	}
+
+	return elem, err
+
 }

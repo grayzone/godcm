@@ -97,7 +97,7 @@ func (meta *DcmMetaInfo) Read(stream *DcmFileStream) error {
 		if err != nil {
 			return err
 		}
-		length, err := stream.ReadDcmElementValueLength(vr)
+		length, err := stream.ReadValueLengthWithExplicitVR(vr)
 		if err != nil {
 			return err
 		}
@@ -118,14 +118,17 @@ func (meta *DcmMetaInfo) Read(stream *DcmFileStream) error {
 	return nil
 }
 
-// CheckTransferSyntaxUID is to identify the Transfer Syntax used to encode the following data set.
-func (meta *DcmMetaInfo) CheckTransferSyntaxUID() error {
+// IsExplicitVR is to check if the tag is Explicit VR structure
+func (meta *DcmMetaInfo) IsExplicitVR() (bool, error) {
 	uid, err := meta.GetTransferSyntaxUID()
 	if err != nil {
-		return err
+		return false, err
 	}
-	log.Println(uid)
-
-	return nil
-
+	var xfer DcmXfer
+	xfer.XferID = uid
+	err = xfer.GetDcmXferByID()
+	if err != nil {
+		return false, err
+	}
+	return xfer.IsExplicitVR(), nil
 }

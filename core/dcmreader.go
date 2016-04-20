@@ -31,12 +31,16 @@ func (reader *DcmReader) ReadFile(filename string) error {
 		return err
 	}
 	//	log.Println(dcmfile.FileMetaInfo)
+	isExplicitVR, err := dcmfile.FileMetaInfo.IsExplicitVR()
+	if err != nil {
+		return err
+	}
 
-	dcmfile.FileMetaInfo.CheckTransferSyntaxUID()
-
-	// read one dicom element
-	//	elem, err := reader.FileStream.ReadDcmElementWithExplicitVR()
-	//	log.Println(elem, err)
+	// read dicom dataset
+	err = dcmfile.FileDataSet.Read(&reader.FileStream, isExplicitVR)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
