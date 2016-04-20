@@ -17,7 +17,6 @@ type DcmElement struct {
 
 // GetValueString convert value to string according to VR
 func (e DcmElement) GetValueString() string {
-	fmt.Println(e.VR)
 	buf := bytes.NewBuffer(e.Value)
 	var result string
 	switch e.VR {
@@ -25,12 +24,16 @@ func (e DcmElement) GetValueString() string {
 		var f float64
 		binary.Read(buf, binary.LittleEndian, &f)
 		result = fmt.Sprintf("%f", f)
-	case "OL", "SH", "SL", "SS", "UL", "US":
-		var i int
+	case "", "OL", "SL", "SS", "UL":
+		var i int32
 		binary.Read(buf, binary.LittleEndian, &i)
 		result = fmt.Sprintf("%d", i)
-	case "AE", "AS", "CS", "DA", "DS", "DT", "IS", "LO", "LT", "PN", "ST", "UI", "UT":
-		binary.Read(buf, binary.LittleEndian, &result)
+	case "US", "US or SS":
+		var i uint16
+		binary.Read(buf, binary.LittleEndian, &i)
+		result = fmt.Sprintf("%d", i)
+	case "AE", "AS", "CS", "DA", "DS", "DT", "IS", "LO", "LT", "PN", "ST", "UI", "UT", "TM", "SH":
+		result = string(bytes.Trim(e.Value, "\x00"))
 	default:
 		result = fmt.Sprintf("%x", e.Value)
 	}
