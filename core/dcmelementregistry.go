@@ -12,7 +12,7 @@ func FindDcmElmentByTag(elem *DcmElement) error{
 			return  nil
 		}
 	}	
-	err := "Failed to find the tag " + elem.Tag.String() + " from DcmElementRegistry"
+	err := "Warning: not find the tag '" + elem.Tag.String() + "' from DcmElementRegistry"
 	return errors.New(err)
 }
 

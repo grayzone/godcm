@@ -7,8 +7,10 @@ const DICOM3FILEIDENTIFIER = "DICM"
 
 // DcmReader is to read DICOM file
 type DcmReader struct {
-	Dataset    DcmDataSet
-	FileStream DcmFileStream
+	Dataset     DcmDataSet
+	FileStream  DcmFileStream
+	IsReadValue bool
+	IsReadPixel bool
 }
 
 // ReadFile is to read dicom file.
@@ -30,17 +32,19 @@ func (reader *DcmReader) ReadFile(filename string) error {
 	if err != nil {
 		return err
 	}
-	//	log.Println(dcmfile.FileMetaInfo)
+	// log.Println(dcmfile.FileMetaInfo)
 	isExplicitVR, err := dcmfile.FileMetaInfo.IsExplicitVR()
 	if err != nil {
 		return err
 	}
 
 	// read dicom dataset
-	err = dcmfile.FileDataSet.Read(&reader.FileStream, isExplicitVR)
+	err = dcmfile.FileDataSet.Read(&reader.FileStream, isExplicitVR, reader.IsReadValue, reader.IsReadPixel)
 	if err != nil {
 		return err
 	}
+
+	//	log.Println(dcmfile.FileDataSet.Elements)
 
 	return nil
 }
@@ -56,6 +60,8 @@ func (reader *DcmReader) IsDicom3() (bool, error) {
 		return false, err
 	}
 	if string(b) == DICOM3FILEIDENTIFIER {
+		reader.FileStream.Putback(132)
+
 		return true, nil
 	}
 	return false, errors.New("Only supprot DICOM 3.0.")

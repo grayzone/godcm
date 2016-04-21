@@ -1,6 +1,7 @@
 package core
 
 import (
+	"errors"
 	"log"
 	"os"
 )
@@ -46,17 +47,18 @@ func NewDcmMetaInfo() *DcmMetaInfo {
 }
 
 // FindDcmElement find the element by tag
-func (meta *DcmMetaInfo) FindDcmElement(tag DcmTag) (*DcmElement, error) {
+func (meta DcmMetaInfo) FindDcmElement(tag DcmTag) (*DcmElement, error) {
 	for i, v := range meta.Elements {
 		if v.Tag == tag {
 			return &meta.Elements[i], nil
 		}
 	}
-	return nil, nil
+	err := "Not find the tag '" + tag.String() + "' in Meta dataset."
+	return nil, errors.New(err)
 }
 
 // GetTransferSyntaxUID return the transfer syntax string of the DICOM file.
-func (meta *DcmMetaInfo) GetTransferSyntaxUID() (string, error) {
+func (meta DcmMetaInfo) GetTransferSyntaxUID() (string, error) {
 	elem, err := meta.FindDcmElement(TransferSyntaxUID)
 	if err != nil {
 		return "", err
@@ -71,6 +73,7 @@ func (meta *DcmMetaInfo) Read(stream *DcmFileStream) error {
 	if err != nil {
 		return err
 	}
+
 	// read the preamble
 	meta.Preamble, err = stream.Read(128)
 	if err != nil {
@@ -78,41 +81,51 @@ func (meta *DcmMetaInfo) Read(stream *DcmFileStream) error {
 	}
 	//read the prefix
 	meta.Prefix, err = stream.Read(4)
+	if err != nil {
+		return err
+	}
 
 	// read dicom meta datasets
 	for !stream.Eos() {
-		group, err := stream.ReadUINT16()
+		var elem DcmElement
+		var err error
+		elem.Tag.Group, err = stream.ReadUINT16()
+
 		if err != nil {
 			return err
 		}
-		if group != 0x0002 {
+
+		if elem.Tag.Group != 0x0002 {
 			err = stream.Putback(2)
 			return err
 		}
-		element, err := stream.ReadUINT16()
+		elem.Tag.Element, err = stream.ReadUINT16()
 		if err != nil {
 			return err
 		}
-		vr, err := stream.ReadDcmVR()
+
+		err = elem.ReadDcmVR(stream)
 		if err != nil {
 			return err
 		}
-		length, err := stream.ReadValueLengthWithExplicitVR(vr)
+
+		err = elem.ReadValueLengthWithExplicitVR(stream)
 		if err != nil {
 			return err
 		}
-		value, err := stream.Read(length)
+
+		err = elem.ReadValue(stream, true, false)
 		if err != nil {
 			return err
 		}
-		elem, err := meta.FindDcmElement(DcmTag{group, element})
+		e, err := meta.FindDcmElement(elem.Tag)
 		if err != nil {
 			log.Println(err.Error())
 			continue
 		}
-		elem.VR = vr
-		elem.Length = length
-		elem.Value = value
+		*e = elem
+
+		//		log.Println(e)
 	}
 
 	return nil

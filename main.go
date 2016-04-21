@@ -2,24 +2,30 @@ package main
 
 import (
 	"log"
-	"os"
 
 	"github.com/grayzone/godcm/core"
 )
 
-func ReadDicom() {
-	_, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
-	filename := "./test/data/CT-MONO2-16-ankle"
+func readdicmfile(filename string) {
 	var reader core.DcmReader
-	err = reader.ReadFile(filename)
+	reader.IsReadValue = true
+	err := reader.ReadFile(filename)
 	if err != nil {
 		log.Println(err.Error())
 	}
 }
 
+// ReadDicomWithImplicitVR read the dicom file with implicit VR for testing.
+func ReadDicomWithImplicitVR() {
+	readdicmfile("./test/data/CT-MONO2-16-ankle")
+}
+
+// ReadDicomWithExplicitVR read the dicom file with explicit VR for testing.
+func ReadDicomWithExplicitVR() {
+	readdicmfile("./test/data/GH220.dcm")
+}
+
 func main() {
-	ReadDicom()
+	ReadDicomWithImplicitVR()
+	//ReadDicomWithExplicitVR()
 }
