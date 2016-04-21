@@ -30,6 +30,13 @@ var (
 	PrivateInformation = DcmTag{0x0002, 0x0102}
 )
 
+// DICOM Sequence Items
+var (
+	DCMItem                     = DcmTag{0xfffe, 0xe000}
+	DCMItemDelimitationItem     = DcmTag{0xfffe, 0xe00d}
+	DCMSequenceDelimitationItem = DcmTag{0xfffe, 0xe0dd}
+)
+
 // DcmTag contains the group and element of the dicom element.
 type DcmTag struct {
 	Group   uint16

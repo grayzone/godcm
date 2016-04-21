@@ -76,30 +76,44 @@ func (e *DcmElement) ReadValueLengthWithExplicitVR(s *DcmFileStream) error {
 		if err != nil {
 			return err
 		}
-		l, err := s.ReadUINT32()
+		err = e.ReadValueLengthUint32(s)
 		if err != nil {
 			return err
 		}
-		e.Length = int64(l)
 	default:
 		// read value length
-		l, err := s.ReadUINT16()
+		err := e.ReadValueLengthUint16(s)
 		if err != nil {
 			return err
 		}
-		e.Length = int64(l)
 	}
 	return nil
 }
 
 // ReadValueLengthWithImplicitVR gets the value length of the dicom element with implicit VR.
 func (e *DcmElement) ReadValueLengthWithImplicitVR(s *DcmFileStream) error {
+	return e.ReadValueLengthUint32(s)
+}
+
+// ReadValueLengthUint16 read 2 bytes value length
+func (e *DcmElement) ReadValueLengthUint16(s *DcmFileStream) error {
+	l, err := s.ReadUINT16()
+	if err != nil {
+		return err
+	}
+	e.Length = int64(l)
+	return nil
+}
+
+// ReadValueLengthUint32 read 4 bytes value length
+func (e *DcmElement) ReadValueLengthUint32(s *DcmFileStream) error {
 	l, err := s.ReadUINT32()
 	if err != nil {
 		return err
 	}
 	e.Length = int64(l)
 	return nil
+
 }
 
 // ReadValue get or skip the element value.
