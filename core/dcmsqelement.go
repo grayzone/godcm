@@ -1,20 +1,52 @@
 package core
 
+import "log"
+
 // DcmSQElement contain an SQ Data Element
 type DcmSQElement struct {
 	Item []DcmElement
 }
 
 // Read the items in an SQ data element
-func (sq *DcmSQElement) Read(stream *DcmFileStream, isExplicitVR bool) error {
+func (sq *DcmSQElement) Read(stream *DcmFileStream, isExplicitVR bool, isReadValue bool) error {
 	if isExplicitVR {
-		return sq.ReadItemsWithExplicitVR(stream)
+		return sq.ReadItemsWithExplicitVR(stream, isReadValue)
 	}
 	return sq.ReadItemsWithImplicitVR(stream)
 }
 
 // ReadItemsWithExplicitVR the items in an SQ data element with explicit VR
-func (sq *DcmSQElement) ReadItemsWithExplicitVR(stream *DcmFileStream) error {
+func (sq *DcmSQElement) ReadItemsWithExplicitVR(stream *DcmFileStream, isReadValue bool) error {
+	for !stream.Eos() {
+		var elem DcmElement
+		err := elem.ReadDcmTag(stream)
+		log.Println(elem)
+		if err != nil {
+			return err
+		}
+		if elem.Tag == DCMItem {
+			// read item length
+			err = elem.ReadValueLengthUint32(stream)
+			if err != nil {
+				return err
+			}
+			// read item value
+			err = elem.ReadValue(stream, isReadValue, false)
+			if err != nil {
+				return err
+			}
+			sq.Item = append(sq.Item, elem)
+		}
+		if elem.Tag == DCMSequenceDelimitationItem {
+			// read item length
+			err = elem.ReadValueLengthUint32(stream)
+			if err != nil {
+				return err
+			}
+			sq.Item = append(sq.Item, elem)
+			break
+		}
+	}
 	return nil
 }
 

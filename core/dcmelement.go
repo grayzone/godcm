@@ -9,11 +9,12 @@ import (
 
 // DcmElement indentified the data element tag.
 type DcmElement struct {
-	Tag    DcmTag
-	Name   string
-	VR     string
-	Length int64
-	Value  []byte
+	Tag     DcmTag
+	Name    string
+	VR      string
+	Length  int64
+	Value   []byte
+	Squence *DcmSQElement
 }
 
 // GetValueString convert value to string according to VR
@@ -162,9 +163,18 @@ func (e *DcmElement) ReadDcmElementWithExplicitVR(s *DcmFileStream, isReadValue 
 		return err
 	}
 
-	err = e.ReadValue(s, isReadValue, isReadPixel)
-	if err != nil {
-		return err
+	if e.VR == "SQ" {
+		e.Squence = new(DcmSQElement)
+		err = e.Squence.Read(s, true, isReadValue)
+		if err != nil {
+			return err
+		}
+	} else {
+
+		err = e.ReadValue(s, isReadValue, isReadPixel)
+		if err != nil {
+			return err
+		}
 	}
 
 	log.Println(e.String())

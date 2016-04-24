@@ -22,10 +22,10 @@ func ReadDicomWithImplicitVR() {
 
 // ReadDicomWithExplicitVR read the dicom file with explicit VR for testing.
 func ReadDicomWithExplicitVR() {
-	readdicmfile("./test/data/GH220.dcm")
+	readdicmfile("./test/data/GH223.dcm")
 }
 
 func main() {
-	ReadDicomWithImplicitVR()
-	//ReadDicomWithExplicitVR()
+	//	ReadDicomWithImplicitVR()
+	ReadDicomWithExplicitVR()
 }
