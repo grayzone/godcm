@@ -8,7 +8,7 @@ import (
 
 func readdicmfile(filename string) {
 	var reader core.DcmReader
-	reader.IsReadValue = true
+	//	reader.IsReadValue = true
 	err := reader.ReadFile(filename)
 	if err != nil {
 		log.Println(err.Error())
@@ -22,7 +22,8 @@ func ReadDicomWithImplicitVR() {
 
 // ReadDicomWithExplicitVR read the dicom file with explicit VR for testing.
 func ReadDicomWithExplicitVR() {
-	readdicmfile("./test/data/GH178.dcm")
+	//	readdicmfile("./test/data/GH178.dcm")
+	readdicmfile("./test/data/GH195.dcm")
 }
 
 func main() {

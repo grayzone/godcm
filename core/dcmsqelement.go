@@ -24,7 +24,7 @@ func (sq *DcmSQElement) Read(stream *DcmFileStream, isExplicitVR bool, isReadVal
 	return sq.ReadItemsWithImplicitVR(stream)
 }
 
-func readItemWithUndefinedLength(e *DcmElement, s *DcmFileStream) error {
+func readItemWithUndefinedLength(e *DcmElement, s *DcmFileStream, isReadValue bool) error {
 	isFoundDelimTag := false
 	for !isFoundDelimTag {
 		//read 2 bytes to check the group of the delim tag.
@@ -46,10 +46,14 @@ func readItemWithUndefinedLength(e *DcmElement, s *DcmFileStream) error {
 				}
 				isFoundDelimTag = true
 			}
-			e.Value = append(e.Value, bg...)
-			e.Value = append(e.Value, be...)
+			if isReadValue {
+				e.Value = append(e.Value, bg...)
+				e.Value = append(e.Value, be...)
+			}
 		} else {
-			e.Value = append(e.Value, bg...)
+			if isReadValue {
+				e.Value = append(e.Value, bg...)
+			}
 		}
 	}
 	return nil
@@ -72,7 +76,7 @@ func (sq *DcmSQElement) ReadItemsWithExplicitVR(stream *DcmFileStream, isReadVal
 			}
 
 			if elem.Length == 0xFFFFFFFF {
-				err = readItemWithUndefinedLength(&elem, stream)
+				err = readItemWithUndefinedLength(&elem, stream, isReadValue)
 				if err != nil {
 					return err
 				}
