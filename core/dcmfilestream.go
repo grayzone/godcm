@@ -80,6 +80,7 @@ func (s *DcmFileStream) Eos() bool {
 		return true
 	}
 	size, _ := s.FileHandler.Seek(0, os.SEEK_CUR)
+	//	log.Println(size, s.Size)
 	return size == s.Size
 
 }

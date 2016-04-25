@@ -1,20 +1,99 @@
 package core
 
+import "log"
+
 // DcmSQElement contain an SQ Data Element
 type DcmSQElement struct {
 	Item []DcmElement
 }
 
+func (sq DcmSQElement) String() string {
+	var result string
+	for _, v := range sq.Item {
+		result += v.String()
+		result += " | "
+	}
+	return result
+}
+
 // Read the items in an SQ data element
-func (sq *DcmSQElement) Read(stream *DcmFileStream, isExplicitVR bool) error {
+func (sq *DcmSQElement) Read(stream *DcmFileStream, isExplicitVR bool, isReadValue bool) error {
 	if isExplicitVR {
-		return sq.ReadItemsWithExplicitVR(stream)
+		return sq.ReadItemsWithExplicitVR(stream, isReadValue)
 	}
 	return sq.ReadItemsWithImplicitVR(stream)
 }
 
+func readItemWithUndefinedLength(e *DcmElement, s *DcmFileStream) error {
+	isFoundDelimTag := false
+	for !isFoundDelimTag {
+		//read 2 bytes to check the group of the delim tag.
+		bg, err := s.Read(2)
+		if err != nil {
+			return err
+		}
+		if bg[0] == 0xFE && bg[1] == 0xFF {
+			// continue to check the element of the delim tag.
+			be, err := s.Read(2)
+			if err != nil {
+				return err
+			}
+			if be[0] == 0x0D && be[1] == 0xE0 {
+				// find the delim tag
+				_, err = s.Skip(4)
+				if err != nil {
+					return err
+				}
+				isFoundDelimTag = true
+			}
+			e.Value = append(e.Value, bg...)
+			e.Value = append(e.Value, be...)
+		} else {
+			e.Value = append(e.Value, bg...)
+		}
+	}
+	return nil
+}
+
 // ReadItemsWithExplicitVR the items in an SQ data element with explicit VR
-func (sq *DcmSQElement) ReadItemsWithExplicitVR(stream *DcmFileStream) error {
+func (sq *DcmSQElement) ReadItemsWithExplicitVR(stream *DcmFileStream, isReadValue bool) error {
+	for !stream.Eos() {
+		var elem DcmElement
+		err := elem.ReadDcmTag(stream)
+		log.Println(elem)
+		if err != nil {
+			return err
+		}
+		if elem.Tag == DCMItem {
+			// read item length
+			err = elem.ReadValueLengthUint32(stream)
+			if err != nil {
+				return err
+			}
+			if elem.Length == 0xFFFFFFFF {
+				err = readItemWithUndefinedLength(&elem, stream)
+				if err != nil {
+					return err
+				}
+			} else {
+				// read item value
+				err = elem.ReadValue(stream, isReadValue, false)
+				if err != nil {
+					return err
+				}
+			}
+			sq.Item = append(sq.Item, elem)
+		}
+		if elem.Tag == DCMSequenceDelimitationItem {
+			// read item length
+			err = elem.ReadValueLengthUint32(stream)
+			if err != nil {
+				return err
+			}
+			sq.Item = append(sq.Item, elem)
+			break
+		}
+	}
 	return nil
 }
 

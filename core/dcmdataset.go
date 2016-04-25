@@ -6,10 +6,6 @@ type DcmDataSet struct {
 }
 
 func (dataset *DcmDataSet) Read(stream *DcmFileStream, isExplicitVR bool, isReadValue bool, isReadPixel bool) error {
-	// for testing, implement the dcm tag with Implicit VR first.
-	if isExplicitVR {
-		return nil
-	}
 	for !stream.Eos() {
 		//	for range [12]int{} {
 		var elem DcmElement

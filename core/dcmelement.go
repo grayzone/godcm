@@ -9,11 +9,12 @@ import (
 
 // DcmElement indentified the data element tag.
 type DcmElement struct {
-	Tag    DcmTag
-	Name   string
-	VR     string
-	Length int64
-	Value  []byte
+	Tag     DcmTag
+	Name    string
+	VR      string
+	Length  int64
+	Value   []byte
+	Squence *DcmSQElement
 }
 
 // GetValueString convert value to string according to VR
@@ -43,6 +44,9 @@ func (e DcmElement) GetValueString() string {
 
 // String convert to string value
 func (e DcmElement) String() string {
+	if e.Squence != nil {
+		return fmt.Sprintf("Tag:%s; VR:%s; Length:%d; Value:%s; Sequence : %v", e.Tag, e.VR, e.Length, e.GetValueString(), e.Squence)
+	}
 	return fmt.Sprintf("Tag:%s; VR:%s; Length:%d; Value:%s", e.Tag, e.VR, e.Length, e.GetValueString())
 }
 
@@ -162,9 +166,23 @@ func (e *DcmElement) ReadDcmElementWithExplicitVR(s *DcmFileStream, isReadValue 
 		return err
 	}
 
-	err = e.ReadValue(s, isReadValue, isReadPixel)
-	if err != nil {
-		return err
+	// skip reading value if length is zero
+	if e.Length == 0 {
+		//		log.Println(e.String())
+		return nil
+	}
+
+	if e.VR == "SQ" {
+		e.Squence = new(DcmSQElement)
+		err = e.Squence.Read(s, true, isReadValue)
+		if err != nil {
+			return err
+		}
+	} else {
+		err = e.ReadValue(s, isReadValue, isReadPixel)
+		if err != nil {
+			return err
+		}
 	}
 
 	log.Println(e.String())
