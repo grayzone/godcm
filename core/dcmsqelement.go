@@ -70,6 +70,7 @@ func (sq *DcmSQElement) ReadItemsWithExplicitVR(stream *DcmFileStream, isReadVal
 			if err != nil {
 				return err
 			}
+
 			if elem.Length == 0xFFFFFFFF {
 				err = readItemWithUndefinedLength(&elem, stream)
 				if err != nil {
@@ -81,6 +82,13 @@ func (sq *DcmSQElement) ReadItemsWithExplicitVR(stream *DcmFileStream, isReadVal
 				if err != nil {
 					return err
 				}
+			}
+
+			// read item value
+			err = elem.ReadValue(stream, isReadValue, false)
+			if err != nil {
+				return err
+
 			}
 			sq.Item = append(sq.Item, elem)
 		}
