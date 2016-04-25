@@ -21,12 +21,18 @@ type DcmElement struct {
 func (e DcmElement) GetValueString() string {
 	buf := bytes.NewBuffer(e.Value)
 	var result string
+	if e.Tag.Element == 0x0000 {
+		var i int32
+		binary.Read(buf, binary.LittleEndian, &i)
+		result = fmt.Sprintf("%d", i)
+		return result
+	}
 	switch e.VR {
 	case "FL", "FD", "OD", "OF":
 		var f float64
 		binary.Read(buf, binary.LittleEndian, &f)
 		result = fmt.Sprintf("%f", f)
-	case "", "OL", "SL", "SS", "UL":
+	case "OL", "SL", "SS", "UL":
 		var i int32
 		binary.Read(buf, binary.LittleEndian, &i)
 		result = fmt.Sprintf("%d", i)

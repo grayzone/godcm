@@ -84,12 +84,6 @@ func (sq *DcmSQElement) ReadItemsWithExplicitVR(stream *DcmFileStream, isReadVal
 				}
 			}
 
-			// read item value
-			err = elem.ReadValue(stream, isReadValue, false)
-			if err != nil {
-				return err
-
-			}
 			sq.Item = append(sq.Item, elem)
 		}
 		if elem.Tag == DCMSequenceDelimitationItem {

@@ -39,6 +39,7 @@ func TestDcmReaderReadFileDICOMWithoutReadValue(t *testing.T) {
 	}{
 		{gettestdatafolder() + "GH220.dcm", DcmDataSet{}},
 		{gettestdatafolder() + "GH178.dcm", DcmDataSet{}},
+		{gettestdatafolder() + "CT-MONO2-16-ankle", DcmDataSet{}},
 		/*
 
 			{gettestdatafolder() + "GH064.dcm", DcmDataSet{}},
@@ -47,7 +48,7 @@ func TestDcmReaderReadFileDICOMWithoutReadValue(t *testing.T) {
 			{gettestdatafolder() + "GH179A.dcm", DcmDataSet{}},
 			{gettestdatafolder() + "GH184.dcm", DcmDataSet{}},
 			{gettestdatafolder() + "CT1_J2KI", DcmDataSet{}},
-			{gettestdatafolder() + "CT-MONO2-16-ankle", DcmDataSet{}},
+
 			{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", DcmDataSet{}},
 			{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", DcmDataSet{}},
 			{gettestdatafolder() + "GH179B.dcm", DcmDataSet{}},
@@ -72,6 +73,7 @@ func TestDcmReaderReadFileDICOM(t *testing.T) {
 	}{
 		{gettestdatafolder() + "GH220.dcm", DcmDataSet{}},
 		{gettestdatafolder() + "GH178.dcm", DcmDataSet{}},
+		{gettestdatafolder() + "CT-MONO2-16-ankle", DcmDataSet{}},
 		/*
 
 			{gettestdatafolder() + "GH064.dcm", DcmDataSet{}},
@@ -80,7 +82,7 @@ func TestDcmReaderReadFileDICOM(t *testing.T) {
 			{gettestdatafolder() + "GH179A.dcm", DcmDataSet{}},
 			{gettestdatafolder() + "GH184.dcm", DcmDataSet{}},
 			{gettestdatafolder() + "CT1_J2KI", DcmDataSet{}},
-			{gettestdatafolder() + "CT-MONO2-16-ankle", DcmDataSet{}},
+
 			{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", DcmDataSet{}},
 			{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", DcmDataSet{}},
 			{gettestdatafolder() + "GH179B.dcm", DcmDataSet{}},

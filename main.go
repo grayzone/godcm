@@ -26,6 +26,6 @@ func ReadDicomWithExplicitVR() {
 }
 
 func main() {
-	//	ReadDicomWithImplicitVR()
+	//ReadDicomWithImplicitVR()
 	ReadDicomWithExplicitVR()
 }
