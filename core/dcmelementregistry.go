@@ -16,6 +16,34 @@ func FindDcmElmentByTag(elem *DcmElement) error{
 	return errors.New(err)
 }
 
+// FindDcmMetaElmentByTag find the meta registry information
+func FindDcmMetaElmentByTag(elem *DcmElement) error{
+	for _, v := range DcmMetaElementRegistry{
+		if v.Tag == elem.Tag{
+			*elem = v
+			return  nil
+		}
+	}	
+	err := "Warning: not find the tag '" + elem.Tag.String() + "' from DcmMetaElementRegistry"
+	return errors.New(err)
+}
+
+// DcmMetaElementRegistry contains the Registry of DICOM Meta Data Elements
+var DcmMetaElementRegistry = []DcmElement{
+	DcmElement{Tag:DcmTag{0x0002, 0x0000}, Name:"File Meta Information Group Length", VR:"UL"},
+	DcmElement{Tag:DcmTag{0x0002, 0x0001}, Name:"File Meta Information Version", VR:"OB"},
+	DcmElement{Tag:DcmTag{0x0002, 0x0002}, Name:"Media Storage SOP Class UID", VR:"UI"},
+	DcmElement{Tag:DcmTag{0x0002, 0x0003}, Name:"Media Storage SOP Instance UID", VR:"UI"},
+	DcmElement{Tag:DcmTag{0x0002, 0x0010}, Name:"Transfer Syntax UID", VR:"UI"},
+	DcmElement{Tag:DcmTag{0x0002, 0x0012}, Name:"Implementation Class UID", VR:"UI"},
+	DcmElement{Tag:DcmTag{0x0002, 0x0013}, Name:"Implementation Version Name", VR:"SH"},
+	DcmElement{Tag:DcmTag{0x0002, 0x0016}, Name:"Source Application Entity Title", VR:"AE"},
+	DcmElement{Tag:DcmTag{0x0002, 0x0017}, Name:"Sending Application Entity Title", VR:"AE"},
+	DcmElement{Tag:DcmTag{0x0002, 0x0018}, Name:"Receiving Application Entity Title", VR:"AE"},
+	DcmElement{Tag:DcmTag{0x0002, 0x0100}, Name:"Private Information Creator UID", VR:"UI"},
+	DcmElement{Tag:DcmTag{0x0002, 0x0102}, Name:"Private Information", VR:"OB"},	
+}
+
 // DcmElementRegistry contains the Registry of DICOM Data Elements
 var DcmElementRegistry = []DcmElement{
 DcmElement{Tag:DcmTag{0x0008, 0x0001}, Name:"Length to End", VR:"UL"},

@@ -17,13 +17,6 @@ type DcmReader struct {
 	IsReadPixel bool
 }
 
-// NewDcmReader create a new instance of DcmReader.
-func NewDcmReader() *DcmReader {
-	var reader DcmReader
-	reader.Meta = *NewDcmMetaInfo()
-	return &reader
-}
-
 // ReadFile is to read dicom file.
 func (reader *DcmReader) ReadFile(filename string) error {
 	reader.FileName = filename

@@ -1,9 +1,6 @@
 package core
 
-import (
-	"errors"
-	"log"
-)
+import "errors"
 
 // DcmMetaInfo is to store DICOM meta data.
 type DcmMetaInfo struct {
@@ -13,53 +10,23 @@ type DcmMetaInfo struct {
 	isEndofMetaInfo bool
 }
 
-/*
-// String convert to string value
-func (meta DcmMetaInfo) String() string {
-	var result string
-	result += fmt.Sprintf("%x", meta.Preamble) + ";"
-	result += string(meta.Prefix) + ";"
-	for _, v := range meta.Elements {
-		result += v.String()
-	}
-	return result
-}
-*/
-
-// NewDcmMetaInfo to initialize the struct with all the tags used for dicom file meta information
-func NewDcmMetaInfo() *DcmMetaInfo {
-	var meta DcmMetaInfo
-
-	meta.Elements = append(meta.Elements, DcmElement{Tag: FileMetaInformationGroupLength})
-	meta.Elements = append(meta.Elements, DcmElement{Tag: FileMetaInformationVersion})
-	meta.Elements = append(meta.Elements, DcmElement{Tag: MediaStorageSOPClassUID})
-	meta.Elements = append(meta.Elements, DcmElement{Tag: MediaStorageSOPInstanceUID})
-	meta.Elements = append(meta.Elements, DcmElement{Tag: TransferSyntaxUID})
-	meta.Elements = append(meta.Elements, DcmElement{Tag: ImplementationClassUID})
-	meta.Elements = append(meta.Elements, DcmElement{Tag: ImplementationVersionName})
-	meta.Elements = append(meta.Elements, DcmElement{Tag: SourceApplicationEntityTitle})
-	meta.Elements = append(meta.Elements, DcmElement{Tag: SendingApplicationEntityTitle})
-	meta.Elements = append(meta.Elements, DcmElement{Tag: ReceivingApplicationEntityTitle})
-	meta.Elements = append(meta.Elements, DcmElement{Tag: PrivateInformationCreatorUID})
-	meta.Elements = append(meta.Elements, DcmElement{Tag: PrivateInformation})
-
-	return &meta
-}
-
 // FindDcmElement find the element by tag
-func (meta DcmMetaInfo) FindDcmElement(tag DcmTag) (*DcmElement, error) {
-	for i, v := range meta.Elements {
-		if v.Tag == tag {
-			return &meta.Elements[i], nil
+func (meta DcmMetaInfo) FindDcmElement(elem *DcmElement) error {
+	for _, v := range meta.Elements {
+		if v.Tag == elem.Tag {
+			*elem = v
+			return nil
 		}
 	}
-	err := "Not find the tag '" + tag.String() + "' in meta information."
-	return nil, errors.New(err)
+	err := "Not find the tag '" + elem.Tag.String() + "' in meta information."
+	return errors.New(err)
 }
 
 // GetTransferSyntaxUID return the transfer syntax string of the DICOM file.
 func (meta DcmMetaInfo) GetTransferSyntaxUID() (string, error) {
-	elem, err := meta.FindDcmElement(TransferSyntaxUID)
+	var elem DcmElement
+	elem.Tag = TagTransferSyntaxUID
+	err := meta.FindDcmElement(&elem)
 	if err != nil {
 		return "", err
 	}
@@ -98,12 +65,7 @@ func (meta *DcmMetaInfo) ReadOneElement(stream *DcmFileStream) error {
 	if err != nil {
 		return err
 	}
-	e, err := meta.FindDcmElement(elem.Tag)
-	if err != nil {
-		log.Println(err.Error())
-		return nil
-	}
-	*e = elem
+	meta.Elements = append(meta.Elements, elem)
 	return nil
 }
 

@@ -7,7 +7,7 @@ import (
 )
 
 func readdicmfile(filename string) {
-	reader := core.NewDcmReader()
+	var reader core.DcmReader
 	//	reader.IsReadValue = true
 	err := reader.ReadFile(filename)
 	if err != nil {
