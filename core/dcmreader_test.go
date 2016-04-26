@@ -39,7 +39,10 @@ func TestDcmReaderReadFileDICOMWithoutReadValue(t *testing.T) {
 	}{
 		{gettestdatafolder() + "GH220.dcm", DcmDataSet{}},
 		{gettestdatafolder() + "GH178.dcm", DcmDataSet{}},
+		{gettestdatafolder() + "xr_chest.dcm", DcmDataSet{}},
+		//		{gettestdatafolder() + "xr_chicken2.dcm", DcmDataSet{}},
 		{gettestdatafolder() + "CT-MONO2-16-ankle", DcmDataSet{}},
+		{gettestdatafolder() + "T14/IM-0001-0001.dcm", DcmDataSet{}},
 		/*
 
 			{gettestdatafolder() + "GH064.dcm", DcmDataSet{}},
@@ -73,7 +76,10 @@ func TestDcmReaderReadFileDICOM(t *testing.T) {
 	}{
 		{gettestdatafolder() + "GH220.dcm", DcmDataSet{}},
 		{gettestdatafolder() + "GH178.dcm", DcmDataSet{}},
+		{gettestdatafolder() + "xr_chest.dcm", DcmDataSet{}},
+		//		{gettestdatafolder() + "xr_chicken2.dcm", DcmDataSet{}},
 		{gettestdatafolder() + "CT-MONO2-16-ankle", DcmDataSet{}},
+		{gettestdatafolder() + "T14/IM-0001-0001.dcm", DcmDataSet{}},
 		/*
 
 			{gettestdatafolder() + "GH064.dcm", DcmDataSet{}},
