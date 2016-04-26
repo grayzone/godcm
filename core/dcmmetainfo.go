@@ -53,7 +53,7 @@ func (meta DcmMetaInfo) FindDcmElement(tag DcmTag) (*DcmElement, error) {
 			return &meta.Elements[i], nil
 		}
 	}
-	err := "Not find the tag '" + tag.String() + "' in Meta dataset."
+	err := "Not find the tag '" + tag.String() + "' in meta information."
 	return nil, errors.New(err)
 }
 

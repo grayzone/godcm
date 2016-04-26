@@ -57,7 +57,7 @@ func TestDcmReaderReadFileDICOMWithoutReadValue(t *testing.T) {
 		*/
 	}
 	for _, c := range cases {
-		var reader DcmReader
+		reader := NewDcmReader()
 		err := reader.ReadFile(c.in)
 		if err != nil {
 			t.Errorf("DcmReader.ReadFile(): %s", err.Error())
@@ -91,7 +91,7 @@ func TestDcmReaderReadFileDICOM(t *testing.T) {
 		*/
 	}
 	for _, c := range cases {
-		var reader DcmReader
+		reader := NewDcmReader()
 		reader.IsReadValue = true
 		err := reader.ReadFile(c.in)
 		if err != nil {
