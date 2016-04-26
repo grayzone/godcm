@@ -3,14 +3,14 @@ package core
 import (
 	"errors"
 	"log"
-	"os"
 )
 
 // DcmMetaInfo is to store DICOM meta data.
 type DcmMetaInfo struct {
-	Preamble []byte // length: 128
-	Prefix   []byte // length: 4
-	Elements []DcmElement
+	Preamble        []byte // length: 128
+	Prefix          []byte // length: 4
+	Elements        []DcmElement
+	isEndofMetaInfo bool
 }
 
 /*
@@ -66,14 +66,54 @@ func (meta DcmMetaInfo) GetTransferSyntaxUID() (string, error) {
 	return elem.GetValueString(), nil
 }
 
-// Read meta information from file stream
-func (meta *DcmMetaInfo) Read(stream *DcmFileStream) error {
-	// turn to the beginning of the file
-	_, err := stream.FileHandler.Seek(0, os.SEEK_SET)
+// ReadOneElement read one DICOM element in meta information.
+func (meta *DcmMetaInfo) ReadOneElement(stream *DcmFileStream) error {
+	var elem DcmElement
+	var err error
+	err = elem.ReadDcmTagGroup(stream)
+	if err != nil {
+		return err
+	}
+	if elem.Tag.Group != 0x0002 {
+		stream.Putback(2)
+		meta.isEndofMetaInfo = true
+		return nil
+	}
+	err = elem.ReadDcmTagElemment(stream)
 	if err != nil {
 		return err
 	}
 
+	err = elem.ReadDcmVR(stream)
+	if err != nil {
+		return err
+	}
+
+	err = elem.ReadValueLengthWithExplicitVR(stream)
+	if err != nil {
+		return err
+	}
+
+	err = elem.ReadValue(stream, true, false)
+	if err != nil {
+		return err
+	}
+	e, err := meta.FindDcmElement(elem.Tag)
+	if err != nil {
+		log.Println(err.Error())
+		return nil
+	}
+	*e = elem
+	return nil
+}
+
+// Read meta information from file stream
+func (meta *DcmMetaInfo) Read(stream *DcmFileStream) error {
+	// turn to the beginning of the file
+	err := stream.SeekToBegin()
+	if err != nil {
+		return err
+	}
 	// read the preamble
 	meta.Preamble, err = stream.Read(128)
 	if err != nil {
@@ -84,50 +124,13 @@ func (meta *DcmMetaInfo) Read(stream *DcmFileStream) error {
 	if err != nil {
 		return err
 	}
-
 	// read dicom meta datasets
-	for !stream.Eos() {
-		var elem DcmElement
-		var err error
-		elem.Tag.Group, err = stream.ReadUINT16()
-
+	for !stream.Eos() && !meta.isEndofMetaInfo {
+		err = meta.ReadOneElement(stream)
 		if err != nil {
 			return err
 		}
-
-		if elem.Tag.Group != 0x0002 {
-			err = stream.Putback(2)
-			return err
-		}
-		elem.Tag.Element, err = stream.ReadUINT16()
-		if err != nil {
-			return err
-		}
-
-		err = elem.ReadDcmVR(stream)
-		if err != nil {
-			return err
-		}
-
-		err = elem.ReadValueLengthWithExplicitVR(stream)
-		if err != nil {
-			return err
-		}
-
-		err = elem.ReadValue(stream, true, false)
-		if err != nil {
-			return err
-		}
-		e, err := meta.FindDcmElement(elem.Tag)
-		if err != nil {
-			log.Println(err.Error())
-			continue
-		}
-		*e = elem
-
-		//		log.Println(e)
 	}
-
 	return nil
 }
 

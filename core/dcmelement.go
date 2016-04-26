@@ -56,14 +56,33 @@ func (e DcmElement) String() string {
 	return fmt.Sprintf("Tag:%s; VR:%s; Length:%d; Value:%s", e.Tag, e.VR, e.Length, e.GetValueString())
 }
 
-// ReadDcmTag is to read group and element
-func (e *DcmElement) ReadDcmTag(s *DcmFileStream) error {
+// ReadDcmTagGroup read tag  group of the dicom element.
+func (e *DcmElement) ReadDcmTagGroup(s *DcmFileStream) error {
 	var err error
 	e.Tag.Group, err = s.ReadUINT16()
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+// ReadDcmTagElemment read tag  group of the dicom element.
+func (e *DcmElement) ReadDcmTagElemment(s *DcmFileStream) error {
+	var err error
 	e.Tag.Element, err = s.ReadUINT16()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// ReadDcmTag is to read group and element
+func (e *DcmElement) ReadDcmTag(s *DcmFileStream) error {
+	err := e.ReadDcmTagGroup(s)
+	if err != nil {
+		return err
+	}
+	err = e.ReadDcmTagElemment(s)
 	if err != nil {
 		return err
 	}

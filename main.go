@@ -7,7 +7,7 @@ import (
 )
 
 func readdicmfile(filename string) {
-	var reader core.DcmReader
+	reader := core.NewDcmReader()
 	//	reader.IsReadValue = true
 	err := reader.ReadFile(filename)
 	if err != nil {
@@ -27,6 +27,6 @@ func ReadDicomWithExplicitVR() {
 }
 
 func main() {
-	//ReadDicomWithImplicitVR()
+	ReadDicomWithImplicitVR()
 	ReadDicomWithExplicitVR()
 }

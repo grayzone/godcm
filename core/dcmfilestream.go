@@ -11,29 +11,29 @@ import (
 // DcmFileStream is to read binary file to bytes.
 type DcmFileStream struct {
 	FileName    string
-	FileHandler *os.File
+	fileHandler *os.File
 	Size        int64
 }
 
 // Open is to open a file
 func (s *DcmFileStream) Open() error {
 	var err error
-	s.FileHandler, err = os.Open(s.FileName)
+	s.fileHandler, err = os.Open(s.FileName)
 	if err != nil {
 		return err
 	}
-	s.Size, err = s.FileHandler.Seek(0, os.SEEK_END)
+	s.Size, err = s.fileHandler.Seek(0, os.SEEK_END)
 	if err != nil {
 		return err
 	}
-	_, err = s.FileHandler.Seek(0, os.SEEK_SET)
+	_, err = s.fileHandler.Seek(0, os.SEEK_SET)
 	return err
 }
 
 // Close is to close a file
 func (s *DcmFileStream) Close() error {
-	if s.FileHandler != nil {
-		return s.FileHandler.Close()
+	if s.fileHandler != nil {
+		return s.fileHandler.Close()
 	}
 	return nil
 }
@@ -41,21 +41,27 @@ func (s *DcmFileStream) Close() error {
 // Skip the bytes by given length
 func (s *DcmFileStream) Skip(skiplength int64) (int64, error) {
 	var result int64
-	if s.FileHandler == nil {
+	if s.fileHandler == nil {
 		return result, errors.New("The file is not opened yet.")
 	}
 	if skiplength == 0 {
 		return result, nil
 	}
-	pos, _ := s.FileHandler.Seek(0, os.SEEK_CUR)
+	pos, _ := s.fileHandler.Seek(0, os.SEEK_CUR)
 
 	if s.Size-pos < skiplength {
 		result = s.Size - pos
 	} else {
 		result = skiplength
 	}
-	_, err := s.FileHandler.Seek(skiplength, os.SEEK_CUR)
+	_, err := s.fileHandler.Seek(skiplength, os.SEEK_CUR)
 	return result, err
+}
+
+// SeekToBegin set the handler to the beginning of the file.
+func (s *DcmFileStream) SeekToBegin() error {
+	_, err := s.fileHandler.Seek(0, os.SEEK_SET)
+	return err
 }
 
 // Putback the bytes by given length
@@ -63,11 +69,11 @@ func (s *DcmFileStream) Putback(num int64) error {
 	if num == 0 {
 		return nil
 	}
-	pos, _ := s.FileHandler.Seek(0, os.SEEK_CUR)
+	pos, _ := s.fileHandler.Seek(0, os.SEEK_CUR)
 	if num > pos {
 		return errors.New("Parser failure: Putback operation failed")
 	}
-	_, err := s.FileHandler.Seek(-num, os.SEEK_CUR)
+	_, err := s.fileHandler.Seek(-num, os.SEEK_CUR)
 	if err != nil {
 		return err
 	}
@@ -76,10 +82,10 @@ func (s *DcmFileStream) Putback(num int64) error {
 
 // Eos is to check the end of the DICOM file.
 func (s *DcmFileStream) Eos() bool {
-	if s.FileHandler == nil {
+	if s.fileHandler == nil {
 		return true
 	}
-	size, _ := s.FileHandler.Seek(0, os.SEEK_CUR)
+	size, _ := s.fileHandler.Seek(0, os.SEEK_CUR)
 	//	log.Println(size, s.Size)
 	return size == s.Size
 
@@ -91,7 +97,7 @@ func (s *DcmFileStream) Read(length int64) ([]byte, error) {
 		return []byte{}, nil
 	}
 	b := make([]byte, length)
-	_, err := s.FileHandler.Read(b)
+	_, err := s.fileHandler.Read(b)
 	return b, err
 }
 
