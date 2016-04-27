@@ -201,7 +201,7 @@ func (e *DcmElement) ReadDcmElementWithExplicitVR(s *DcmFileStream, isReadValue 
 		if err != nil {
 			return err
 		}
-		log.Println(e.String())
+		//		log.Println(e.String())
 		return nil
 	}
 
@@ -212,7 +212,7 @@ func (e *DcmElement) ReadDcmElementWithExplicitVR(s *DcmFileStream, isReadValue 
 		if err != nil {
 			return err
 		}
-		log.Println(e.String())
+		//		log.Println(e.String())
 		return nil
 	}
 
@@ -221,7 +221,7 @@ func (e *DcmElement) ReadDcmElementWithExplicitVR(s *DcmFileStream, isReadValue 
 		return err
 	}
 
-	log.Println(e.String())
+	//	log.Println(e.String())
 
 	return nil
 }
@@ -251,7 +251,7 @@ func (e *DcmElement) ReadDcmElementWithImplicitVR(s *DcmFileStream, isReadValue 
 		return err
 	}
 
-	log.Println(e)
+	//	log.Println(e)
 
 	/*
 		if elem.Tag.Group != 0x7fe0 {
