@@ -49,7 +49,7 @@ func (meta *DcmMetaInfo) ReadOneElement(stream *DcmFileStream) error {
 		meta.isEndofMetaInfo = true
 		return nil
 	}
-	err = elem.ReadDcmTagElemment(stream)
+	err = elem.ReadDcmTagElement(stream)
 	if err != nil {
 		return err
 	}

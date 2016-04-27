@@ -192,7 +192,8 @@ type DcmXfer struct {
 	StreamCompression EStreamCompression
 }
 
-const ERRORXferName = "Unknown Transfer Syntax"
+// ERRORXferName is for the unkown transfer syntax.
+var ERRORXferName = "Unknown Transfer Syntax"
 
 var xferList = []DcmXfer{
 	{UIDLittleEndianImplicitTransferSyntax,

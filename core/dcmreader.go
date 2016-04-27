@@ -63,9 +63,9 @@ func (reader *DcmReader) IsDicom3() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	if string(b) == DICOM3FILEIDENTIFIER {
-		reader.Putback(132)
-		return true, nil
+	if string(b) != DICOM3FILEIDENTIFIER {
+		return false, errors.New("Only supprot DICOM 3.0.")
 	}
-	return false, errors.New("Only supprot DICOM 3.0.")
+	reader.Putback(132)
+	return true, nil
 }

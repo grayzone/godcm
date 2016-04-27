@@ -14,7 +14,7 @@ type DcmFileStream struct {
 	Position    int64
 }
 
-// Open is to open a file
+// Open the dicom file
 func (s *DcmFileStream) Open() error {
 	var err error
 	s.fileHandler, err = os.Open(s.FileName)
@@ -29,7 +29,7 @@ func (s *DcmFileStream) Open() error {
 	return err
 }
 
-// Close is to close a file
+// Close the dicom file
 func (s *DcmFileStream) Close() error {
 	if s.fileHandler != nil {
 		return s.fileHandler.Close()
@@ -37,7 +37,7 @@ func (s *DcmFileStream) Close() error {
 	return nil
 }
 
-// Skip the bytes by given length
+// Skip the bytes by the given length
 func (s *DcmFileStream) Skip(skiplength int64) (int64, error) {
 	var result int64
 	if s.fileHandler == nil {
@@ -85,7 +85,7 @@ func (s *DcmFileStream) Putback(num int64) error {
 }
 
 // Eos is to check the end of the DICOM file.
-func (s *DcmFileStream) Eos() bool {
+func (s DcmFileStream) Eos() bool {
 	if s.fileHandler == nil {
 		return true
 	}

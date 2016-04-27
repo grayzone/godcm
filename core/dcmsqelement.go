@@ -4,7 +4,7 @@ import (
 	_ "log"
 )
 
-// DcmSQElement contain an SQ Data Element
+// DcmSQElement contain a SQ Data Element
 type DcmSQElement struct {
 	Item []DcmElement
 }

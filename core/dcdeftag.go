@@ -70,6 +70,7 @@ var (
 	DCMPrivateInformation              = DcmTag{0x0002, 0x0102}
 )
 
+// DICOM data set
 var (
 	DCMFileSetID                                                      = DcmTag{0x0004, 0x1130}
 	DCMFileSetDescriptorFileID                                        = DcmTag{0x0004, 0x1141}
@@ -3277,7 +3278,6 @@ var (
 ** Tags where the group/element can vary {repeating tags}.
 ** Number of entries: 78
  */
-
 var (
 	DCMOverlayRows                             = DcmTag{0x6000, 0x0010} /* {0x6000-0x60ff,0x0010} */
 	DCMOverlayColumns                          = DcmTag{0x6000, 0x0011} /* {0x6000-0x60ff,0x0011} */

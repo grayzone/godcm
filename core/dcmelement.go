@@ -113,8 +113,8 @@ func (e *DcmElement) ReadDcmTagGroup(s *DcmFileStream) error {
 	return nil
 }
 
-// ReadDcmTagElemment read tag  group of the dicom element.
-func (e *DcmElement) ReadDcmTagElemment(s *DcmFileStream) error {
+// ReadDcmTagElement read tag  group of the dicom element.
+func (e *DcmElement) ReadDcmTagElement(s *DcmFileStream) error {
 	var err error
 	e.Tag.Element, err = e.ReadUINT16(s)
 	if err != nil {
@@ -129,7 +129,7 @@ func (e *DcmElement) ReadDcmTag(s *DcmFileStream) error {
 	if err != nil {
 		return err
 	}
-	err = e.ReadDcmTagElemment(s)
+	err = e.ReadDcmTagElement(s)
 	if err != nil {
 		return err
 	}
