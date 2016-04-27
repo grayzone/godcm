@@ -113,11 +113,13 @@ func TestGetPatientID(t *testing.T) {
 		{gettestdatafolder() + "GH220.dcm", ""},
 		{gettestdatafolder() + "GH178.dcm", "55555"},
 		{gettestdatafolder() + "CT-MONO2-16-ankle", ""},
+		{gettestdatafolder() + "xr_chest.dcm", "234"},
+		{gettestdatafolder() + "xr_chicken2.dcm", "CHICKEN"},
 
 		/*
 
-			{gettestdatafolder() + "xr_chest.dcm", DcmDataSet{}},
-			{gettestdatafolder() + "xr_chicken2.dcm", DcmDataSet{}},
+
+
 
 			{gettestdatafolder() + "T14/IM-0001-0001.dcm", DcmDataSet{}},
 			{gettestdatafolder() + "GH184.dcm", DcmDataSet{}},
