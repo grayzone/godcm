@@ -1,8 +1,6 @@
 package core
 
 import (
-	"bytes"
-	"encoding/binary"
 	"errors"
 	"os"
 	"strings"
@@ -107,30 +105,6 @@ func (s *DcmFileStream) Read(length int64) ([]byte, error) {
 
 	s.Position += length
 	return b, err
-}
-
-// ReadUINT16 is to read a uint16 value from the file.
-func (s *DcmFileStream) ReadUINT16() (uint16, error) {
-	v, err := s.Read(2)
-	if err != nil {
-		return 0, err
-	}
-	var result uint16
-	buf := bytes.NewReader(v)
-	err = binary.Read(buf, binary.LittleEndian, &result)
-	return result, err
-}
-
-// ReadUINT32 is to read a uint32 value from the file.
-func (s *DcmFileStream) ReadUINT32() (uint32, error) {
-	v, err := s.Read(4)
-	if err != nil {
-		return 0, err
-	}
-	var result uint32
-	buf := bytes.NewReader(v)
-	err = binary.Read(buf, binary.LittleEndian, &result)
-	return result, err
 }
 
 // ReadString is to read a string from the file.

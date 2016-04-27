@@ -1,6 +1,9 @@
 package core
 
-import "errors"
+import (
+	"errors"
+	_ "log"
+)
 
 // DcmMetaInfo is to store DICOM meta data.
 type DcmMetaInfo struct {
@@ -65,6 +68,7 @@ func (meta *DcmMetaInfo) ReadOneElement(stream *DcmFileStream) error {
 	if err != nil {
 		return err
 	}
+	//	log.Println(elem)
 	meta.Elements = append(meta.Elements, elem)
 	return nil
 }
@@ -97,7 +101,7 @@ func (meta *DcmMetaInfo) Read(stream *DcmFileStream) error {
 }
 
 // IsExplicitVR is to check if the tag is Explicit VR structure
-func (meta *DcmMetaInfo) IsExplicitVR() (bool, error) {
+func (meta DcmMetaInfo) IsExplicitVR() (bool, error) {
 	uid, err := meta.GetTransferSyntaxUID()
 	if err != nil {
 		return false, err
@@ -109,4 +113,19 @@ func (meta *DcmMetaInfo) IsExplicitVR() (bool, error) {
 		return false, err
 	}
 	return xfer.IsExplicitVR(), nil
+}
+
+// GetByteOrder get the byte orber of the file
+func (meta DcmMetaInfo) GetByteOrder() (EByteOrder, error) {
+	uid, err := meta.GetTransferSyntaxUID()
+	if err != nil {
+		return EBOunknown, err
+	}
+	var xfer DcmXfer
+	xfer.XferID = uid
+	err = xfer.GetDcmXferByID()
+	if err != nil {
+		return EBOunknown, err
+	}
+	return xfer.ByteOrder, nil
 }

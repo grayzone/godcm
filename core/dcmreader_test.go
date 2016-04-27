@@ -50,14 +50,16 @@ func TestDcmReaderReadFileDICOMWithoutReadValue(t *testing.T) {
 		{gettestdatafolder() + "CT1_J2KI", DcmDataSet{}},
 		{gettestdatafolder() + "GH223.dcm", DcmDataSet{}},
 		{gettestdatafolder() + "GH195.dcm", DcmDataSet{}},
+		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", DcmDataSet{}},
+		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", DcmDataSet{}},
 
 		/*
 
 
-								{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", DcmDataSet{}},
 
-					{gettestdatafolder() + "GH179B.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", DcmDataSet{}},
+
+			{gettestdatafolder() + "GH179B.dcm", DcmDataSet{}}, // incomplete file
+
 
 
 
@@ -96,12 +98,13 @@ func TestDcmReaderReadFileDICOM(t *testing.T) {
 		{gettestdatafolder() + "GH223.dcm", DcmDataSet{}},
 		{gettestdatafolder() + "GH195.dcm", DcmDataSet{}},
 		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", DcmDataSet{}},
+		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", DcmDataSet{}},
 
 		/*
 
-			{gettestdatafolder() + "GH179B.dcm", DcmDataSet{}},
+			{gettestdatafolder() + "GH179B.dcm", DcmDataSet{}}, // incomplete file
 
-						{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", DcmDataSet{}},
+
 
 
 

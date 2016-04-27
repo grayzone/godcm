@@ -9,12 +9,14 @@ import (
 
 // DcmElement indentified the data element tag.
 type DcmElement struct {
-	Tag     DcmTag
-	Name    string
-	VR      string
-	Length  int64
-	Value   []byte
-	Squence *DcmSQElement
+	Tag          DcmTag
+	Name         string
+	VR           string
+	Length       int64
+	Value        []byte
+	Squence      *DcmSQElement
+	isExplicitVR bool
+	byteOrder    EByteOrder
 }
 
 // GetValueString convert value to string according to VR
@@ -30,15 +32,27 @@ func (e DcmElement) GetValueString() string {
 	switch e.VR {
 	case "FL", "FD", "OD", "OF":
 		var f float64
-		binary.Read(buf, binary.LittleEndian, &f)
+		if e.byteOrder == EBOBigEndian {
+			binary.Read(buf, binary.BigEndian, &f)
+		} else {
+			binary.Read(buf, binary.LittleEndian, &f)
+		}
 		result = fmt.Sprintf("%f", f)
 	case "OL", "SL", "SS", "UL":
 		var i int32
-		binary.Read(buf, binary.LittleEndian, &i)
+		if e.byteOrder == EBOBigEndian {
+			binary.Read(buf, binary.BigEndian, &i)
+		} else {
+			binary.Read(buf, binary.LittleEndian, &i)
+		}
 		result = fmt.Sprintf("%d", i)
 	case "US", "US or SS":
 		var i uint16
-		binary.Read(buf, binary.LittleEndian, &i)
+		if e.byteOrder == EBOBigEndian {
+			binary.Read(buf, binary.BigEndian, &i)
+		} else {
+			binary.Read(buf, binary.LittleEndian, &i)
+		}
 		result = fmt.Sprintf("%d", i)
 	case "AE", "AS", "CS", "DA", "DS", "DT", "IS", "LO", "LT", "PN", "ST", "UI", "UT", "TM", "SH":
 		result = string(bytes.Trim(e.Value, "\x00"))
@@ -56,10 +70,43 @@ func (e DcmElement) String() string {
 	return fmt.Sprintf("Tag:%s; VR:%s; Length:%d; Value:%s", e.Tag, e.VR, e.Length, e.GetValueString())
 }
 
+// ReadUINT16 is to read a uint16 value from the file.
+func (e DcmElement) ReadUINT16(s *DcmFileStream) (uint16, error) {
+	v, err := s.Read(2)
+	if err != nil {
+		return 0, err
+	}
+	var result uint16
+	buf := bytes.NewReader(v)
+	if e.byteOrder == EBOBigEndian {
+		err = binary.Read(buf, binary.BigEndian, &result)
+	} else {
+		err = binary.Read(buf, binary.LittleEndian, &result)
+	}
+
+	return result, err
+}
+
+// ReadUINT32 is to read a uint32 value from the file.
+func (e DcmElement) ReadUINT32(s *DcmFileStream) (uint32, error) {
+	v, err := s.Read(4)
+	if err != nil {
+		return 0, err
+	}
+	var result uint32
+	buf := bytes.NewReader(v)
+	if e.byteOrder == EBOBigEndian {
+		err = binary.Read(buf, binary.BigEndian, &result)
+	} else {
+		err = binary.Read(buf, binary.LittleEndian, &result)
+	}
+	return result, err
+}
+
 // ReadDcmTagGroup read tag  group of the dicom element.
 func (e *DcmElement) ReadDcmTagGroup(s *DcmFileStream) error {
 	var err error
-	e.Tag.Group, err = s.ReadUINT16()
+	e.Tag.Group, err = e.ReadUINT16(s)
 	if err != nil {
 		return err
 	}
@@ -69,7 +116,7 @@ func (e *DcmElement) ReadDcmTagGroup(s *DcmFileStream) error {
 // ReadDcmTagElemment read tag  group of the dicom element.
 func (e *DcmElement) ReadDcmTagElemment(s *DcmFileStream) error {
 	var err error
-	e.Tag.Element, err = s.ReadUINT16()
+	e.Tag.Element, err = e.ReadUINT16(s)
 	if err != nil {
 		return err
 	}
@@ -126,7 +173,7 @@ func (e *DcmElement) ReadValueLengthWithImplicitVR(s *DcmFileStream) error {
 
 // ReadValueLengthUint16 read 2 bytes value length
 func (e *DcmElement) ReadValueLengthUint16(s *DcmFileStream) error {
-	l, err := s.ReadUINT16()
+	l, err := e.ReadUINT16(s)
 	if err != nil {
 		return err
 	}
@@ -136,7 +183,7 @@ func (e *DcmElement) ReadValueLengthUint16(s *DcmFileStream) error {
 
 // ReadValueLengthUint32 read 4 bytes value length
 func (e *DcmElement) ReadValueLengthUint32(s *DcmFileStream) error {
-	l, err := s.ReadUINT32()
+	l, err := e.ReadUINT32(s)
 	if err != nil {
 		return err
 	}
@@ -164,8 +211,8 @@ func (e *DcmElement) ReadValue(s *DcmFileStream, isReadValue bool, isReadPixel b
 }
 
 // ReadDcmElement read one dicom element.
-func (e *DcmElement) ReadDcmElement(s *DcmFileStream, isExplicitVR bool, isReadValue bool, isReadPixel bool) error {
-	if isExplicitVR {
+func (e *DcmElement) ReadDcmElement(s *DcmFileStream, isReadValue bool, isReadPixel bool) error {
+	if e.isExplicitVR {
 		return e.ReadDcmElementWithExplicitVR(s, isReadValue, isReadPixel)
 	}
 	return e.ReadDcmElementWithImplicitVR(s, isReadValue, isReadPixel)
@@ -195,7 +242,20 @@ func (e *DcmElement) ReadDcmElementWithExplicitVR(s *DcmFileStream, isReadValue 
 		//		log.Println(e.String())
 		return nil
 	}
+
+	// read sequence items
 	if e.VR == "SQ" {
+		e.Squence = new(DcmSQElement)
+		err = e.Squence.Read(s, e.Length, true, isReadValue)
+		if err != nil {
+			return err
+		}
+		//		log.Println(e.String())
+		return nil
+	}
+
+	// read VR:UN with unknown length
+	if e.VR == "UN" && e.Length == 0xFFFFFFFF {
 		e.Squence = new(DcmSQElement)
 		err = e.Squence.Read(s, e.Length, true, isReadValue)
 		if err != nil {
