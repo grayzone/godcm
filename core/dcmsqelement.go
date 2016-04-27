@@ -1,6 +1,8 @@
 package core
 
-import "log"
+import (
+	_ "log"
+)
 
 // DcmSQElement contain an SQ Data Element
 type DcmSQElement struct {
@@ -17,9 +19,9 @@ func (sq DcmSQElement) String() string {
 }
 
 // Read the items in an SQ data element
-func (sq *DcmSQElement) Read(stream *DcmFileStream, isExplicitVR bool, isReadValue bool) error {
+func (sq *DcmSQElement) Read(stream *DcmFileStream, length int64, isExplicitVR bool, isReadValue bool) error {
 	if isExplicitVR {
-		return sq.ReadItemsWithExplicitVR(stream, isReadValue)
+		return sq.ReadItemsWithExplicitVR(stream, length, isReadValue)
 	}
 	return sq.ReadItemsWithImplicitVR(stream)
 }
@@ -60,11 +62,14 @@ func readItemWithUndefinedLength(e *DcmElement, s *DcmFileStream, isReadValue bo
 }
 
 // ReadItemsWithExplicitVR the items in an SQ data element with explicit VR
-func (sq *DcmSQElement) ReadItemsWithExplicitVR(stream *DcmFileStream, isReadValue bool) error {
-	for !stream.Eos() {
+func (sq *DcmSQElement) ReadItemsWithExplicitVR(stream *DcmFileStream, length int64, isReadValue bool) error {
+	startPos := stream.Position
+	var delta int64
+	for !stream.Eos() && delta < length {
 		var elem DcmElement
 		err := elem.ReadDcmTag(stream)
-		log.Println(elem)
+		//		log.Println("SQ :", elem, delta)
+
 		if err != nil {
 			return err
 		}
@@ -87,7 +92,7 @@ func (sq *DcmSQElement) ReadItemsWithExplicitVR(stream *DcmFileStream, isReadVal
 					return err
 				}
 			}
-
+			//			log.Println(elem)
 			sq.Item = append(sq.Item, elem)
 		}
 		if elem.Tag == DCMSequenceDelimitationItem {
@@ -96,9 +101,11 @@ func (sq *DcmSQElement) ReadItemsWithExplicitVR(stream *DcmFileStream, isReadVal
 			if err != nil {
 				return err
 			}
+			//			log.Println(elem)
 			sq.Item = append(sq.Item, elem)
 			break
 		}
+		delta = stream.Position - startPos
 	}
 	return nil
 }

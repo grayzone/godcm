@@ -25,7 +25,7 @@ func (meta DcmMetaInfo) FindDcmElement(elem *DcmElement) error {
 // GetTransferSyntaxUID return the transfer syntax string of the DICOM file.
 func (meta DcmMetaInfo) GetTransferSyntaxUID() (string, error) {
 	var elem DcmElement
-	elem.Tag = TagTransferSyntaxUID
+	elem.Tag = DCMTransferSyntaxUID
 	err := meta.FindDcmElement(&elem)
 	if err != nil {
 		return "", err

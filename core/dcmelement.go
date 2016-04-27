@@ -190,24 +190,35 @@ func (e *DcmElement) ReadDcmElementWithExplicitVR(s *DcmFileStream, isReadValue 
 	if err != nil {
 		return err
 	}
-
 	// skip reading value if length is zero
 	if e.Length == 0 {
 		//		log.Println(e.String())
 		return nil
 	}
-
 	if e.VR == "SQ" {
 		e.Squence = new(DcmSQElement)
-		err = e.Squence.Read(s, true, isReadValue)
+		err = e.Squence.Read(s, e.Length, true, isReadValue)
 		if err != nil {
 			return err
 		}
-	} else {
-		err = e.ReadValue(s, isReadValue, isReadPixel)
+		log.Println(e.String())
+		return nil
+	}
+
+	// encapsulated pixel data
+	if e.Tag == DCMPixelData && e.Length == 0xFFFFFFFF {
+		e.Squence = new(DcmSQElement)
+		err = e.Squence.Read(s, e.Length, true, isReadValue)
 		if err != nil {
 			return err
 		}
+		log.Println(e.String())
+		return nil
+	}
+
+	err = e.ReadValue(s, isReadValue, isReadPixel)
+	if err != nil {
+		return err
 	}
 
 	log.Println(e.String())

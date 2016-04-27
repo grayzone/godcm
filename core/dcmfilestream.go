@@ -13,6 +13,7 @@ type DcmFileStream struct {
 	FileName    string
 	fileHandler *os.File
 	Size        int64
+	Position    int64
 }
 
 // Open is to open a file
@@ -55,12 +56,16 @@ func (s *DcmFileStream) Skip(skiplength int64) (int64, error) {
 		result = skiplength
 	}
 	_, err := s.fileHandler.Seek(skiplength, os.SEEK_CUR)
+
+	s.Position += result
 	return result, err
 }
 
 // SeekToBegin set the handler to the beginning of the file.
 func (s *DcmFileStream) SeekToBegin() error {
 	_, err := s.fileHandler.Seek(0, os.SEEK_SET)
+
+	s.Position = 0
 	return err
 }
 
@@ -77,6 +82,7 @@ func (s *DcmFileStream) Putback(num int64) error {
 	if err != nil {
 		return err
 	}
+	s.Position -= num
 	return nil
 }
 
@@ -98,6 +104,8 @@ func (s *DcmFileStream) Read(length int64) ([]byte, error) {
 	}
 	b := make([]byte, length)
 	_, err := s.fileHandler.Read(b)
+
+	s.Position += length
 	return b, err
 }
 
