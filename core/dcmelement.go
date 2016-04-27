@@ -14,7 +14,7 @@ type DcmElement struct {
 	VR           string
 	Length       int64
 	Value        []byte
-	Squence      *DcmSQElement
+	Squence      DcmSQElement
 	isExplicitVR bool
 	byteOrder    EByteOrder
 }
@@ -64,7 +64,7 @@ func (e DcmElement) GetValueString() string {
 
 // String convert to string value
 func (e DcmElement) String() string {
-	if e.Squence != nil {
+	if len(e.Squence.Item) > 0 {
 		return fmt.Sprintf("Tag:%s; VR:%s; Length:%d; Value:%s; Sequence : %v", e.Tag, e.VR, e.Length, e.GetValueString(), e.Squence)
 	}
 	return fmt.Sprintf("Tag:%s; VR:%s; Length:%d; Value:%s", e.Tag, e.VR, e.Length, e.GetValueString())
@@ -245,34 +245,31 @@ func (e *DcmElement) ReadDcmElementWithExplicitVR(s *DcmFileStream, isReadValue 
 
 	// read sequence items
 	if e.VR == "SQ" {
-		e.Squence = new(DcmSQElement)
 		err = e.Squence.Read(s, e.Length, true, isReadValue)
 		if err != nil {
 			return err
 		}
-		//		log.Println(e.String())
+		//	log.Println(e.String())
 		return nil
 	}
 
 	// read VR:UN with unknown length
 	if e.VR == "UN" && e.Length == 0xFFFFFFFF {
-		e.Squence = new(DcmSQElement)
 		err = e.Squence.Read(s, e.Length, true, isReadValue)
 		if err != nil {
 			return err
 		}
-		//		log.Println(e.String())
+		//	log.Println(e.String())
 		return nil
 	}
 
 	// encapsulated pixel data
 	if e.Tag == DCMPixelData && e.Length == 0xFFFFFFFF {
-		e.Squence = new(DcmSQElement)
 		err = e.Squence.Read(s, e.Length, true, isReadValue)
 		if err != nil {
 			return err
 		}
-		//		log.Println(e.String())
+		//	log.Println(e.String())
 		return nil
 	}
 

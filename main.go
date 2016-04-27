@@ -24,6 +24,8 @@ var testfile = []string{
 	"./test/data/GH064.dcm",
 	"./test/data/GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm",
 	"./test/data/GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm",
+	"./test/data/MR-MONO2-8-16x-heart.dcm",
+	"./test/data/xr_chicken2.dcm",
 }
 
 func main() {
@@ -31,7 +33,7 @@ func main() {
 	var isReadValue bool
 	switch len(os.Args) {
 	case 1:
-		readdicmfile(testfile[4], true)
+		readdicmfile(testfile[0], true)
 	case 2:
 		index, _ = strconv.Atoi(os.Args[1])
 		readdicmfile(testfile[index-1], isReadValue)

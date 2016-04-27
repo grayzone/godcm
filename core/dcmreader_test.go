@@ -52,21 +52,10 @@ func TestDcmReaderReadFileDICOMWithoutReadValue(t *testing.T) {
 		{gettestdatafolder() + "GH195.dcm", DcmDataSet{}},
 		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", DcmDataSet{}},
 		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", DcmDataSet{}},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", DcmDataSet{}},
 
 		/*
-
-
-
-
 			{gettestdatafolder() + "GH179B.dcm", DcmDataSet{}}, // incomplete file
-
-
-
-
-
-
-
-
 		*/
 	}
 	for _, c := range cases {
@@ -99,20 +88,10 @@ func TestDcmReaderReadFileDICOM(t *testing.T) {
 		{gettestdatafolder() + "GH195.dcm", DcmDataSet{}},
 		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", DcmDataSet{}},
 		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", DcmDataSet{}},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", DcmDataSet{}},
 
 		/*
-
 			{gettestdatafolder() + "GH179B.dcm", DcmDataSet{}}, // incomplete file
-
-
-
-
-
-
-
-
-
-
 		*/
 	}
 	for _, c := range cases {
