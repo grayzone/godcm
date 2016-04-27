@@ -69,3 +69,14 @@ func (reader *DcmReader) IsDicom3() (bool, error) {
 	reader.Putback(132)
 	return true, nil
 }
+
+// GetPatientID get the patient ID from the dicom file.
+func (reader DcmReader) GetPatientID() (string, error) {
+	var elem DcmElement
+	elem.Tag = DCMPatientID
+	err := reader.Dataset.FindElement(&elem)
+	if err != nil {
+		return "", err
+	}
+	return elem.GetValueString(), nil
+}

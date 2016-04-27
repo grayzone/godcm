@@ -70,12 +70,12 @@ var (
 	DCMPrivateInformation              = DcmTag{0x0002, 0x0102}
 )
 
-// DICOM data set
-var (
+var (   
 	DCMFileSetID                                                      = DcmTag{0x0004, 0x1130}
 	DCMFileSetDescriptorFileID                                        = DcmTag{0x0004, 0x1141}
 	DCMSpecificCharacterSetOfFileSetDescriptorFile                    = DcmTag{0x0004, 0x1142}
-	DCMOffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity        = DcmTag{0x0004, 0x1200}
+	
+DCMOffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity        = DcmTag{0x0004, 0x1200}
 	DCMOffsetOfTheLastDirectoryRecordOfTheRootDirectoryEntity         = DcmTag{0x0004, 0x1202}
 	DCMFileSetConsistencyFlag                                         = DcmTag{0x0004, 0x1212}
 	DCMDirectoryRecordSequence                                        = DcmTag{0x0004, 0x1220}

@@ -1,6 +1,7 @@
 package core
 
 import (
+	"errors"
 	_ "log"
 )
 
@@ -19,8 +20,20 @@ func (dataset *DcmDataSet) Read(stream *DcmFileStream, isExplicitVR bool, byteOr
 		if err != nil {
 			return err
 		}
-		//		log.Println(elem)
+		//	log.Println(elem)
 		dataset.Elements = append(dataset.Elements, elem)
 	}
 	return nil
+}
+
+// FindElement find the element information from the data set.
+func (dataset DcmDataSet) FindElement(e *DcmElement) error {
+	for _, v := range dataset.Elements {
+		if e.Tag == v.Tag {
+			*e = v
+			return nil
+		}
+	}
+	str := "not find the tag '" + e.Tag.String() + "' in the data set"
+	return errors.New(str)
 }

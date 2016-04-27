@@ -5,6 +5,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"log"
+	"strings"
 )
 
 // DcmElement indentified the data element tag.
@@ -59,7 +60,7 @@ func (e DcmElement) GetValueString() string {
 	default:
 		result = fmt.Sprintf("%x", e.Value)
 	}
-	return result
+	return strings.TrimSpace(result)
 }
 
 // String convert to string value
