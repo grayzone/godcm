@@ -110,12 +110,9 @@ func TestGetPatientID(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "GH220.dcm", ""},
 		{gettestdatafolder() + "GH178.dcm", "55555"},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", ""},
 		{gettestdatafolder() + "xr_chest.dcm", "234"},
 		{gettestdatafolder() + "xr_chicken2.dcm", "CHICKEN"},
-		{gettestdatafolder() + "GH223.dcm", ""},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -124,9 +121,32 @@ func TestGetPatientID(t *testing.T) {
 		if err != nil {
 			t.Errorf("DcmReader.ReadFile(): %s", err.Error())
 		}
-		got, _ := reader.GetPatientID()
+		got, err := reader.GetPatientID()
+		if err != nil {
+			t.Errorf("GetPatientID() %s, error : %s", c.in, err.Error())
+		}
 		if got != c.want {
-			t.Errorf("%s GetPatientID(), want '%v' got '%v'", c.in, c.want, got)
+			t.Errorf("GetPatientID() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}
+
+func TestGetPatientIDFailed(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{gettestdatafolder() + "GH220.dcm", ""},
+		{gettestdatafolder() + "CT-MONO2-16-ankle", ""},
+		{gettestdatafolder() + "GH223.dcm", ""},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		err := reader.ReadFile(c.in)
+		got, err := reader.GetPatientID()
+		if err == nil || got != c.want {
+			t.Errorf("GetPatientID() %s, want '%v' got '%v'", c.in, c.want, got)
 		}
 	}
 }
@@ -140,7 +160,6 @@ func TestGetPatientName(t *testing.T) {
 		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "Anonymized"},
 		{gettestdatafolder() + "CT-MONO2-16-ankle", "Anonymized"},
 		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "CompressedSamples^CT1"},
-		{gettestdatafolder() + "GH223.dcm", ""},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -149,9 +168,30 @@ func TestGetPatientName(t *testing.T) {
 		if err != nil {
 			t.Errorf("DcmReader.ReadFile(): %s", err.Error())
 		}
-		got, _ := reader.GetPatientName()
+		got, err := reader.GetPatientName()
+		if err != nil {
+			t.Errorf("GetPatientName() %s, error : %s", c.in, err.Error())
+		}
 		if got != c.want {
-			t.Errorf("%s GetPatientName(), want '%v' got '%v'", c.in, c.want, got)
+			t.Errorf("GetPatientName() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}
+
+func TestGetPatientNameFailed(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{gettestdatafolder() + "GH223.dcm", ""},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		err := reader.ReadFile(c.in)
+		got, err := reader.GetPatientName()
+		if err == nil || got != c.want {
+			t.Errorf("GetPatientName() %s, want '%v' got '%v'", c.in, c.want, got)
 		}
 	}
 }
