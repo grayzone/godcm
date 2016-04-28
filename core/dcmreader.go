@@ -80,3 +80,14 @@ func (reader DcmReader) GetPatientID() (string, error) {
 	}
 	return elem.GetValueString(), nil
 }
+
+// GetPatientName get the patient name from the dicom file.
+func (reader DcmReader) GetPatientName() (string, error) {
+	var elem DcmElement
+	elem.Tag = DCMPatientName
+	err := reader.Dataset.FindElement(&elem)
+	if err != nil {
+		return "", err
+	}
+	return elem.GetValueString(), nil
+}

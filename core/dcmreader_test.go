@@ -115,27 +115,7 @@ func TestGetPatientID(t *testing.T) {
 		{gettestdatafolder() + "CT-MONO2-16-ankle", ""},
 		{gettestdatafolder() + "xr_chest.dcm", "234"},
 		{gettestdatafolder() + "xr_chicken2.dcm", "CHICKEN"},
-
-		/*
-
-
-
-
-			{gettestdatafolder() + "T14/IM-0001-0001.dcm", DcmDataSet{}},
-			{gettestdatafolder() + "GH184.dcm", DcmDataSet{}},
-			{gettestdatafolder() + "GH064.dcm", DcmDataSet{}},
-			{gettestdatafolder() + "GH133.dcm", DcmDataSet{}},
-			{gettestdatafolder() + "GH179A.dcm", DcmDataSet{}},
-			{gettestdatafolder() + "CT1_J2KI", DcmDataSet{}},
-			{gettestdatafolder() + "GH223.dcm", DcmDataSet{}},
-			{gettestdatafolder() + "GH195.dcm", DcmDataSet{}},
-			{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", DcmDataSet{}},
-			{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", DcmDataSet{}},
-			{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", DcmDataSet{}},
-
-
-				{gettestdatafolder() + "GH179B.dcm", DcmDataSet{}}, // incomplete file
-		*/
+		{gettestdatafolder() + "GH223.dcm", ""},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -147,6 +127,31 @@ func TestGetPatientID(t *testing.T) {
 		got, _ := reader.GetPatientID()
 		if got != c.want {
 			t.Errorf("%s GetPatientID(), want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}
+
+func TestGetPatientName(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "WRIX"},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "Anonymized"},
+		{gettestdatafolder() + "CT-MONO2-16-ankle", "Anonymized"},
+		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "CompressedSamples^CT1"},
+		{gettestdatafolder() + "GH223.dcm", ""},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		err := reader.ReadFile(c.in)
+		if err != nil {
+			t.Errorf("DcmReader.ReadFile(): %s", err.Error())
+		}
+		got, _ := reader.GetPatientName()
+		if got != c.want {
+			t.Errorf("%s GetPatientName(), want '%v' got '%v'", c.in, c.want, got)
 		}
 	}
 }
