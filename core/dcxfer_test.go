@@ -27,7 +27,7 @@ func TestNewDcmXfer(t *testing.T) {
 
 }
 
-func TestDcmxferToString(t *testing.T) {
+func TestEByteOrderString(t *testing.T) {
 	cases := []struct {
 		in   EByteOrder
 		want string
@@ -35,6 +35,22 @@ func TestDcmxferToString(t *testing.T) {
 		{EBOunknown, "Unknown"},
 		{EBOLittleEndian, "LittleEndian"},
 		{EBOBigEndian, "BigEndian"},
+	}
+	for _, c := range cases {
+		got := c.in.String()
+		if got != c.want {
+			t.Errorf("String(%d), want %q got %q", c.in, c.want, got)
+		}
+	}
+}
+
+func TestEVRTypeString(t *testing.T) {
+	cases := []struct {
+		in   EVRType
+		want string
+	}{
+		{EVTImplicit, "Implicit"},
+		{EVTExplicit, "Explicit"},
 	}
 	for _, c := range cases {
 		got := c.in.String()
