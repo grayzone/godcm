@@ -70,12 +70,13 @@ var (
 	DCMPrivateInformation              = DcmTag{0x0002, 0x0102}
 )
 
+
+// DICOM Dataset
 var (   
 	DCMFileSetID                                                      = DcmTag{0x0004, 0x1130}
 	DCMFileSetDescriptorFileID                                        = DcmTag{0x0004, 0x1141}
-	DCMSpecificCharacterSetOfFileSetDescriptorFile                    = DcmTag{0x0004, 0x1142}
-	
-DCMOffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity        = DcmTag{0x0004, 0x1200}
+	DCMSpecificCharacterSetOfFileSetDescriptorFile                    = DcmTag{0x0004, 0x1142}	
+	DCMOffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity        = DcmTag{0x0004, 0x1200}
 	DCMOffsetOfTheLastDirectoryRecordOfTheRootDirectoryEntity         = DcmTag{0x0004, 0x1202}
 	DCMFileSetConsistencyFlag                                         = DcmTag{0x0004, 0x1212}
 	DCMDirectoryRecordSequence                                        = DcmTag{0x0004, 0x1220}
@@ -3258,6 +3259,8 @@ DCMOffsetOfTheFirstDirectoryRecordOfTheRootDirectoryEntity        = DcmTag{0x000
 	DCMFirstOrderPhaseCorrectionAngle                                 = DcmTag{0x5600, 0x0010}
 	DCMSpectroscopyData                                               = DcmTag{0x5600, 0x0020}
 )
+
+// DICOM Pixel Data
 var (
 	DCMPixelData                 = DcmTag{0x7fe0, 0x0010}
 	DCMACRNEMA2CCoefficientsSDVN = DcmTag{0x7fe0, 0x0020}
