@@ -11,7 +11,7 @@ const DICOM3FILEIDENTIFIER = "DICM"
 type DcmReader struct {
 	fs          DcmFileStream
 	Meta        DcmMetaInfo
-	Dataset     DcmDataSet
+	Dataset     DcmDataset
 	IsReadValue bool
 	IsReadPixel bool
 }
@@ -68,37 +68,4 @@ func (reader *DcmReader) IsDicom3() (bool, error) {
 	}
 	reader.fs.Putback(132)
 	return true, nil
-}
-
-// GetPatientID get the patient ID from the dicom file.
-func (reader DcmReader) GetPatientID() (string, error) {
-	var elem DcmElement
-	elem.Tag = DCMPatientID
-	err := reader.Dataset.FindElement(&elem)
-	if err != nil {
-		return "", err
-	}
-	return elem.GetValueString(), nil
-}
-
-// GetPatientName get the patient name from the dicom file.
-func (reader DcmReader) GetPatientName() (string, error) {
-	var elem DcmElement
-	elem.Tag = DCMPatientName
-	err := reader.Dataset.FindElement(&elem)
-	if err != nil {
-		return "", err
-	}
-	return elem.GetValueString(), nil
-}
-
-// GetModality get the modality of the dicom image.
-func (reader DcmReader) GetModality() (string, error) {
-	var elem DcmElement
-	elem.Tag = DCMModality
-	err := reader.Dataset.FindElement(&elem)
-	if err != nil {
-		return "", err
-	}
-	return elem.GetValueString(), nil
 }

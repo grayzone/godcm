@@ -5,12 +5,12 @@ import (
 	_ "log"
 )
 
-// DcmDataSet is to contain the DICOM dataset from file.
-type DcmDataSet struct {
+// DcmDataset is to contain the DICOM dataset from file.
+type DcmDataset struct {
 	Elements []DcmElement
 }
 
-func (dataset *DcmDataSet) Read(stream *DcmFileStream, isExplicitVR bool, byteOrder EByteOrder, isReadValue bool, isReadPixel bool) error {
+func (dataset *DcmDataset) Read(stream *DcmFileStream, isExplicitVR bool, byteOrder EByteOrder, isReadValue bool, isReadPixel bool) error {
 	for !stream.Eos() {
 		//	for range [12]int{} {
 		var elem DcmElement
@@ -27,7 +27,7 @@ func (dataset *DcmDataSet) Read(stream *DcmFileStream, isExplicitVR bool, byteOr
 }
 
 // FindElement find the element information from the data set.
-func (dataset DcmDataSet) FindElement(e *DcmElement) error {
+func (dataset DcmDataset) FindElement(e *DcmElement) error {
 	for _, v := range dataset.Elements {
 		if e.Tag == v.Tag {
 			*e = v
@@ -36,4 +36,37 @@ func (dataset DcmDataSet) FindElement(e *DcmElement) error {
 	}
 	str := "not find the tag '" + e.Tag.String() + "' in the data set"
 	return errors.New(str)
+}
+
+// GetPatientID get the patient ID from the dicom file.
+func (dataset DcmDataset) PatientID() string {
+	var elem DcmElement
+	elem.Tag = DCMPatientID
+	err := dataset.FindElement(&elem)
+	if err != nil {
+		return ""
+	}
+	return elem.GetValueString()
+}
+
+// GetPatientName get the patient name from the dicom file.
+func (dataset DcmDataset) PatientName() string {
+	var elem DcmElement
+	elem.Tag = DCMPatientName
+	err := dataset.FindElement(&elem)
+	if err != nil {
+		return ""
+	}
+	return elem.GetValueString()
+}
+
+// GetModality get the modality of the dicom image.
+func (dataset DcmDataset) Modality() string {
+	var elem DcmElement
+	elem.Tag = DCMModality
+	err := dataset.FindElement(&elem)
+	if err != nil {
+		return ""
+	}
+	return elem.GetValueString()
 }

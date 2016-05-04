@@ -17,10 +17,10 @@ func gettestdatafolder() string {
 func TestDcmReaderReadFileNONDICOM(t *testing.T) {
 	cases := []struct {
 		in   string
-		want DcmDataSet
+		want DcmDataset
 	}{
-		{"", DcmDataSet{}},
-		{gettestdatafolder() + "minimumdict.xml", DcmDataSet{}},
+		{"", DcmDataset{}},
+		{gettestdatafolder() + "minimumdict.xml", DcmDataset{}},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -35,27 +35,27 @@ func TestDcmReaderReadFileNONDICOM(t *testing.T) {
 func TestDcmReaderReadFileDICOMWithoutReadValue(t *testing.T) {
 	cases := []struct {
 		in   string
-		want DcmDataSet
+		want DcmDataset
 	}{
-		{gettestdatafolder() + "GH220.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "GH178.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "xr_chest.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "xr_chicken2.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", DcmDataSet{}},
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "GH184.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "GH064.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "GH133.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "GH179A.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "CT1_J2KI", DcmDataSet{}},
-		{gettestdatafolder() + "GH223.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "GH195.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", DcmDataSet{}},
+		{gettestdatafolder() + "GH220.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH178.dcm", DcmDataset{}},
+		{gettestdatafolder() + "xr_chest.dcm", DcmDataset{}},
+		{gettestdatafolder() + "xr_chicken2.dcm", DcmDataset{}},
+		{gettestdatafolder() + "CT-MONO2-16-ankle", DcmDataset{}},
+		{gettestdatafolder() + "T14/IM-0001-0001.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH184.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH064.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH133.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH179A.dcm", DcmDataset{}},
+		{gettestdatafolder() + "CT1_J2KI", DcmDataset{}},
+		{gettestdatafolder() + "GH223.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH195.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", DcmDataset{}},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", DcmDataset{}},
 
 		/*
-			{gettestdatafolder() + "GH179B.dcm", DcmDataSet{}}, // incomplete file
+			{gettestdatafolder() + "GH179B.dcm", DcmDataset{}}, // incomplete file
 		*/
 	}
 	for _, c := range cases {
@@ -71,27 +71,27 @@ func TestDcmReaderReadFileDICOMWithoutReadValue(t *testing.T) {
 func TestDcmReaderReadFileDICOM(t *testing.T) {
 	cases := []struct {
 		in   string
-		want DcmDataSet
+		want DcmDataset
 	}{
-		{gettestdatafolder() + "GH220.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "GH178.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "xr_chest.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "xr_chicken2.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", DcmDataSet{}},
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "GH184.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "GH064.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "GH133.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "GH179A.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "CT1_J2KI", DcmDataSet{}},
-		{gettestdatafolder() + "GH223.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "GH195.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", DcmDataSet{}},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", DcmDataSet{}},
+		{gettestdatafolder() + "GH220.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH178.dcm", DcmDataset{}},
+		{gettestdatafolder() + "xr_chest.dcm", DcmDataset{}},
+		{gettestdatafolder() + "xr_chicken2.dcm", DcmDataset{}},
+		{gettestdatafolder() + "CT-MONO2-16-ankle", DcmDataset{}},
+		{gettestdatafolder() + "T14/IM-0001-0001.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH184.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH064.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH133.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH179A.dcm", DcmDataset{}},
+		{gettestdatafolder() + "CT1_J2KI", DcmDataset{}},
+		{gettestdatafolder() + "GH223.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH195.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", DcmDataset{}},
+		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", DcmDataset{}},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", DcmDataset{}},
 
 		/*
-			{gettestdatafolder() + "GH179B.dcm", DcmDataSet{}}, // incomplete file
+			{gettestdatafolder() + "GH179B.dcm", DcmDataset{}}, // incomplete file
 		*/
 	}
 	for _, c := range cases {
@@ -378,6 +378,7 @@ func TestGetPatientName(t *testing.T) {
 		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "Anonymized"},
 		{gettestdatafolder() + "CT-MONO2-16-ankle", "Anonymized"},
 		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "CompressedSamples^CT1"},
+		{gettestdatafolder() + "GH223.dcm", ""},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -386,29 +387,8 @@ func TestGetPatientName(t *testing.T) {
 		if err != nil {
 			t.Errorf("DcmReader.ReadFile(): %s", err.Error())
 		}
-		got, err := reader.GetPatientName()
-		if err != nil {
-			t.Errorf("GetPatientName() %s, error : %s", c.in, err.Error())
-		}
+		got := reader.Dataset.PatientName()
 		if got != c.want {
-			t.Errorf("GetPatientName() %s, want '%v' got '%v'", c.in, c.want, got)
-		}
-	}
-}
-
-func TestGetPatientNameFailed(t *testing.T) {
-	cases := []struct {
-		in   string
-		want string
-	}{
-		{gettestdatafolder() + "GH223.dcm", ""},
-	}
-	for _, c := range cases {
-		var reader DcmReader
-		reader.IsReadValue = true
-		err := reader.ReadFile(c.in)
-		got, err := reader.GetPatientName()
-		if err == nil || got != c.want {
 			t.Errorf("GetPatientName() %s, want '%v' got '%v'", c.in, c.want, got)
 		}
 	}
@@ -422,6 +402,10 @@ func TestGetPatientID(t *testing.T) {
 		{gettestdatafolder() + "GH178.dcm", "55555"},
 		{gettestdatafolder() + "xr_chest.dcm", "234"},
 		{gettestdatafolder() + "xr_chicken2.dcm", "CHICKEN"},
+		{gettestdatafolder() + "GH220.dcm", ""},
+		{gettestdatafolder() + "CT-MONO2-16-ankle", ""},
+		{gettestdatafolder() + "GH223.dcm", ""},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", ""},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -430,31 +414,8 @@ func TestGetPatientID(t *testing.T) {
 		if err != nil {
 			t.Errorf("DcmReader.ReadFile(): %s", err.Error())
 		}
-		got, err := reader.GetPatientID()
-		if err != nil {
-			t.Errorf("GetPatientID() %s, error : %s", c.in, err.Error())
-		}
+		got := reader.Dataset.PatientID()
 		if got != c.want {
-			t.Errorf("GetPatientID() %s, want '%v' got '%v'", c.in, c.want, got)
-		}
-	}
-}
-
-func TestGetPatientIDFailed(t *testing.T) {
-	cases := []struct {
-		in   string
-		want string
-	}{
-		{gettestdatafolder() + "GH220.dcm", ""},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", ""},
-		{gettestdatafolder() + "GH223.dcm", ""},
-	}
-	for _, c := range cases {
-		var reader DcmReader
-		reader.IsReadValue = true
-		err := reader.ReadFile(c.in)
-		got, err := reader.GetPatientID()
-		if err == nil || got != c.want {
 			t.Errorf("GetPatientID() %s, want '%v' got '%v'", c.in, c.want, got)
 		}
 	}
@@ -468,15 +429,13 @@ func TestGetModality(t *testing.T) {
 		{gettestdatafolder() + "GH178.dcm", "CT"},
 		{gettestdatafolder() + "xr_chest.dcm", "CR"},
 		{gettestdatafolder() + "xr_chicken2.dcm", "CR"},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "MR"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
 		reader.IsReadValue = true
 		reader.ReadFile(c.in)
-		got, err := reader.GetModality()
-		if err != nil {
-			t.Errorf("GetModality() %s, error : %s", c.in, err.Error())
-		}
+		got := reader.Dataset.Modality()
 		if got != c.want {
 			t.Errorf("GetModality() %s, want '%v' got '%v'", c.in, c.want, got)
 		}
