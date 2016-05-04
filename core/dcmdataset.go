@@ -5,7 +5,7 @@ import (
 	_ "log"
 )
 
-// DcmDataset is to contain the DICOM dataset from file.
+// DcmDataset is to contain the DICOM dataset from file
 type DcmDataset struct {
 	Elements []DcmElement
 }
@@ -26,7 +26,7 @@ func (dataset *DcmDataset) Read(stream *DcmFileStream, isExplicitVR bool, byteOr
 	return nil
 }
 
-// FindElement find the element information from the data set.
+// FindElement find the element information from the data set
 func (dataset DcmDataset) FindElement(e *DcmElement) error {
 	for _, v := range dataset.Elements {
 		if e.Tag == v.Tag {
@@ -38,7 +38,7 @@ func (dataset DcmDataset) FindElement(e *DcmElement) error {
 	return errors.New(str)
 }
 
-// GetPatientID get the patient ID from the dicom file.
+// PatientID get the patient ID from the dicom file
 func (dataset DcmDataset) PatientID() string {
 	var elem DcmElement
 	elem.Tag = DCMPatientID
@@ -49,7 +49,7 @@ func (dataset DcmDataset) PatientID() string {
 	return elem.GetValueString()
 }
 
-// GetPatientName get the patient name from the dicom file.
+// PatientName get the patient name from the dicom file
 func (dataset DcmDataset) PatientName() string {
 	var elem DcmElement
 	elem.Tag = DCMPatientName
@@ -60,10 +60,32 @@ func (dataset DcmDataset) PatientName() string {
 	return elem.GetValueString()
 }
 
-// GetModality get the modality of the dicom image.
+// Modality get the modality of the dicom image
 func (dataset DcmDataset) Modality() string {
 	var elem DcmElement
 	elem.Tag = DCMModality
+	err := dataset.FindElement(&elem)
+	if err != nil {
+		return ""
+	}
+	return elem.GetValueString()
+}
+
+// Rows get the rows of the dicom image
+func (dataset DcmDataset) Rows() string {
+	var elem DcmElement
+	elem.Tag = DCMRows
+	err := dataset.FindElement(&elem)
+	if err != nil {
+		return ""
+	}
+	return elem.GetValueString()
+}
+
+// Columns get the columns of the dicom image
+func (dataset DcmDataset) Columns() string {
+	var elem DcmElement
+	elem.Tag = DCMColumns
 	err := dataset.FindElement(&elem)
 	if err != nil {
 		return ""

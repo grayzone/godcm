@@ -369,7 +369,7 @@ func TestPrivateInformation(t *testing.T) {
 	}
 }
 
-func TestGetPatientName(t *testing.T) {
+func TestPatientName(t *testing.T) {
 	cases := []struct {
 		in   string
 		want string
@@ -389,12 +389,12 @@ func TestGetPatientName(t *testing.T) {
 		}
 		got := reader.Dataset.PatientName()
 		if got != c.want {
-			t.Errorf("GetPatientName() %s, want '%v' got '%v'", c.in, c.want, got)
+			t.Errorf("PatientName() %s, want '%v' got '%v'", c.in, c.want, got)
 		}
 	}
 }
 
-func TestGetPatientID(t *testing.T) {
+func TestPatientID(t *testing.T) {
 	cases := []struct {
 		in   string
 		want string
@@ -416,12 +416,12 @@ func TestGetPatientID(t *testing.T) {
 		}
 		got := reader.Dataset.PatientID()
 		if got != c.want {
-			t.Errorf("GetPatientID() %s, want '%v' got '%v'", c.in, c.want, got)
+			t.Errorf("PatientID() %s, want '%v' got '%v'", c.in, c.want, got)
 		}
 	}
 }
 
-func TestGetModality(t *testing.T) {
+func TestModality(t *testing.T) {
 	cases := []struct {
 		in   string
 		want string
@@ -437,7 +437,49 @@ func TestGetModality(t *testing.T) {
 		reader.ReadFile(c.in)
 		got := reader.Dataset.Modality()
 		if got != c.want {
-			t.Errorf("GetModality() %s, want '%v' got '%v'", c.in, c.want, got)
+			t.Errorf("Modality() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}
+
+func TestRows(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{gettestdatafolder() + "GH178.dcm", "512"},
+		{gettestdatafolder() + "xr_chest.dcm", "2048"},
+		{gettestdatafolder() + "xr_chicken2.dcm", "3015"},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "256"},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		reader.ReadFile(c.in)
+		got := reader.Dataset.Rows()
+		if got != c.want {
+			t.Errorf("Rows() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}
+
+func TestColumns(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{gettestdatafolder() + "GH178.dcm", "512"},
+		{gettestdatafolder() + "xr_chest.dcm", "2495"},
+		{gettestdatafolder() + "xr_chicken2.dcm", "2505"},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "256"},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		reader.ReadFile(c.in)
+		got := reader.Dataset.Columns()
+		if got != c.want {
+			t.Errorf("Columns() %s, want '%v' got '%v'", c.in, c.want, got)
 		}
 	}
 }
