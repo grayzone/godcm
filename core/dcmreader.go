@@ -91,3 +91,14 @@ func (reader DcmReader) GetPatientName() (string, error) {
 	}
 	return elem.GetValueString(), nil
 }
+
+// GetModality get the modality of the dicom image.
+func (reader DcmReader) GetModality() (string, error) {
+	var elem DcmElement
+	elem.Tag = DCMModality
+	err := reader.Dataset.FindElement(&elem)
+	if err != nil {
+		return "", err
+	}
+	return elem.GetValueString(), nil
+}

@@ -142,17 +142,6 @@ func (meta DcmMetaInfo) FindElement(e *DcmElement) error {
 	return errors.New(str)
 }
 
-/*
-
-
-var (
-
-	DCMPrivateInformationCreatorUID    = DcmTag{0x0002, 0x0100}
-	DCMPrivateInformation              = DcmTag{0x0002, 0x0102}
-)
-
-*/
-
 // FileMetaInformationGroupLength gets meta information group length
 func (meta DcmMetaInfo) FileMetaInformationGroupLength() string {
 	var e DcmElement
@@ -273,7 +262,6 @@ func (meta DcmMetaInfo) PrivateInformationCreatorUID() string {
 	}
 	return e.GetValueString()
 }
-
 
 // PrivateInformation gets private information
 func (meta DcmMetaInfo) PrivateInformation() string {
