@@ -9,7 +9,7 @@ const DICOM3FILEIDENTIFIER = "DICM"
 
 // DcmReader is to read DICOM file
 type DcmReader struct {
-	DcmFileStream
+	fs          DcmFileStream
 	Meta        DcmMetaInfo
 	Dataset     DcmDataSet
 	IsReadValue bool
@@ -18,19 +18,19 @@ type DcmReader struct {
 
 // ReadFile is to read dicom file.
 func (reader *DcmReader) ReadFile(filename string) error {
-	reader.FileName = filename
-	err := reader.Open()
+	reader.fs.FileName = filename
+	err := reader.fs.Open()
 	if err != nil {
 		return err
 	}
-	defer reader.Close()
+	defer reader.fs.Close()
 	isDCM3, err := reader.IsDicom3()
 	if !isDCM3 {
 		return err
 	}
 
 	//read dicom file meta information
-	err = reader.Meta.Read(&reader.DcmFileStream)
+	err = reader.Meta.Read(&reader.fs)
 	if err != nil {
 		return err
 	}
@@ -45,7 +45,7 @@ func (reader *DcmReader) ReadFile(filename string) error {
 		return err
 	}
 	// read dicom dataset
-	err = reader.Dataset.Read(&reader.DcmFileStream, isExplicitVR, byteOrder, reader.IsReadValue, reader.IsReadPixel)
+	err = reader.Dataset.Read(&reader.fs, isExplicitVR, byteOrder, reader.IsReadValue, reader.IsReadPixel)
 	if err != nil {
 		return err
 	}
@@ -55,18 +55,18 @@ func (reader *DcmReader) ReadFile(filename string) error {
 
 // IsDicom3 is to check the file is supported by DICOM 3.0 or not.
 func (reader *DcmReader) IsDicom3() (bool, error) {
-	_, err := reader.Skip(128)
+	_, err := reader.fs.Skip(128)
 	if err != nil {
 		return false, err
 	}
-	b, err := reader.Read(int64(len(DICOM3FILEIDENTIFIER)))
+	b, err := reader.fs.Read(int64(len(DICOM3FILEIDENTIFIER)))
 	if err != nil {
 		return false, err
 	}
 	if string(b) != DICOM3FILEIDENTIFIER {
 		return false, errors.New("Only supprot DICOM 3.0.")
 	}
-	reader.Putback(132)
+	reader.fs.Putback(132)
 	return true, nil
 }
 
