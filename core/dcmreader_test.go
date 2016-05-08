@@ -483,3 +483,45 @@ func TestColumns(t *testing.T) {
 		}
 	}
 }
+
+func TestWindowCenter(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{gettestdatafolder() + "GH178.dcm", "-2"},
+		{gettestdatafolder() + "xr_chest.dcm", "2.04750000E+03"},
+		{gettestdatafolder() + "xr_chicken2.dcm", ""},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", ""},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		reader.ReadFile(c.in)
+		got := reader.Dataset.WindowCenter()
+		if got != c.want {
+			t.Errorf("WindowCenter() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}
+
+func TestWindowWidth(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{gettestdatafolder() + "GH178.dcm", "1"},
+		{gettestdatafolder() + "xr_chest.dcm", "4.09500000E+03"},
+		{gettestdatafolder() + "xr_chicken2.dcm", ""},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", ""},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		reader.ReadFile(c.in)
+		got := reader.Dataset.WindowWidth()
+		if got != c.want {
+			t.Errorf("WindowWidth() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}

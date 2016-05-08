@@ -38,57 +38,53 @@ func (dataset DcmDataset) FindElement(e *DcmElement) error {
 	return errors.New(str)
 }
 
-// PatientID get the patient ID from the dicom file
-func (dataset DcmDataset) PatientID() string {
+func (dataset DcmDataset) getElementValue(tag DcmTag) string {
 	var elem DcmElement
-	elem.Tag = DCMPatientID
+	elem.Tag = tag
 	err := dataset.FindElement(&elem)
 	if err != nil {
 		return ""
 	}
 	return elem.GetValueString()
+}
+
+// PatientID get the patient ID from the dicom file
+func (dataset DcmDataset) PatientID() string {
+	return dataset.getElementValue(DCMPatientID)
 }
 
 // PatientName get the patient name from the dicom file
 func (dataset DcmDataset) PatientName() string {
-	var elem DcmElement
-	elem.Tag = DCMPatientName
-	err := dataset.FindElement(&elem)
-	if err != nil {
-		return ""
-	}
-	return elem.GetValueString()
+	return dataset.getElementValue(DCMPatientName)
 }
 
 // Modality get the modality of the dicom image
 func (dataset DcmDataset) Modality() string {
-	var elem DcmElement
-	elem.Tag = DCMModality
-	err := dataset.FindElement(&elem)
-	if err != nil {
-		return ""
-	}
-	return elem.GetValueString()
+	return dataset.getElementValue(DCMModality)
 }
 
 // Rows get the rows of the dicom image
 func (dataset DcmDataset) Rows() string {
-	var elem DcmElement
-	elem.Tag = DCMRows
-	err := dataset.FindElement(&elem)
-	if err != nil {
-		return ""
-	}
-	return elem.GetValueString()
+	return dataset.getElementValue(DCMRows)
 }
 
 // Columns get the columns of the dicom image
 func (dataset DcmDataset) Columns() string {
-	var elem DcmElement
-	elem.Tag = DCMColumns
-	err := dataset.FindElement(&elem)
-	if err != nil {
-		return ""
-	}
-	return elem.GetValueString()
+	return dataset.getElementValue(DCMColumns)
+}
+
+// WindowCenter gets the window center of the dicom image
+func (dataset DcmDataset) WindowCenter() string {
+	return dataset.getElementValue(DCMWindowCenter)
+}
+
+// WindowWidth gets tge window width of the dicom image
+func (dataset DcmDataset) WindowWidth() string {
+	return dataset.getElementValue(DCMWindowWidth)
+}
+
+// PixelData get the pixel data of the dicom image.
+func (dataset DcmDataset) PixelData() []byte {
+
+	return nil
 }
