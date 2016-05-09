@@ -16,6 +16,15 @@ func readdicmfile(filename string, isReadValue bool) {
 	if err != nil {
 		log.Println(err.Error())
 	}
+
+	/*
+		for _, v := range reader.Meta.Elements {
+			log.Println(v.String())
+		}
+		for i := range reader.Dataset.Elements {
+			log.Println(reader.Dataset.Elements[i].String())
+		}
+	*/
 }
 
 var testfile = []string{

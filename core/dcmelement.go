@@ -15,9 +15,11 @@ type DcmElement struct {
 	VR           string
 	Length       int64
 	Value        []byte
-	Squence      DcmSQElement
+	Squence      *DcmSQElement
 	isExplicitVR bool
 	byteOrder    EByteOrder
+	isReadValue  bool
+	isReadPixel  bool
 }
 
 // GetValueString convert value to string according to VR
@@ -65,7 +67,7 @@ func (e DcmElement) GetValueString() string {
 
 // String convert to string value
 func (e DcmElement) String() string {
-	if len(e.Squence.Item) > 0 {
+	if e.Squence != nil {
 		return fmt.Sprintf("Tag:%s; VR:%s; Length:%d; Value:%s; Sequence : %v", e.Tag, e.VR, e.Length, e.GetValueString(), e.Squence)
 	}
 	return fmt.Sprintf("Tag:%s; VR:%s; Length:%d; Value:%s", e.Tag, e.VR, e.Length, e.GetValueString())
@@ -194,15 +196,16 @@ func (e *DcmElement) ReadValueLengthUint32(s *DcmFileStream) error {
 }
 
 // ReadValue get or skip the element value.
-func (e *DcmElement) ReadValue(s *DcmFileStream, isReadValue bool, isReadPixel bool) error {
+func (e *DcmElement) ReadValue(s *DcmFileStream) error {
 	var err error
-	if !isReadPixel {
+	if !e.isReadPixel {
 		if e.Tag.Group == 0x7fe0 {
 			_, err = s.Skip(e.Length)
 			return err
 		}
 	}
-	if isReadValue {
+
+	if e.isReadValue {
 		// read element value
 		e.Value, err = s.Read(e.Length)
 	} else {
@@ -212,15 +215,26 @@ func (e *DcmElement) ReadValue(s *DcmFileStream, isReadValue bool, isReadPixel b
 }
 
 // ReadDcmElement read one dicom element.
-func (e *DcmElement) ReadDcmElement(s *DcmFileStream, isReadValue bool, isReadPixel bool) error {
+func (e *DcmElement) ReadDcmElement(s *DcmFileStream) error {
+
 	if e.isExplicitVR {
-		return e.ReadDcmElementWithExplicitVR(s, isReadValue, isReadPixel)
+		return e.ReadDcmElementWithExplicitVR(s)
 	}
-	return e.ReadDcmElementWithImplicitVR(s, isReadValue, isReadPixel)
+	return e.ReadDcmElementWithImplicitVR(s)
+}
+
+func (e *DcmElement) readDcmSQElement(s *DcmFileStream) error {
+	e.Squence = new(DcmSQElement)
+	err := e.Squence.Read(s, e.Length, e.isExplicitVR, e.isReadValue)
+	if err != nil {
+		return err
+	}
+	//	log.Println(e.String())
+	return nil
 }
 
 // ReadDcmElementWithExplicitVR read the data element with explicit VR.
-func (e *DcmElement) ReadDcmElementWithExplicitVR(s *DcmFileStream, isReadValue bool, isReadPixel bool) error {
+func (e *DcmElement) ReadDcmElementWithExplicitVR(s *DcmFileStream) error {
 	// read dicom tag
 	err := e.ReadDcmTag(s)
 	if err != nil {
@@ -246,35 +260,20 @@ func (e *DcmElement) ReadDcmElementWithExplicitVR(s *DcmFileStream, isReadValue 
 
 	// read sequence items
 	if e.VR == "SQ" {
-		err = e.Squence.Read(s, e.Length, true, isReadValue)
-		if err != nil {
-			return err
-		}
-		//	log.Println(e.String())
-		return nil
+		return e.readDcmSQElement(s)
 	}
 
 	// read VR:UN with unknown length
 	if e.VR == "UN" && e.Length == 0xFFFFFFFF {
-		err = e.Squence.Read(s, e.Length, true, isReadValue)
-		if err != nil {
-			return err
-		}
-		//	log.Println(e.String())
-		return nil
+		return e.readDcmSQElement(s)
 	}
 
 	// encapsulated pixel data
 	if e.Tag == DCMPixelData && e.Length == 0xFFFFFFFF {
-		err = e.Squence.Read(s, e.Length, true, isReadValue)
-		if err != nil {
-			return err
-		}
-		//	log.Println(e.String())
-		return nil
+		return e.readDcmSQElement(s)
 	}
 
-	err = e.ReadValue(s, isReadValue, isReadPixel)
+	err = e.ReadValue(s)
 	if err != nil {
 		return err
 	}
@@ -285,13 +284,13 @@ func (e *DcmElement) ReadDcmElementWithExplicitVR(s *DcmFileStream, isReadValue 
 }
 
 // ReadDcmElementWithImplicitVR read the data element with implicit VR.
-func (e *DcmElement) ReadDcmElementWithImplicitVR(s *DcmFileStream, isReadValue bool, isReadPixel bool) error {
-
+func (e *DcmElement) ReadDcmElementWithImplicitVR(s *DcmFileStream) error {
 	// read dciom tag
 	err := e.ReadDcmTag(s)
 	if err != nil {
 		return err
 	}
+
 	// get VR from Dicom Element registry
 	err = FindDcmElmentByTag(e)
 	if err != nil {
@@ -304,7 +303,7 @@ func (e *DcmElement) ReadDcmElementWithImplicitVR(s *DcmFileStream, isReadValue 
 		return err
 	}
 
-	err = e.ReadValue(s, isReadValue, isReadPixel)
+	err = e.ReadValue(s)
 	if err != nil {
 		return err
 	}

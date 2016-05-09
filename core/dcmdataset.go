@@ -16,11 +16,14 @@ func (dataset *DcmDataset) Read(stream *DcmFileStream, isExplicitVR bool, byteOr
 		var elem DcmElement
 		elem.isExplicitVR = isExplicitVR
 		elem.byteOrder = byteOrder
-		err := elem.ReadDcmElement(stream, isReadValue, isReadPixel)
+		elem.isReadValue = isReadValue
+		elem.isReadPixel = isReadPixel
+
+		err := elem.ReadDcmElement(stream)
 		if err != nil {
 			return err
 		}
-		//	log.Println(elem)
+		//		log.Println(elem)
 		dataset.Elements = append(dataset.Elements, elem)
 	}
 	return nil
@@ -84,7 +87,16 @@ func (dataset DcmDataset) WindowWidth() string {
 }
 
 // PixelData get the pixel data of the dicom image.
-func (dataset DcmDataset) PixelData() []byte {
+func (dataset DcmDataset) PixelData() ([]byte, error) {
+	var elem DcmElement
+	elem.Tag = DCMPixelData
+	err := dataset.FindElement(&elem)
+	if err != nil {
+		return nil, err
+	}
+	if elem.Length == 0xFFFFFFFF && elem.Squence != nil {
 
-	return nil
+	}
+
+	return nil, nil
 }

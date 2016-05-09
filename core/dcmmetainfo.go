@@ -39,6 +39,7 @@ func (meta DcmMetaInfo) GetTransferSyntaxUID() (string, error) {
 // ReadOneElement read one DICOM element in meta information.
 func (meta *DcmMetaInfo) ReadOneElement(stream *DcmFileStream) error {
 	var elem DcmElement
+	elem.isReadValue = true
 	var err error
 	err = elem.ReadDcmTagGroup(stream)
 	if err != nil {
@@ -64,7 +65,7 @@ func (meta *DcmMetaInfo) ReadOneElement(stream *DcmFileStream) error {
 		return err
 	}
 
-	err = elem.ReadValue(stream, true, false)
+	err = elem.ReadValue(stream)
 	if err != nil {
 		return err
 	}

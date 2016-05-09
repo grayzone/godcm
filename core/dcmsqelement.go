@@ -67,6 +67,7 @@ func (sq *DcmSQElement) ReadItemsWithExplicitVR(stream *DcmFileStream, length in
 	var delta int64
 	for !stream.Eos() && delta < length {
 		var elem DcmElement
+		elem.isReadValue = isReadValue
 		err := elem.ReadDcmTag(stream)
 		//		log.Println("SQ :", elem, delta)
 
@@ -87,7 +88,7 @@ func (sq *DcmSQElement) ReadItemsWithExplicitVR(stream *DcmFileStream, length in
 				}
 			} else {
 				// read item value
-				err = elem.ReadValue(stream, isReadValue, false)
+				err = elem.ReadValue(stream)
 				if err != nil {
 					return err
 				}

@@ -12,7 +12,8 @@ func FindDcmElmentByTag(elem *DcmElement) error {
 
 	for _, v := range DcmElementRegistry {
 		if v.Tag == elem.Tag {
-			*elem = v
+			elem.Name = v.Name
+			elem.VR = v.VR
 			return nil
 		}
 	}
