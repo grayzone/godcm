@@ -525,3 +525,51 @@ func TestWindowWidth(t *testing.T) {
 		}
 	}
 }
+
+func TestSOPInstanceUID(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{gettestdatafolder() + "GH178.dcm", "1.2.840.113619.2.284.3.17442826.413.1388989542.640"},
+		{gettestdatafolder() + "xr_chest.dcm", "1.3.51.0.7.99.2155959091.28444.877621460.2"},
+		{gettestdatafolder() + "xr_chicken2.dcm", "1.2.392.200036.9125.4.0.219104458.164963328.1055409964"},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "999.999.2.19960619.163000.1.103"},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		reader.ReadFile(c.in)
+		got := reader.Dataset.SOPInstanceUID()
+		if got != c.want {
+			t.Errorf("SOPInstanceUID() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}
+
+func TestPixelData(t *testing.T) {
+	cases := []struct {
+		in   string
+		want int
+	}{
+		{gettestdatafolder() + "GH178.dcm", 0},
+		{gettestdatafolder() + "xr_chest.dcm", 10219520},
+		{gettestdatafolder() + "xr_chicken2.dcm", 659012},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", 1048576},
+		{gettestdatafolder() + "IM-0001-0010.dcm", 103518},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		reader.IsReadPixel = true
+		reader.ReadFile(c.in)
+		p := reader.Dataset.PixelData()
+		var got int
+		if p != nil {
+			got = len(p)
+		}
+		if got != c.want {
+			t.Errorf("SOPInstanceUID() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}

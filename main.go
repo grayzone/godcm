@@ -17,17 +17,17 @@ func readdicmfile(filename string, isReadValue bool) {
 		log.Println(err.Error())
 	}
 
-	/*
-		for _, v := range reader.Meta.Elements {
-			log.Println(v.String())
-		}
-		for i := range reader.Dataset.Elements {
-			log.Println(reader.Dataset.Elements[i].String())
-		}
-	*/
+	for _, v := range reader.Meta.Elements {
+		log.Println(v.String())
+	}
+	for i := range reader.Dataset.Elements {
+		log.Println(reader.Dataset.Elements[i].String())
+	}
+
 }
 
 var testfile = []string{
+	"./test/data/IM-0001-0010.dcm",
 	"./test/data/CT-MONO2-16-ankle",
 	"./test/data/GH195.dcm",
 	"./test/data/GH064.dcm",

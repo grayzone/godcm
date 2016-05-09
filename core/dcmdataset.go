@@ -2,7 +2,7 @@ package core
 
 import (
 	"errors"
-	_ "log"
+	_ "log" // for debug
 )
 
 // DcmDataset is to contain the DICOM dataset from file
@@ -66,6 +66,11 @@ func (dataset DcmDataset) Modality() string {
 	return dataset.getElementValue(DCMModality)
 }
 
+// SOPInstanceUID get the SOP Instance UID of the dicom image
+func (dataset DcmDataset) SOPInstanceUID() string {
+	return dataset.getElementValue(DCMSOPInstanceUID)
+}
+
 // Rows get the rows of the dicom image
 func (dataset DcmDataset) Rows() string {
 	return dataset.getElementValue(DCMRows)
@@ -87,16 +92,23 @@ func (dataset DcmDataset) WindowWidth() string {
 }
 
 // PixelData get the pixel data of the dicom image.
-func (dataset DcmDataset) PixelData() ([]byte, error) {
+func (dataset DcmDataset) PixelData() []byte {
 	var elem DcmElement
 	elem.Tag = DCMPixelData
 	err := dataset.FindElement(&elem)
 	if err != nil {
-		return nil, err
+		return nil
 	}
-	if elem.Length == 0xFFFFFFFF && elem.Squence != nil {
-
+	if elem.Squence != nil {
+		var maxLengthIndex int
+		var maxLength int64
+		for i, v := range elem.Squence.Item {
+			if maxLength < v.Length {
+				maxLength = v.Length
+				maxLengthIndex = i
+			}
+		}
+		return elem.Squence.Item[maxLengthIndex].Value
 	}
-
-	return nil, nil
+	return elem.Value
 }
