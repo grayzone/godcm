@@ -142,134 +142,72 @@ func (meta DcmMetaInfo) FindElement(e *DcmElement) error {
 	return errors.New(str)
 }
 
-// FileMetaInformationGroupLength gets meta information group length
-func (meta DcmMetaInfo) FileMetaInformationGroupLength() string {
-	var e DcmElement
-	e.Tag = DCMFileMetaInformationGroupLength
-	err := meta.FindDcmElement(&e)
+func (meta DcmMetaInfo) getElementValue(tag DcmTag) string {
+	var elem DcmElement
+	elem.Tag = tag
+	err := meta.FindElement(&elem)
 	if err != nil {
 		return ""
 	}
-	return e.GetValueString()
+	return elem.GetValueString()
+}
+
+// FileMetaInformationGroupLength gets meta information group length
+func (meta DcmMetaInfo) FileMetaInformationGroupLength() string {
+	return meta.getElementValue(DCMFileMetaInformationGroupLength)
 }
 
 // FileMetaInformationVersion gets meta information version
 func (meta DcmMetaInfo) FileMetaInformationVersion() string {
-	var e DcmElement
-	e.Tag = DCMFileMetaInformationVersion
-	err := meta.FindDcmElement(&e)
-	if err != nil {
-		return ""
-	}
-	return e.GetValueString()
+	return meta.getElementValue(DCMFileMetaInformationVersion)
 }
 
 // MediaStorageSOPClassUID gets media storage SOP Class UID
 func (meta DcmMetaInfo) MediaStorageSOPClassUID() string {
-	var e DcmElement
-	e.Tag = DCMMediaStorageSOPClassUID
-	err := meta.FindDcmElement(&e)
-	if err != nil {
-		return ""
-	}
-	return e.GetValueString()
+	return meta.getElementValue(DCMMediaStorageSOPClassUID)
 }
 
 // MediaStorageSOPInstanceUID gets media storage SOP Instance UID
 func (meta DcmMetaInfo) MediaStorageSOPInstanceUID() string {
-	var e DcmElement
-	e.Tag = DCMMediaStorageSOPInstanceUID
-	err := meta.FindDcmElement(&e)
-	if err != nil {
-		return ""
-	}
-	return e.GetValueString()
+	return meta.getElementValue(DCMMediaStorageSOPInstanceUID)
 }
 
 // TransferSyntaxUID gets Transfer Syntax UID
 func (meta DcmMetaInfo) TransferSyntaxUID() string {
-	var e DcmElement
-	e.Tag = DCMTransferSyntaxUID
-	err := meta.FindDcmElement(&e)
-	if err != nil {
-		return ""
-	}
-	return e.GetValueString()
+	return meta.getElementValue(DCMTransferSyntaxUID)
 }
 
 // ImplementationClassUID gets Implementation Class UID
 func (meta DcmMetaInfo) ImplementationClassUID() string {
-	var e DcmElement
-	e.Tag = DCMImplementationClassUID
-	err := meta.FindDcmElement(&e)
-	if err != nil {
-		return ""
-	}
-	return e.GetValueString()
+	return meta.getElementValue(DCMImplementationClassUID)
 }
 
 // ImplementationVersionName gets implementation version name
 func (meta DcmMetaInfo) ImplementationVersionName() string {
-	var e DcmElement
-	e.Tag = DCMImplementationVersionName
-	err := meta.FindDcmElement(&e)
-	if err != nil {
-		return ""
-	}
-	return e.GetValueString()
+	return meta.getElementValue(DCMImplementationVersionName)
 }
 
 // SourceApplicationEntityTitle gets source application entity title
 func (meta DcmMetaInfo) SourceApplicationEntityTitle() string {
-	var e DcmElement
-	e.Tag = DCMSourceApplicationEntityTitle
-	err := meta.FindDcmElement(&e)
-	if err != nil {
-		return ""
-	}
-	return e.GetValueString()
+	return meta.getElementValue(DCMSourceApplicationEntityTitle)
 }
 
 // SendingApplicationEntityTitle gets sending application entity title
 func (meta DcmMetaInfo) SendingApplicationEntityTitle() string {
-	var e DcmElement
-	e.Tag = DCMSendingApplicationEntityTitle
-	err := meta.FindDcmElement(&e)
-	if err != nil {
-		return ""
-	}
-	return e.GetValueString()
+	return meta.getElementValue(DCMSendingApplicationEntityTitle)
 }
 
 // ReceivingApplicationEntityTitle gets receiving application entity title
 func (meta DcmMetaInfo) ReceivingApplicationEntityTitle() string {
-	var e DcmElement
-	e.Tag = DCMReceivingApplicationEntityTitle
-	err := meta.FindDcmElement(&e)
-	if err != nil {
-		return ""
-	}
-	return e.GetValueString()
+	return meta.getElementValue(DCMReceivingApplicationEntityTitle)
 }
 
 // PrivateInformationCreatorUID gets private information createor UID
 func (meta DcmMetaInfo) PrivateInformationCreatorUID() string {
-	var e DcmElement
-	e.Tag = DCMPrivateInformationCreatorUID
-	err := meta.FindDcmElement(&e)
-	if err != nil {
-		return ""
-	}
-	return e.GetValueString()
+	return meta.getElementValue(DCMPrivateInformationCreatorUID)
 }
 
 // PrivateInformation gets private information
 func (meta DcmMetaInfo) PrivateInformation() string {
-	var e DcmElement
-	e.Tag = DCMPrivateInformation
-	err := meta.FindDcmElement(&e)
-	if err != nil {
-		return ""
-	}
-	return e.GetValueString()
+	return meta.getElementValue(DCMPrivateInformation)
 }
