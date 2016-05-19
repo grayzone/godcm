@@ -86,9 +86,14 @@ func (dataset DcmDataset) WindowCenter() string {
 	return dataset.getElementValue(DCMWindowCenter)
 }
 
-// WindowWidth gets tge window width of the dicom image
+// WindowWidth gets the window width of the dicom image
 func (dataset DcmDataset) WindowWidth() string {
 	return dataset.getElementValue(DCMWindowWidth)
+}
+
+// NumberOfFrames gets the frame number
+func (dataset DcmDataset) NumberOfFrames() string {
+	return dataset.getElementValue(DCMNumberOfFrames)
 }
 
 // PixelData get the pixel data of the dicom image.

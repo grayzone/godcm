@@ -573,3 +573,28 @@ func TestPixelData(t *testing.T) {
 		}
 	}
 }
+
+func TestNumberOfFrames(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{gettestdatafolder() + "GH178.dcm", ""},
+		{gettestdatafolder() + "xr_chest.dcm", ""},
+		{gettestdatafolder() + "xr_chicken2.dcm", ""},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "16"},
+		{gettestdatafolder() + "IM-0001-0010.dcm", ""},
+		{gettestdatafolder() + "T23/IM-0001-0001.dcm", ""},
+		{gettestdatafolder() + "T14/IM-0001-0001.dcm", ""},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		reader.IsReadPixel = true
+		reader.ReadFile(c.in)
+		got := reader.Dataset.NumberOfFrames()
+		if got != c.want {
+			t.Errorf("NumberOfFrames() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}
