@@ -598,3 +598,78 @@ func TestNumberOfFrames(t *testing.T) {
 		}
 	}
 }
+
+func TestBitsAllocated(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{gettestdatafolder() + "GH178.dcm", "16"},
+		{gettestdatafolder() + "xr_chest.dcm", "16"},
+		{gettestdatafolder() + "xr_chicken2.dcm", "16"},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "8"},
+		{gettestdatafolder() + "IM-0001-0010.dcm", "16"},
+		{gettestdatafolder() + "T23/IM-0001-0001.dcm", "16"},
+		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "16"},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		reader.IsReadPixel = true
+		reader.ReadFile(c.in)
+		got := reader.Dataset.BitsAllocated()
+		if got != c.want {
+			t.Errorf("BitsAllocated() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}
+
+func TestBitsStored(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{gettestdatafolder() + "GH178.dcm", "16"},
+		{gettestdatafolder() + "xr_chest.dcm", "12"},
+		{gettestdatafolder() + "xr_chicken2.dcm", "12"},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "8"},
+		{gettestdatafolder() + "IM-0001-0010.dcm", "12"},
+		{gettestdatafolder() + "T23/IM-0001-0001.dcm", "12"},
+		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "12"},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		reader.IsReadPixel = true
+		reader.ReadFile(c.in)
+		got := reader.Dataset.BitsStored()
+		if got != c.want {
+			t.Errorf("BitsStored() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}
+
+func TestHighBit(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{gettestdatafolder() + "GH178.dcm", "15"},
+		{gettestdatafolder() + "xr_chest.dcm", "11"},
+		{gettestdatafolder() + "xr_chicken2.dcm", "11"},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "7"},
+		{gettestdatafolder() + "IM-0001-0010.dcm", "11"},
+		{gettestdatafolder() + "T23/IM-0001-0001.dcm", "11"},
+		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "11"},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		reader.IsReadPixel = true
+		reader.ReadFile(c.in)
+		got := reader.Dataset.HighBit()
+		if got != c.want {
+			t.Errorf("HighBit() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}

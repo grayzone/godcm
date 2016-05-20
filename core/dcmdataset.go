@@ -96,6 +96,26 @@ func (dataset DcmDataset) NumberOfFrames() string {
 	return dataset.getElementValue(DCMNumberOfFrames)
 }
 
+/*
+	PixelWidth    float64
+	PixelHeight   float64
+*/
+
+// BitsAllocated gets the bits allocated value
+func (dataset DcmDataset) BitsAllocated() string {
+	return dataset.getElementValue(DCMBitsAllocated)
+}
+
+// BitsStored gets the bits stored
+func (dataset DcmDataset) BitsStored() string {
+	return dataset.getElementValue(DCMBitsStored)
+}
+
+// HighBit gets the high bit
+func (dataset DcmDataset) HighBit() string {
+	return dataset.getElementValue(DCMHighBit)
+}
+
 // PixelData get the pixel data of the dicom image.
 func (dataset DcmDataset) PixelData() []byte {
 	var elem DcmElement
