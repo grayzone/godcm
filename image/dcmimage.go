@@ -19,27 +19,28 @@ type BitmapFileHeader struct {
 // BitmapInfoHeader is for BMP info header
 type BitmapInfoHeader struct {
 	bitSize         uint32
-	biWidth         int32
-	biHeight        int32
+	biWidth         uint32
+	biHeight        uint32
 	biPlanes        uint16
 	biBitCount      uint16
 	biCompression   uint32
 	biSizeImage     uint32
-	biXPelsPerMeter int32
-	biYPelsPerMeter int32
+	biXPelsPerMeter uint32
+	biYPelsPerMeter uint32
 	biClrUsed       uint32
 	biClrImportant  uint32
 }
 
 // DcmImage provide the "DICOM image toolkit"
 type DcmImage struct {
-	Rows          int32
-	Columns       int32
+	Rows          uint32
+	Columns       uint32
 	PixelWidth    float64
 	PixelHeight   float64
 	BitsAllocated uint16
 	BitsStored    uint16
 	HighBit       uint16
+	PixelData     []byte
 }
 
 // WriteBMP write pixel data to BMP file
@@ -55,7 +56,7 @@ func (image DcmImage) WriteBMP(filename string, bits uint16, frame int) error {
 	var fileHeader BitmapFileHeader
 	fileHeader.bfType[0] = 'B'
 	fileHeader.bfType[1] = 'M'
-	fileHeader.bfSize = 54 + uint32(image.Rows*image.Columns*3)
+	fileHeader.bfSize = 54 + uint32(image.Rows*image.Columns)
 	fileHeader.bfReserved1 = 0
 	fileHeader.bfReserved2 = 0
 	fileHeader.bfOffBits = 54
@@ -77,7 +78,7 @@ func (image DcmImage) WriteBMP(filename string, bits uint16, frame int) error {
 	infoHeader.biPlanes = 1
 	infoHeader.biBitCount = bits
 	infoHeader.biCompression = 0
-	infoHeader.biSizeImage = 0
+	infoHeader.biSizeImage = uint32((uint32(infoHeader.biWidth)*uint32(infoHeader.biBitCount) + 31) / 32 * 4 * infoHeader.biHeight)
 	infoHeader.biXPelsPerMeter = 0
 	infoHeader.biYPelsPerMeter = 0
 	infoHeader.biClrUsed = 0
@@ -87,38 +88,27 @@ func (image DcmImage) WriteBMP(filename string, bits uint16, frame int) error {
 	defer f.Close()
 
 	buf := new(bytes.Buffer)
-	binary.Write(buf, binary.LittleEndian, fileHeader.bfType)
-	binary.Write(buf, binary.LittleEndian, fileHeader.bfSize)
-	binary.Write(buf, binary.LittleEndian, fileHeader.bfReserved1)
-	binary.Write(buf, binary.LittleEndian, fileHeader.bfReserved2)
-	binary.Write(buf, binary.LittleEndian, fileHeader.bfOffBits)
-
-	binary.Write(buf, binary.LittleEndian, infoHeader.bitSize)
-	binary.Write(buf, binary.LittleEndian, infoHeader.biWidth)
-	binary.Write(buf, binary.LittleEndian, infoHeader.biHeight)
-	binary.Write(buf, binary.LittleEndian, infoHeader.biPlanes)
-	binary.Write(buf, binary.LittleEndian, infoHeader.biBitCount)
-	binary.Write(buf, binary.LittleEndian, infoHeader.biCompression)
-
-	binary.Write(buf, binary.LittleEndian, infoHeader.biSizeImage)
-
-	binary.Write(buf, binary.LittleEndian, infoHeader.biXPelsPerMeter)
-	binary.Write(buf, binary.LittleEndian, infoHeader.biYPelsPerMeter)
-	binary.Write(buf, binary.LittleEndian, infoHeader.biClrUsed)
-	binary.Write(buf, binary.LittleEndian, infoHeader.biClrImportant)
+	binary.Write(buf, binary.LittleEndian, fileHeader)
+	binary.Write(buf, binary.LittleEndian, infoHeader)
 
 	if palette != nil {
 		binary.Write(buf, binary.LittleEndian, palette)
 	}
 
-	var data []uint8
+	/*
 
-	for i := int32(0); i < image.Columns; i++ {
-		for j := int32(0); j < image.Rows; j++ {
-			data = append(data, 16)
+		var data []uint8
+		var index int
+		for i := uint32(0); i < image.Columns; i++ {
+			for j := uint32(0); j < image.Rows; j++ {
+				data = append(data, uint8(image.PixelData[index]))
+				index++
+			}
 		}
-	}
-	binary.Write(buf, binary.LittleEndian, data)
+	*/
+
+	binary.Write(buf, binary.LittleEndian, image.PixelData)
+	//	binary.Write(buf, binary.LittleEndian, data)
 
 	f.Write(buf.Bytes())
 

@@ -1,16 +1,14 @@
 package image
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestWrite8BMP(t *testing.T) {
 	filename := "8.bmp"
 
 	var di DcmImage
 
-	di.Columns = 64
-	di.Rows = 64
+	di.Columns = 512
+	di.Rows = 512
 	di.BitsAllocated = 8
 	di.BitsStored = 12
 	di.HighBit = 11
@@ -25,8 +23,8 @@ func TestWrite16BMP(t *testing.T) {
 
 	var di DcmImage
 
-	di.Columns = 64
-	di.Rows = 64
+	di.Columns = 512
+	di.Rows = 512
 	di.BitsAllocated = 16
 	di.BitsStored = 12
 	di.HighBit = 11
