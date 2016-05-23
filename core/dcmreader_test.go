@@ -557,6 +557,7 @@ func TestPixelData(t *testing.T) {
 		{gettestdatafolder() + "xr_chicken2.dcm", 659012},
 		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", 1048576},
 		{gettestdatafolder() + "IM-0001-0010.dcm", 103518},
+		{gettestdatafolder() + "IM0.dcm", 524288},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -586,6 +587,7 @@ func TestNumberOfFrames(t *testing.T) {
 		{gettestdatafolder() + "IM-0001-0010.dcm", ""},
 		{gettestdatafolder() + "T23/IM-0001-0001.dcm", ""},
 		{gettestdatafolder() + "T14/IM-0001-0001.dcm", ""},
+		{gettestdatafolder() + "IM0.dcm", "1"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -611,6 +613,7 @@ func TestBitsAllocated(t *testing.T) {
 		{gettestdatafolder() + "IM-0001-0010.dcm", "16"},
 		{gettestdatafolder() + "T23/IM-0001-0001.dcm", "16"},
 		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "16"},
+		{gettestdatafolder() + "IM0.dcm", "16"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -636,6 +639,7 @@ func TestBitsStored(t *testing.T) {
 		{gettestdatafolder() + "IM-0001-0010.dcm", "12"},
 		{gettestdatafolder() + "T23/IM-0001-0001.dcm", "12"},
 		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "12"},
+		{gettestdatafolder() + "IM0.dcm", "13"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -661,6 +665,7 @@ func TestHighBit(t *testing.T) {
 		{gettestdatafolder() + "IM-0001-0010.dcm", "11"},
 		{gettestdatafolder() + "T23/IM-0001-0001.dcm", "11"},
 		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "11"},
+		{gettestdatafolder() + "IM0.dcm", "12"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -670,6 +675,110 @@ func TestHighBit(t *testing.T) {
 		got := reader.Dataset.HighBit()
 		if got != c.want {
 			t.Errorf("HighBit() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}
+
+func TestPhotometricInterpretation(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{gettestdatafolder() + "GH178.dcm", "MONOCHROME2"},
+		{gettestdatafolder() + "xr_chest.dcm", "MONOCHROME1"},
+		{gettestdatafolder() + "xr_chicken2.dcm", "MONOCHROME1"},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "MONOCHROME2"},
+		{gettestdatafolder() + "IM-0001-0010.dcm", "MONOCHROME2"},
+		{gettestdatafolder() + "T23/IM-0001-0001.dcm", "MONOCHROME2"},
+		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "MONOCHROME2"},
+		{gettestdatafolder() + "IM0.dcm", "MONOCHROME2"},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		reader.IsReadPixel = true
+		reader.ReadFile(c.in)
+		got := reader.Dataset.PhotometricInterpretation()
+		if got != c.want {
+			t.Errorf("PhotometricInterpretation() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}
+
+func TestSamplesPerPixel(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{gettestdatafolder() + "GH178.dcm", "1"},
+		{gettestdatafolder() + "xr_chest.dcm", "1"},
+		{gettestdatafolder() + "xr_chicken2.dcm", "1"},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "1"},
+		{gettestdatafolder() + "IM-0001-0010.dcm", "1"},
+		{gettestdatafolder() + "T23/IM-0001-0001.dcm", "1"},
+		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "1"},
+		{gettestdatafolder() + "IM0.dcm", "1"},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		reader.IsReadPixel = true
+		reader.ReadFile(c.in)
+		got := reader.Dataset.SamplesPerPixel()
+		if got != c.want {
+			t.Errorf("SamplesPerPixel() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}
+
+func TestPixelRepresentation(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{gettestdatafolder() + "GH178.dcm", "1"},
+		{gettestdatafolder() + "xr_chest.dcm", "0"},
+		{gettestdatafolder() + "xr_chicken2.dcm", "0"},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "0"},
+		{gettestdatafolder() + "IM-0001-0010.dcm", "0"},
+		{gettestdatafolder() + "T23/IM-0001-0001.dcm", "0"},
+		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "0"},
+		{gettestdatafolder() + "IM0.dcm", "1"},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		reader.IsReadPixel = true
+		reader.ReadFile(c.in)
+		got := reader.Dataset.PixelRepresentation()
+		if got != c.want {
+			t.Errorf("PixelRepresentation() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}
+
+func TestPlanarConfiguration(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{gettestdatafolder() + "GH178.dcm", ""},
+		{gettestdatafolder() + "xr_chest.dcm", ""},
+		{gettestdatafolder() + "xr_chicken2.dcm", ""},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", ""},
+		{gettestdatafolder() + "IM-0001-0010.dcm", ""},
+		{gettestdatafolder() + "T23/IM-0001-0001.dcm", ""},
+		{gettestdatafolder() + "T14/IM-0001-0001.dcm", ""},
+		{gettestdatafolder() + "IM0.dcm", ""},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		reader.IsReadPixel = true
+		reader.ReadFile(c.in)
+		got := reader.Dataset.PlanarConfiguration()
+		if got != c.want {
+			t.Errorf("PlanarConfiguration() %s, want '%v' got '%v'", c.in, c.want, got)
 		}
 	}
 }

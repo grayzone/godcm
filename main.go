@@ -62,6 +62,7 @@ func convert2bmp(filename string) {
 }
 
 var testfile = []string{
+	"./test/data/IM0.dcm",
 	"./test/data/image_09-12-2013_4.dcm",
 	"./test/data/IM-0001-0010.dcm",
 	"./test/data/CT-MONO2-16-ankle",

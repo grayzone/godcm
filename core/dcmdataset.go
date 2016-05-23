@@ -116,6 +116,28 @@ func (dataset DcmDataset) HighBit() string {
 	return dataset.getElementValue(DCMHighBit)
 }
 
+// PhotometricInterpretation gets photometric interpretation
+func (dataset DcmDataset) PhotometricInterpretation() string {
+	return dataset.getElementValue(DCMPhotometricInterpretation)
+}
+
+// SamplesPerPixel gets samples per pixel
+func (dataset DcmDataset) SamplesPerPixel() string {
+	return dataset.getElementValue(DCMSamplesPerPixel)
+}
+
+// PixelRepresentation gets pixel representation
+// unsigned (0) or signed (1), the default is unsigned
+func (dataset DcmDataset) PixelRepresentation() string {
+	return dataset.getElementValue(DCMPixelRepresentation)
+}
+
+// PlanarConfiguration gets planar configuration
+// the default is interlaced, 0 meaning the channels are interlaced which is the common way of serializing color pixels or 1 meaning its separated
+func (dataset DcmDataset) PlanarConfiguration() string {
+	return dataset.getElementValue(DCMPlanarConfiguration)
+}
+
 // PixelData get the pixel data of the dicom image.
 func (dataset DcmDataset) PixelData() []byte {
 	var elem DcmElement

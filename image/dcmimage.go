@@ -33,14 +33,24 @@ type BitmapInfoHeader struct {
 
 // DcmImage provide the "DICOM image toolkit"
 type DcmImage struct {
-	Rows          uint32
-	Columns       uint32
-	PixelWidth    float64
-	PixelHeight   float64
-	BitsAllocated uint16
-	BitsStored    uint16
-	HighBit       uint16
-	PixelData     []byte
+	Rows                      uint32
+	Columns                   uint32
+	PixelWidth                float64
+	PixelHeight               float64
+	BitsAllocated             uint16
+	BitsStored                uint16
+	HighBit                   uint16
+	PhotometricInterpretation string
+	SamplesPerPixel           uint16
+	PixelRepresentation       uint16
+	PlanarConfiguration       uint16
+
+	RescaleIntercept     string
+	RescaleSlope         string
+	RescaleType          string
+	PresentationLUTShape string
+
+	PixelData []byte
 }
 
 // WriteBMP write pixel data to BMP file
@@ -111,6 +121,54 @@ func (image DcmImage) WriteBMP(filename string, bits uint16, frame int) error {
 	//	binary.Write(buf, binary.LittleEndian, data)
 
 	f.Write(buf.Bytes())
+
+	return nil
+}
+
+func (image DcmImage) convertTo8Bit() []uint8 {
+	var result []uint8
+	if image.HighBit < 15 {
+
+		var nMask int32
+		if image.PixelRepresentation == 0 {
+			nMask = 0xffff << (image.HighBit + 1)
+			for i := range image.PixelData {
+				var p int32
+				p &= ^nMask - 1
+				result = append(result, uint8(p))
+
+			}
+		}
+
+	}
+
+}
+
+func (image *DcmImage) insertSCMultiFrameAttribs() {
+	image.RescaleIntercept = "0"
+	image.RescaleSlope = "1"
+	image.RescaleType = "US"
+	image.PresentationLUTShape = "IDENTITY"
+}
+
+func (image *DcmImage) handle8Bits() error {
+	if image.PhotometricInterpretation != "MONOCHROME2" {
+		return errors.New("handle8Bits: Photometric interpretation does not fit SOP class")
+	}
+	if image.SamplesPerPixel != 1 {
+		return errors.New("handle8Bits: Samples Per Pixel does not fit SOP class")
+	}
+	if image.BitsStored != 8 {
+		return errors.New("handle8Bits: Bits Stored does not fit SOP class")
+	}
+	if image.HighBit != 7 {
+		return errors.New("handle8Bits: High Bit does not fit SOP class")
+	}
+	if image.PixelRepresentation != 0 {
+		return errors.New("handle8Bits: Pixel Representation does not fit SOP class")
+	}
+
+	image.insertSCMultiFrameAttribs()
 
 	return nil
 }
