@@ -138,6 +138,16 @@ func (dataset DcmDataset) PlanarConfiguration() string {
 	return dataset.getElementValue(DCMPlanarConfiguration)
 }
 
+// RescaleIntercept gets rescale intercept
+func (dataset DcmDataset) RescaleIntercept() string {
+	return dataset.getElementValue(DCMRescaleIntercept)
+}
+
+// RescaleSlope gets rescale slope
+func (dataset DcmDataset) RescaleSlope() string {
+	return dataset.getElementValue(DCMRescaleSlope)
+}
+
 // PixelData get the pixel data of the dicom image.
 func (dataset DcmDataset) PixelData() []byte {
 	var elem DcmElement

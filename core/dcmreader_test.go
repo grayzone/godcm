@@ -782,3 +782,55 @@ func TestPlanarConfiguration(t *testing.T) {
 		}
 	}
 }
+
+func TestRescaleIntercept(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{gettestdatafolder() + "GH178.dcm", "-1024"},
+		{gettestdatafolder() + "xr_chest.dcm", "0.00000000E+00"},
+		{gettestdatafolder() + "xr_chicken2.dcm", "0.000000"},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", ""},
+		{gettestdatafolder() + "IM-0001-0010.dcm", ""},
+		{gettestdatafolder() + "T23/IM-0001-0001.dcm", ""},
+		{gettestdatafolder() + "T14/IM-0001-0001.dcm", ""},
+		{gettestdatafolder() + "IM0.dcm", "0"},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		reader.IsReadPixel = true
+		reader.ReadFile(c.in)
+		got := reader.Dataset.RescaleIntercept()
+		if got != c.want {
+			t.Errorf("RescaleIntercept() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}
+
+func TestRescaleSlope(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{gettestdatafolder() + "GH178.dcm", "1"},
+		{gettestdatafolder() + "xr_chest.dcm", "1.00000000E+00"},
+		{gettestdatafolder() + "xr_chicken2.dcm", "1.000000"},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", ""},
+		{gettestdatafolder() + "IM-0001-0010.dcm", ""},
+		{gettestdatafolder() + "T23/IM-0001-0001.dcm", ""},
+		{gettestdatafolder() + "T14/IM-0001-0001.dcm", ""},
+		{gettestdatafolder() + "IM0.dcm", "1"},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		reader.IsReadPixel = true
+		reader.ReadFile(c.in)
+		got := reader.Dataset.RescaleSlope()
+		if got != c.want {
+			t.Errorf("RescaleSlope() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}

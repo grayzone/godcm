@@ -39,19 +39,31 @@ func convert2bmp(filename string) {
 
 	var img image.DcmImage
 
-	var num uint64
+	var num interface{}
 
 	num, _ = strconv.ParseUint(reader.Dataset.BitsAllocated(), 10, 16)
-	img.BitsAllocated = uint16(num)
+	img.BitsAllocated = uint16(num.(uint64))
 
 	num, _ = strconv.ParseUint(reader.Dataset.Columns(), 10, 32)
-	img.Columns = uint32(num)
+	img.Columns = uint32(num.(uint64))
 
 	num, _ = strconv.ParseUint(reader.Dataset.Rows(), 10, 32)
-	img.Rows = uint32(num)
+	img.Rows = uint32(num.(uint64))
 
-	num, _ = strconv.ParseUint(reader.Dataset.Rows(), 10, 16)
-	img.HighBit = uint16(num)
+	num, _ = strconv.ParseUint(reader.Dataset.HighBit(), 10, 16)
+	img.HighBit = uint16(num.(uint64))
+
+	num, _ = strconv.ParseFloat(reader.Dataset.WindowCenter(), 64)
+	img.WindowCenter = num.(float64)
+
+	num, _ = strconv.ParseFloat(reader.Dataset.WindowWidth(), 64)
+	img.WindowWidth = num.(float64)
+
+	num, _ = strconv.ParseFloat(reader.Dataset.RescaleIntercept(), 64)
+	img.RescaleIntercept = num.(float64)
+
+	num, _ = strconv.ParseFloat(reader.Dataset.RescaleSlope(), 64)
+	img.RescaleSlope = num.(float64)
 
 	img.PixelData = pixeldata
 
