@@ -53,6 +53,9 @@ type DcmImage struct {
 	RescaleType          string
 	PresentationLUTShape string
 
+	minValue int16
+	maxValue int16
+
 	PixelData []byte
 }
 
@@ -108,182 +111,100 @@ func (image DcmImage) WriteBMP(filename string, bits uint16, frame int) error {
 		binary.Write(buf, binary.LittleEndian, palette)
 	}
 
-	/*
-		var data []uint32
-		var index int
-		for i := uint32(0); i < image.Columns; i++ {
-			for j := uint32(0); j < image.Rows; j++ {
-				data = append(data, uint8(image.PixelData[index]))
-				index++
-			}
-		}
-	*/
-	//	data := image.convertTo8Bit()
+	data := image.convertTo8Bit()
 
-	//	binary.Write(buf, binary.LittleEndian, data)
-	var result []int16
-	count := image.Rows * image.Columns
-	for i := uint32(0); i < count; i++ {
-		var p uint16
-		//		buf := bytes.NewBuffer(image.PixelData[2*i : 2*i+2])
-		p = binary.LittleEndian.Uint16(image.PixelData[2*i : 2*i+2])
-
-		result = append(result, int16(p))
-	}
-	image.PixelRepresentation = 1
-	if image.PixelRepresentation == 0 {
-		var nMask int32
-		nMask = 0xffff << (image.HighBit + 1)
-		//	sign = 1 << image.HighBit
-
-		for i := uint32(0); i < count; i++ {
-			p := int32(result[i])
-			p &= ^nMask
-			result[i] = int16(p)
-		}
-	} else {
-		var nSignBit int32
-		nSignBit = 1 << image.HighBit
-		var nMask int32
-		nMask = 0xffff << (image.HighBit + 1)
-		for i := uint32(0); i < count; i++ {
-			p := int32(result[i])
-			if (p & nSignBit) != 0 {
-				p |= nMask
-			} else {
-				p &= ^nMask
-			}
-			result[i] = int16(p)
-		}
-
-	}
-
-	shift := image.WindowCenter - image.WindowWidth/2.0
-	slope := 255.0 / image.WindowWidth
-	var data []uint8
-	for i := uint32(0); i < count; i++ {
-		value := (float64(result[i]) - shift) * slope
-		if value < 0 {
-			value = 0
-		} else if value > 255 {
-			value = 255
-		}
-
-		data = append(data, uint8(value))
-		//	data = append(data, uint8(result[i]))
-	}
 	binary.Write(buf, binary.LittleEndian, data)
 	f.Write(buf.Bytes())
-
 	return nil
 }
 
-/*
-func (image DcmImage) convertTo8Bit() []uint8 {
-	var result []uint8
-	count := image.Rows * image.Columns
-
-	if image.HighBit < 15 {
-		var nMask int32
-		if image.PixelRepresentation == 0 {
-			nMask = 0xffff << (image.HighBit + 1)
-
-			for i := uint32(0); i < count; i++ {
-				var p int32
-				buf := bytes.NewBuffer(image.PixelData[2*i : 2*i+1])
-				binary.Read(buf, binary.LittleEndian, &p)
-				p &= ^nMask
-				result = append(result, uint8(p))
-			}
-
-		} else {
-			nSignBit := int32(1 << image.HighBit)
-			nMask = 0xffff << (image.HighBit + 1)
-
-			for i := uint32(0); i < count; i++ {
-				var p int32
-				buf := bytes.NewBuffer(image.PixelData[2*i : 2*i+1])
-				binary.Read(buf, binary.LittleEndian, &p)
-				if (p & nSignBit) != 0 {
-					p |= nMask
-				} else {
-					p &= ^nMask
-				}
-				result = append(result, uint8(p))
-			}
-
-		}
-
+// ClipHighBits clip the high bits
+func (image DcmImage) ClipHighBits(pixel int16) int16 {
+	if image.HighBit > 15 {
+		return pixel
 	}
-
-	if (image.RescaleSlope != 1.0) || (image.RescaleIntercept != 0.0) {
-		for i := uint32(0); i < count; i++ {
-			var p int32
-			buf := bytes.NewBuffer(image.PixelData[2*i : 2*i+1])
-			binary.Read(buf, binary.LittleEndian, &p)
-			fvalue := float64(p)*image.RescaleSlope + image.RescaleIntercept
-
-			result = append(result, uint8(fvalue))
+	nMask := 0xffff << (image.HighBit + 1)
+	if image.PixelRepresentation == 0 {
+		nSignBit := 1 << image.HighBit
+		if (pixel & int16(nSignBit)) != 0 {
+			pixel |= int16(nMask)
+			return pixel
 		}
 	}
+	pixel &= ^int16(nMask)
+	return pixel
+}
 
-	if (image.WindowCenter != 0.0) || (image.WindowWidth != 0.0) {
-		shift := image.WindowCenter - image.WindowWidth/2.0
-		slope := 255.0 / image.WindowWidth
-		for i := uint32(0); i < count; i++ {
-			var p int32
-			buf := bytes.NewBuffer(image.PixelData[2*i : 2*i+1])
-			binary.Read(buf, binary.LittleEndian, &p)
-			value := (float64(p) - shift) * slope
-			if value < 0 {
-				value = 0
-			} else if value > 255 {
-				value = 255
-			}
-			result = append(result, uint8(value))
-		}
-	} else {
-		min, max := image.findPixelExtremeValue()
+// RescalePixel rescale the pixel data ,especially for CT
+func (image DcmImage) RescalePixel(pixel int16) int16 {
+	if image.RescaleSlope == 1.0 && image.RescaleIntercept == 0.0 {
+		return pixel
+	}
+	return int16(float64(pixel)*image.RescaleSlope + image.RescaleIntercept)
+}
+
+// RescaleWindowLevel rescale the window level to 8 bit
+func (image DcmImage) RescaleWindowLevel(pixel int16) uint8 {
+	var value float64
+	if (image.WindowCenter == 0.0) && (image.WindowWidth == 0.0) {
 		var slope float64
-		if min != max {
-			slope = 255.0 / float64(max-min)
+		if image.minValue != image.maxValue {
+			slope = 255.0 / float64(image.maxValue-image.minValue)
 		} else {
 			slope = 1.0
 		}
-		for i := uint32(0); i < count; i++ {
-			var p int32
-			buf := bytes.NewBuffer(image.PixelData[2*i : 2*i+1])
-			binary.Read(buf, binary.LittleEndian, &p)
-			value := float64(p-min) * slope
-			if value < 0 {
-				value = 0
-			} else if value > 255 {
-				value = 255
-			}
-			result = append(result, uint8(value))
-		}
+		value = float64(pixel-image.minValue) * slope
+	} else {
+
+		shift := image.WindowCenter - image.WindowWidth/2.0
+		slope := 255.0 / image.WindowWidth
+		value = (float64(pixel) - shift) * slope
+	}
+	var result uint8
+	if value < 0 {
+		result = 0
+	} else if value > 255 {
+		result = 255
+	} else {
+		result = uint8(value)
 	}
 	return result
 }
 
-func (image DcmImage) findPixelExtremeValue() (int32, int32) {
-	var min, max int32
+func (image DcmImage) convertTo8Bit() []uint8 {
+	var result []uint8
+	count := image.Rows * image.Columns
+	image.findPixelExtremeValue()
+
+	for i := uint32(0); i < count; i++ {
+		p := binary.LittleEndian.Uint16(image.PixelData[2*i : 2*i+2])
+
+		pixel := image.ClipHighBits(int16(p))
+		pixel = image.RescalePixel(pixel)
+
+		b := image.RescaleWindowLevel(pixel)
+		result = append(result, b)
+	}
+	return result
+}
+
+func (image DcmImage) findPixelExtremeValue() {
+	// skip to find the max/min value if window level is not 0
+	if (image.WindowCenter != 0.0) || (image.WindowWidth != 0.0) {
+		return
+	}
 	count := image.Columns * image.Rows
 	for i := uint32(0); i < count; i++ {
-		var p int32
-		buf := bytes.NewBuffer(image.PixelData[2*i : 2*i+1])
-		binary.Read(buf, binary.LittleEndian, &p)
+		p := int16(binary.LittleEndian.Uint16(image.PixelData[2*i : 2*i+2]))
 		if i == 0 {
-			min = p
-			max = p
+			image.minValue = p
+			image.maxValue = p
 		}
-		if p < min {
-			min = p
+		if p < image.minValue {
+			image.minValue = p
 		}
-		if p > max {
-			max = p
+		if p > image.maxValue {
+			image.maxValue = p
 		}
 	}
-	return min, max
 }
-*/

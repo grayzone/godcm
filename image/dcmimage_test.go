@@ -22,6 +22,7 @@ func TestWrite8BMP(t *testing.T) {
 		want string
 	}{
 		{gettestdatafolder() + "IM0.dcm", "1"},
+		{gettestdatafolder() + "xr_chest.dcm", "1"},
 	}
 	for _, c := range cases {
 		var reader core.DcmReader
@@ -60,7 +61,8 @@ func TestWrite8BMP(t *testing.T) {
 
 		img.PixelData = pixeldata
 
-		err = img.WriteBMP("test.bmp", 8, 0)
+		sop := reader.Dataset.SOPInstanceUID()
+		err = img.WriteBMP(sop+".bmp", 8, 0)
 		if err != nil {
 			t.Errorf("WriteBMP() %s", err.Error())
 		}
