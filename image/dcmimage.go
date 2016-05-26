@@ -118,8 +118,7 @@ func (image DcmImage) WriteBMP(filename string, bits uint16, frame int) error {
 	return nil
 }
 
-// ClipHighBits clip the high bits
-func (image DcmImage) ClipHighBits(pixel int16) int16 {
+func (image DcmImage) clipHighBits(pixel int16) int16 {
 	if image.HighBit > 15 {
 		return pixel
 	}
@@ -135,16 +134,14 @@ func (image DcmImage) ClipHighBits(pixel int16) int16 {
 	return pixel
 }
 
-// RescalePixel rescale the pixel data ,especially for CT
-func (image DcmImage) RescalePixel(pixel int16) int16 {
+func (image DcmImage) rescalePixel(pixel int16) int16 {
 	if image.RescaleSlope == 1.0 && image.RescaleIntercept == 0.0 {
 		return pixel
 	}
 	return int16(float64(pixel)*image.RescaleSlope + image.RescaleIntercept)
 }
 
-// RescaleWindowLevel rescale the window level to 8 bit
-func (image DcmImage) RescaleWindowLevel(pixel int16) uint8 {
+func (image DcmImage) rescaleWindowLevel(pixel int16) uint8 {
 	var value float64
 	if (image.WindowCenter == 0.0) && (image.WindowWidth == 0.0) {
 		var slope float64
@@ -178,12 +175,13 @@ func (image DcmImage) convertTo8Bit() []uint8 {
 	for i := image.Rows; i > uint32(0); i-- {
 		for j := uint32(0); j < image.Columns; j++ {
 			p := binary.LittleEndian.Uint16(image.PixelData[2*image.Columns*i-2*image.Columns+2*j : 2*image.Columns*i-2*image.Columns+2*j+2])
-			pixel := image.ClipHighBits(int16(p))
-			pixel = image.RescalePixel(pixel)
+			pixel := image.clipHighBits(int16(p))
+			pixel = image.rescalePixel(pixel)
 
-			b := image.RescaleWindowLevel(pixel)
+			b := image.rescaleWindowLevel(pixel)
 			result = append(result, b)
 		}
+
 	}
 
 	return result
