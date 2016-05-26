@@ -65,6 +65,9 @@ func convert2bmp(filename string) {
 	num, _ = strconv.ParseFloat(reader.Dataset.RescaleSlope(), 64)
 	img.RescaleSlope = num.(float64)
 
+	num, _ = strconv.ParseUint(reader.Dataset.PixelRepresentation(), 10, 16)
+	img.PixelRepresentation = uint16(num.(uint64))
+
 	img.PixelData = pixeldata
 
 	err = img.WriteBMP("test.bmp", 8, 0)
@@ -74,6 +77,7 @@ func convert2bmp(filename string) {
 }
 
 var testfile = []string{
+	"./test/data/xr_chest.dcm",
 	"./test/data/IM0.dcm",
 	"./test/data/image_09-12-2013_4.dcm",
 	"./test/data/IM-0001-0010.dcm",
@@ -104,7 +108,14 @@ func testParseDcm() {
 }
 
 func testdcm2bmp() {
-	convert2bmp(testfile[0])
+	var index int
+	switch len(os.Args) {
+	case 1:
+		convert2bmp(testfile[0])
+	case 2:
+		index, _ = strconv.Atoi(os.Args[1])
+		convert2bmp(testfile[index])
+	}
 }
 
 func main() {

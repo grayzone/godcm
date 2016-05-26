@@ -124,7 +124,7 @@ func (image DcmImage) ClipHighBits(pixel int16) int16 {
 		return pixel
 	}
 	nMask := 0xffff << (image.HighBit + 1)
-	if image.PixelRepresentation == 0 {
+	if image.PixelRepresentation != 0 {
 		nSignBit := 1 << image.HighBit
 		if (pixel & int16(nSignBit)) != 0 {
 			pixel |= int16(nMask)
@@ -173,18 +173,19 @@ func (image DcmImage) RescaleWindowLevel(pixel int16) uint8 {
 
 func (image DcmImage) convertTo8Bit() []uint8 {
 	var result []uint8
-	count := image.Rows * image.Columns
 	image.findPixelExtremeValue()
 
-	for i := uint32(0); i < count; i++ {
-		p := binary.LittleEndian.Uint16(image.PixelData[2*i : 2*i+2])
+	for i := image.Rows; i > uint32(0); i-- {
+		for j := uint32(0); j < image.Columns; j++ {
+			p := binary.LittleEndian.Uint16(image.PixelData[2*image.Columns*i-2*image.Columns+2*j : 2*image.Columns*i-2*image.Columns+2*j+2])
+			pixel := image.ClipHighBits(int16(p))
+			pixel = image.RescalePixel(pixel)
 
-		pixel := image.ClipHighBits(int16(p))
-		pixel = image.RescalePixel(pixel)
-
-		b := image.RescaleWindowLevel(pixel)
-		result = append(result, b)
+			b := image.RescaleWindowLevel(pixel)
+			result = append(result, b)
+		}
 	}
+
 	return result
 }
 
