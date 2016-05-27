@@ -8,6 +8,10 @@ import (
 	"os"
 )
 
+var (
+	MAXBITS uint16 = 32
+)
+
 // BitmapFileHeader is for BMP file header
 type BitmapFileHeader struct {
 	bfType      [2]byte // must always be 'BM'
@@ -56,7 +60,24 @@ type DcmImage struct {
 	minValue int16
 	maxValue int16
 
+	AbsMinimum float64
+	AbsMaximum float64
+
 	PixelData []byte
+}
+
+func maxval(bits uint16, pos uint32) uint32 {
+	if bits > MAXBITS {
+		return uint32(1<<bits - 1)
+	}
+	return uint32(1<<bits - pos)
+}
+
+func expandSign(value int16, signBit int16, signMask int16) int16 {
+	if (value & signBit) == 0 {
+		return value
+	}
+	return value | signMask
 }
 
 // WriteBMP write pixel data to BMP file
@@ -141,6 +162,24 @@ func (image DcmImage) rescalePixel(pixel int16) int16 {
 	return int16(float64(pixel)*image.RescaleSlope + image.RescaleIntercept)
 }
 
+func (image DcmImage) covertPixelToInputRepresentation(pixel int16) int16 {
+	var mask uint16
+	for i := uint16(0); i < image.BitsStored; i++ {
+		mask |= 1 << i
+	}
+	sign := int16(1 << (image.BitsStored - 1))
+	var smask int16
+	for i := image.BitsStored; i < 16; i++ {
+		smask |= int16(1 << i)
+	}
+	shift := image.HighBit + 1 - image.BitsStored
+
+	if shift == 0 {
+		return expandSign(pixel&int16(mask), sign, smask)
+	}
+	return expandSign((pixel>>shift)&int16(mask), sign, smask)
+}
+
 func (image DcmImage) rescaleWindowLevel(pixel int16) uint8 {
 	var value float64
 	if (image.WindowCenter == 0.0) && (image.WindowWidth == 0.0) {
@@ -175,16 +214,29 @@ func (image DcmImage) convertTo8Bit() []uint8 {
 	for i := image.Rows; i > uint32(0); i-- {
 		for j := uint32(0); j < image.Columns; j++ {
 			p := binary.LittleEndian.Uint16(image.PixelData[2*image.Columns*i-2*image.Columns+2*j : 2*image.Columns*i-2*image.Columns+2*j+2])
-			pixel := image.clipHighBits(int16(p))
+
+			pixel := image.covertPixelToInputRepresentation(int16(p))
+			//		pixel := image.clipHighBits(int16(p))
 			pixel = image.rescalePixel(pixel)
 
-			b := image.rescaleWindowLevel(pixel)
-			result = append(result, b)
+			//		b := image.rescaleWindowLevel(pixel)
+			result = append(result, uint8(pixel))
+
 		}
 
 	}
 
 	return result
+}
+
+func (image DcmImage) findAbsMaxMinValue() {
+	if image.PixelRepresentation == 1 {
+		image.AbsMinimum = -float64(maxval(image.BitsStored-1, 0))
+		image.AbsMaximum = float64(maxval(image.BitsStored-1, 1))
+		return
+	}
+	image.AbsMinimum = 0
+	image.AbsMaximum = float64(maxval(image.BitsStored, 1))
 }
 
 func (image DcmImage) findPixelExtremeValue() {
