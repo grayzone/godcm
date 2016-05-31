@@ -44,6 +44,9 @@ func convert2bmp(filename string) {
 	num, _ = strconv.ParseUint(reader.Dataset.BitsAllocated(), 10, 16)
 	img.BitsAllocated = uint16(num.(uint64))
 
+	num, _ = strconv.ParseUint(reader.Dataset.BitsStored(), 10, 16)
+	img.BitsStored = uint16(num.(uint64))
+
 	num, _ = strconv.ParseUint(reader.Dataset.Columns(), 10, 32)
 	img.Columns = uint32(num.(uint64))
 
