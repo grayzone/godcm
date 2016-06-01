@@ -63,6 +63,9 @@ type DcmImage struct {
 	AbsMinimum float64
 	AbsMaximum float64
 
+	high float64
+	low  float64
+
 	PixelData []byte
 }
 
@@ -71,13 +74,6 @@ func maxval(bits uint16, pos uint32) uint32 {
 		return uint32(1<<bits - 1)
 	}
 	return uint32(1<<bits - pos)
-}
-
-func expandSign(value uint16, signBit uint16, signMask uint16) uint16 {
-	if (value & signBit) == 0 {
-		return value
-	}
-	return value | signMask
 }
 
 // WriteBMP write pixel data to BMP file
@@ -159,31 +155,10 @@ func (image DcmImage) rescalePixel(pixel int16) int16 {
 	if image.RescaleSlope == 1.0 && image.RescaleIntercept == 0.0 {
 		return pixel
 	}
-	return int16(float64(pixel)*image.RescaleSlope + image.RescaleIntercept)
+	return image.getRescaling(pixel).(int16)
 }
 
-/*
-func (image DcmImage) covertPixelToInputRepresentation(pixel uint16) uint16 {
-	var mask uint16
-	for i := uint16(0); i < image.BitsStored; i++ {
-		mask |= 1 << i
-	}
-	sign := uint16(1 << (image.BitsStored - 1))
-	var smask uint16
-	for i := image.BitsStored; i < 16; i++ {
-		smask |= uint16(1 << i)
-	}
-	shift := image.HighBit + 1 - image.BitsStored
-
-	if shift == 0 {
-		return expandSign(pixel&uint16(mask), sign, smask)
-	}
-	return expandSign((pixel>>shift)&uint16(mask), sign, smask)
-}
-
-*/
-
-func (image DcmImage) countRescaling(value interface{}) interface{} {
+func (image DcmImage) getRescaling(value interface{}) interface{} {
 	switch value.(type) {
 	case int16:
 		return int16(float64(value.(int16))*image.RescaleSlope + image.RescaleIntercept)
@@ -198,39 +173,62 @@ func (image *DcmImage) checkRescaling() {
 	if image.RescaleSlope < 0 {
 		var tmp interface{}
 		tmp = image.minValue
-		image.minValue = image.countRescaling(image.maxValue).(int16)
-		image.maxValue = image.countRescaling(tmp).(int16)
+		image.minValue = image.getRescaling(image.maxValue).(int16)
+		image.maxValue = image.getRescaling(tmp).(int16)
 
 		tmp = image.AbsMinimum
-		image.AbsMinimum = image.countRescaling(image.AbsMaximum).(float64)
-		image.AbsMaximum = image.countRescaling(tmp).(float64)
+		image.AbsMinimum = image.getRescaling(image.AbsMaximum).(float64)
+		image.AbsMaximum = image.getRescaling(tmp).(float64)
 		return
 	}
-	image.minValue = image.countRescaling(image.minValue).(int16)
-	image.maxValue = image.countRescaling(image.maxValue).(int16)
+	image.minValue = image.getRescaling(image.minValue).(int16)
+	image.maxValue = image.getRescaling(image.maxValue).(int16)
 
-	image.AbsMinimum = image.countRescaling(image.AbsMinimum).(float64)
-	image.AbsMaximum = image.countRescaling(image.AbsMaximum).(float64)
+	image.AbsMinimum = image.getRescaling(image.AbsMinimum).(float64)
+	image.AbsMaximum = image.getRescaling(image.AbsMaximum).(float64)
 }
 
 func (image DcmImage) nowindow(pixel int16) uint8 {
-	var outrange float64
-	if image.PixelRepresentation == 1 {
-		outrange = float64(maxval(8, 0))
-	} else {
-		outrange = 0 - 255 + 1
-	}
+	//	var outrange float64
+	//	outrange = image.high - image.low + 1
 
-	ocnt := image.getAbsMaxRange()
-	gradient := outrange / ocnt
+	//	ocnt := image.getAbsMaxRange()
+	gradient := 255.0 / float64(image.maxValue-image.minValue)
 	value := float64(pixel-image.minValue) * gradient
+	if value > 255 {
+		return 255
+	}
+	if value < 0 {
+		return 0
+	}
 	return uint8(value)
 }
 
 func (image DcmImage) window(pixel int16) uint8 {
-	shift := image.WindowCenter - image.WindowWidth/2.0
+
+	/*
+		width1 := image.WindowWidth - 1
+		outrange := image.high - image.low
+		var offset float64
+		var gradient float64
+		if width1 != 0 {
+			offset = (image.high - (image.WindowCenter-0.5)/width1 + 0.5) * outrange
+			gradient = outrange / width1
+		}
+		value := offset + float64(pixel)*gradient
+	*/
+
+	min := image.WindowCenter - image.WindowWidth/2.0 + 0.5
+	max := image.WindowCenter + image.WindowWidth/2.0 + 0.5
 	slope := 255.0 / image.WindowWidth
-	value := (float64(pixel) - shift) * slope
+	value := float64(pixel)
+	if value < min {
+		return 0
+	} else if value > max {
+		return 255
+	}
+	value = (value - min) * slope
+
 	if value > 255 {
 		return 255
 	}
@@ -250,40 +248,24 @@ func (image DcmImage) rescaleWindowLevel(pixel int16) uint8 {
 
 func (image DcmImage) convertTo8Bit() []uint8 {
 	image.determineMinMax()
+	image.determinHighLow()
 	var result []uint8
 	gap := (4 - (image.Columns & 0x3)) & 0x3
 	for i := image.Rows; i > uint32(0); i-- {
 		for j := uint32(0); j < image.Columns; j++ {
 			p := binary.LittleEndian.Uint16(image.PixelData[2*image.Columns*i-2*image.Columns+2*j : 2*image.Columns*i-2*image.Columns+2*j+2])
 
-			//		pixel := image.covertPixelToInputRepresentation(int16(p))
 			pixel := image.clipHighBits(int16(p))
 			pixel = image.rescalePixel(pixel)
 
-			//	b := image.rescaleWindowLevel(pixel)
-			b := image.nowindow(pixel)
+			b := image.rescaleWindowLevel(pixel)
+			//b := image.nowindow(pixel)
 			result = append(result, uint8(b))
 		}
 		for i := uint32(0); i < gap; i++ {
 			result = append(result, uint8(0))
 		}
 	}
-
-	/*
-		var data []uint16
-		var data1 []uint16
-		for i := uint32(0); i < image.Rows*image.Columns; i++ {
-			p := binary.LittleEndian.Uint16(image.PixelData[2*i : 2*i+2])
-			pixel := image.covertPixelToInputRepresentation(p)
-			data = append(data, pixel)
-			data1 = append(data1, p)
-		}
-		f, _ := os.Create("test.bin")
-		defer f.Close()
-		buf := new(bytes.Buffer)
-		binary.Write(buf, binary.LittleEndian, data1)
-		f.Write(buf.Bytes())
-	*/
 	return result
 }
 
@@ -302,13 +284,23 @@ func (image DcmImage) getAbsMaxRange() float64 {
 	return image.AbsMaximum - image.AbsMinimum + 1
 }
 
-func (image *DcmImage) determineMinMax() {
-	// skip to find the max/min value if window level is not 0
-
-	if (image.WindowCenter != 0.0) || (image.WindowWidth != 0.0) {
+func (image *DcmImage) determinHighLow() {
+	if image.PixelRepresentation == 0 {
+		image.high = 0
+		image.low = 255
 		return
 	}
+	image.high = 255
+	image.low = 0
+}
 
+func (image *DcmImage) determineMinMax() {
+	// skip to find the max/min value if window level is not 0
+	/*
+		if (image.WindowCenter != 0.0) || (image.WindowWidth != 0.0) {
+			return
+		}
+	*/
 	image.findAbsMaxMinValue()
 	count := image.Columns * image.Rows
 	for i := uint32(0); i < count; i++ {
@@ -324,6 +316,7 @@ func (image *DcmImage) determineMinMax() {
 			image.maxValue = p
 		}
 	}
+
 	log.Println("min1", image.minValue, "max1", image.maxValue, "absmin", image.AbsMinimum, "absmax", image.AbsMaximum)
 	image.checkRescaling()
 	log.Println("min2", image.minValue, "max2", image.maxValue)
