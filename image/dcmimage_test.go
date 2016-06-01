@@ -25,6 +25,9 @@ func TestWrite8BMP(t *testing.T) {
 		{gettestdatafolder() + "IM0.dcm", "1"},
 		{gettestdatafolder() + "xr_chest.dcm", "1"},
 		{gettestdatafolder() + "CT-MONO2-16-ankle", "1"},
+		{gettestdatafolder() + "xr_tspine.dcm", "1"},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "1"},
+		{gettestdatafolder() + "image_09-12-2013_4.dcm", "1"},
 	}
 	for _, c := range cases {
 		var reader core.DcmReader

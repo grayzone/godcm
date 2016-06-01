@@ -82,16 +82,18 @@ func convert2bmp(filename string) {
 }
 
 var testfile = []string{
+	"./test/data/US-MONO2-8-8x-execho.dcm",
+	"./test/data/xr_tspine.dcm",
+	"./test/data/MR-MONO2-8-16x-heart.dcm",
 	"./test/data/xr_chest.dcm",
 	"./test/data/IM0.dcm",
 	"./test/data/image_09-12-2013_4.dcm",
-	"./test/data/IM-0001-0010.dcm",
 	"./test/data/CT-MONO2-16-ankle",
+	"./test/data/IM-0001-0010.dcm",
 	"./test/data/GH195.dcm",
 	"./test/data/GH064.dcm",
 	"./test/data/GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm",
 	"./test/data/GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm",
-	"./test/data/MR-MONO2-8-16x-heart.dcm",
 	"./test/data/xr_chicken2.dcm",
 	"./test/data/T23/IM-0001-0001.dcm",
 }

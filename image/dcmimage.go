@@ -249,9 +249,9 @@ func (image DcmImage) convertTo8Bit() []uint8 {
 	for i := image.Rows; i > uint32(0); i-- {
 		for j := uint32(0); j < image.Columns; j++ {
 			p := binary.LittleEndian.Uint16(image.PixelData[2*image.Columns*i-2*image.Columns+2*j : 2*image.Columns*i-2*image.Columns+2*j+2])
-
-			//	pixel := image.clipHighBits(int16(p))
-			pixel := image.rescalePixel(int16(p))
+			pixel := int16(p)
+			//	pixel = image.clipHighBits(pixel)
+			pixel = image.rescalePixel(pixel)
 
 			b := image.rescaleWindowLevel(pixel)
 			//b := image.nowindow(pixel)
