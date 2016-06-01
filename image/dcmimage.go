@@ -6,6 +6,7 @@ import (
 	"errors"
 	"log" // for debug
 	"os"
+	"strings"
 )
 
 var (
@@ -53,6 +54,8 @@ type DcmImage struct {
 	RescaleSlope              float64
 	WindowCenter              float64
 	WindowWidth               float64
+
+	IsReverse bool
 
 	RescaleType          string
 	PresentationLUTShape string
@@ -135,6 +138,7 @@ func (image DcmImage) WriteBMP(filename string, bits uint16, frame int) error {
 	return nil
 }
 
+/*
 func (image DcmImage) clipHighBits(pixel int16) int16 {
 	if image.HighBit > 15 {
 		return pixel
@@ -150,6 +154,7 @@ func (image DcmImage) clipHighBits(pixel int16) int16 {
 	pixel &= ^int16(nMask)
 	return pixel
 }
+*/
 
 func (image DcmImage) rescalePixel(pixel int16) int16 {
 	if image.RescaleSlope == 1.0 && image.RescaleIntercept == 0.0 {
@@ -168,6 +173,7 @@ func (image DcmImage) getRescaling(value interface{}) interface{} {
 	return 0
 }
 
+/*
 func (image *DcmImage) checkRescaling() {
 
 	if image.RescaleSlope < 0 {
@@ -187,6 +193,7 @@ func (image *DcmImage) checkRescaling() {
 	image.AbsMinimum = image.getRescaling(image.AbsMinimum).(float64)
 	image.AbsMaximum = image.getRescaling(image.AbsMaximum).(float64)
 }
+*/
 
 func (image DcmImage) nowindow(pixel int16) uint8 {
 	//	var outrange float64
@@ -205,19 +212,6 @@ func (image DcmImage) nowindow(pixel int16) uint8 {
 }
 
 func (image DcmImage) window(pixel int16) uint8 {
-
-	/*
-		width1 := image.WindowWidth - 1
-		outrange := image.high - image.low
-		var offset float64
-		var gradient float64
-		if width1 != 0 {
-			offset = (image.high - (image.WindowCenter-0.5)/width1 + 0.5) * outrange
-			gradient = outrange / width1
-		}
-		value := offset + float64(pixel)*gradient
-	*/
-
 	min := image.WindowCenter - image.WindowWidth/2.0 + 0.5
 	max := image.WindowCenter + image.WindowWidth/2.0 + 0.5
 	slope := 255.0 / image.WindowWidth
@@ -248,19 +242,24 @@ func (image DcmImage) rescaleWindowLevel(pixel int16) uint8 {
 
 func (image DcmImage) convertTo8Bit() []uint8 {
 	image.determineMinMax()
-	image.determinHighLow()
+	//	image.determinHighLow()
+	image.determinReverse()
 	var result []uint8
 	gap := (4 - (image.Columns & 0x3)) & 0x3
 	for i := image.Rows; i > uint32(0); i-- {
 		for j := uint32(0); j < image.Columns; j++ {
 			p := binary.LittleEndian.Uint16(image.PixelData[2*image.Columns*i-2*image.Columns+2*j : 2*image.Columns*i-2*image.Columns+2*j+2])
 
-			pixel := image.clipHighBits(int16(p))
-			pixel = image.rescalePixel(pixel)
+			//	pixel := image.clipHighBits(int16(p))
+			pixel := image.rescalePixel(int16(p))
 
 			b := image.rescaleWindowLevel(pixel)
 			//b := image.nowindow(pixel)
-			result = append(result, uint8(b))
+			if image.IsReverse {
+				result = append(result, 255-uint8(b))
+			} else {
+				result = append(result, uint8(b))
+			}
 		}
 		for i := uint32(0); i < gap; i++ {
 			result = append(result, uint8(0))
@@ -279,10 +278,12 @@ func (image *DcmImage) findAbsMaxMinValue() {
 	image.AbsMaximum = float64(maxval(image.BitsStored, 1))
 }
 
+/*
 func (image DcmImage) getAbsMaxRange() float64 {
 	image.findAbsMaxMinValue()
 	return image.AbsMaximum - image.AbsMinimum + 1
 }
+
 
 func (image *DcmImage) determinHighLow() {
 	if image.PixelRepresentation == 0 {
@@ -292,6 +293,13 @@ func (image *DcmImage) determinHighLow() {
 	}
 	image.high = 255
 	image.low = 0
+}
+*/
+
+func (image *DcmImage) determinReverse() {
+	if strings.ToUpper(image.PhotometricInterpretation) == "MONOCHROME1" {
+		image.IsReverse = true
+	}
 }
 
 func (image *DcmImage) determineMinMax() {
@@ -318,6 +326,6 @@ func (image *DcmImage) determineMinMax() {
 	}
 
 	log.Println("min1", image.minValue, "max1", image.maxValue, "absmin", image.AbsMinimum, "absmax", image.AbsMaximum)
-	image.checkRescaling()
+	//	image.checkRescaling()
 	log.Println("min2", image.minValue, "max2", image.maxValue)
 }

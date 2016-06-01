@@ -71,6 +71,8 @@ func convert2bmp(filename string) {
 	num, _ = strconv.ParseUint(reader.Dataset.PixelRepresentation(), 10, 16)
 	img.PixelRepresentation = uint16(num.(uint64))
 
+	img.PhotometricInterpretation = reader.Dataset.PhotometricInterpretation()
+
 	img.PixelData = pixeldata
 
 	err = img.WriteBMP("test.bmp", 8, 0)

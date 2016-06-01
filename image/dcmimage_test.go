@@ -1,10 +1,11 @@
 package image
 
 import (
-	"github.com/grayzone/godcm/core"
 	"os"
 	"strconv"
 	"testing"
+
+	"github.com/grayzone/godcm/core"
 )
 
 func gettestdatafolder() string {
@@ -23,6 +24,7 @@ func TestWrite8BMP(t *testing.T) {
 	}{
 		{gettestdatafolder() + "IM0.dcm", "1"},
 		{gettestdatafolder() + "xr_chest.dcm", "1"},
+		{gettestdatafolder() + "CT-MONO2-16-ankle", "1"},
 	}
 	for _, c := range cases {
 		var reader core.DcmReader
@@ -58,6 +60,11 @@ func TestWrite8BMP(t *testing.T) {
 
 		num, _ = strconv.ParseFloat(reader.Dataset.RescaleSlope(), 64)
 		img.RescaleSlope = num.(float64)
+
+		num, _ = strconv.ParseUint(reader.Dataset.PixelRepresentation(), 10, 16)
+		img.PixelRepresentation = uint16(num.(uint64))
+
+		img.PhotometricInterpretation = reader.Dataset.PhotometricInterpretation()
 
 		img.PixelData = pixeldata
 
