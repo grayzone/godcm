@@ -7,7 +7,7 @@ import (
 	"strconv"
 
 	"github.com/grayzone/godcm/core"
-	"github.com/grayzone/godcm/image"
+	"github.com/grayzone/godcm/dcmimage"
 )
 
 func readdicmfile(filename string, isReadValue bool) {
@@ -47,7 +47,7 @@ func convert2bmp(filename string) {
 
 	pixeldata := reader.Dataset.PixelData()
 
-	var img image.DcmImage
+	var img dcmimage.DcmImage
 
 	img.IsCompressed = isCompressed
 	img.IsBigEndian = isBigEndian
@@ -88,7 +88,7 @@ func convert2bmp(filename string) {
 
 	img.PixelData = pixeldata
 
-	err = img.WriteBMP("test.bmp", 32, 0)
+	err = img.WriteBMP("test.bmp", 8, 0)
 	if err != nil {
 		log.Println(err.Error())
 	}
