@@ -43,6 +43,7 @@ func TestWrite8BMP(t *testing.T) {
 		reader.IsReadValue = true
 		filepath := gettestdatafolder() + c.in
 		err := reader.ReadFile(filepath)
+
 		isCompressed, err := reader.IsCompressed()
 		if err != nil {
 			t.Errorf("WriteBMP() %s", err.Error())
@@ -91,7 +92,9 @@ func TestWrite8BMP(t *testing.T) {
 		img.PixelData = pixeldata
 
 		//		sop := reader.Dataset.SOPInstanceUID()
-		err = img.WriteBMP(c.in+".bmp", 8, 0)
+		bmpfile := c.in + ".bmp"
+		err = img.WriteBMP(bmpfile, 8, 0)
+		defer os.Remove(bmpfile)
 		if err != nil {
 			//		t.Errorf("WriteBMP() %s", err.Error())
 		}

@@ -265,8 +265,6 @@ func (image DcmImage) convertTo8Bit() []uint8 {
 				pixel = int16(binary.LittleEndian.Uint16(image.PixelData[2*image.Columns*i-2*image.Columns+2*j : 2*image.Columns*i-2*image.Columns+2*j+2]))
 			case 8:
 				pixel = int16(image.PixelData[image.Columns*i-image.Columns+j])
-			default:
-				log.Panic("unknow bits allocated : ", image.BitsAllocated)
 			}
 			/*
 				if pixel != 0 {

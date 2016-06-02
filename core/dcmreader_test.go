@@ -834,3 +834,29 @@ func TestRescaleSlope(t *testing.T) {
 		}
 	}
 }
+
+func TestIsCompressed(t *testing.T) {
+	cases := []struct {
+		in   string
+		want bool
+	}{
+		{gettestdatafolder() + "GH178.dcm", false},
+		{gettestdatafolder() + "xr_chest.dcm", false},
+		{gettestdatafolder() + "xr_chicken2.dcm", true},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", false},
+		{gettestdatafolder() + "IM-0001-0010.dcm", true},
+		{gettestdatafolder() + "T23/IM-0001-0001.dcm", true},
+		{gettestdatafolder() + "T14/IM-0001-0001.dcm", true},
+		{gettestdatafolder() + "IM0.dcm", false},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		reader.IsReadPixel = false
+		reader.ReadFile(c.in)
+		got, _ := reader.IsCompressed()
+		if got != c.want {
+			t.Errorf("IsCompressed() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}
