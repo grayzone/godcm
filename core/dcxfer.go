@@ -540,6 +540,12 @@ func (xfer *DcmXfer) GetDcmXferByID() error {
 }
 
 // IsExplicitVR returns true if transfer syntax is explicit VR, false otherwise
-func (xfer *DcmXfer) IsExplicitVR() bool {
+func (xfer DcmXfer) IsExplicitVR() bool {
 	return xfer.VRType == EVTExplicit
+}
+
+// IsCompressed check whether pixel data only exist in compressed format
+func (xfer DcmXfer) IsCompressed() bool {
+	return xfer.Encapsulated == EJEEncapsulated
+
 }

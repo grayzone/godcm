@@ -19,24 +19,39 @@ func gettestdatafolder() string {
 
 func TestWrite8BMP(t *testing.T) {
 	cases := []struct {
-		in   string
-		want string
+		in string
 	}{
-		{gettestdatafolder() + "IM0.dcm", "1"},
-		{gettestdatafolder() + "xr_chest.dcm", "1"},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", "1"},
-		{gettestdatafolder() + "xr_tspine.dcm", "1"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "1"},
-		{gettestdatafolder() + "image_09-12-2013_4.dcm", "1"},
+		{"MR-MONO2-8-16x-heart.dcm"},
+		{"US-MONO2-8-8x-execho.dcm"},
+		{"xr_tspine.dcm"},
+		{"xr_chest.dcm"},
+		{"IM0.dcm"},
+		{"image_09-12-2013_4.dcm"},
+		{"CT-MONO2-16-ankle"},
+		{"xr_chicken2.dcm"},
+		{"T23/IM-0001-0001.dcm"},
+		{"IM-0001-0010.dcm"},
+		{"GH195.dcm"},
+		{"GH064.dcm"},
+		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm"},
+		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm"},
 	}
 	for _, c := range cases {
 		var reader core.DcmReader
 		reader.IsReadPixel = true
 		reader.IsReadValue = true
-		err := reader.ReadFile(c.in)
+		filepath := gettestdatafolder() + c.in
+		err := reader.ReadFile(filepath)
+		isCompressed, err := reader.IsCompressed()
+		if err != nil {
+			t.Errorf("WriteBMP() %s", err.Error())
+		}
+
 		pixeldata := reader.Dataset.PixelData()
 
 		var img DcmImage
+
+		img.IsCompressed = isCompressed
 
 		var num interface{}
 
@@ -71,8 +86,8 @@ func TestWrite8BMP(t *testing.T) {
 
 		img.PixelData = pixeldata
 
-		sop := reader.Dataset.SOPInstanceUID()
-		err = img.WriteBMP(sop+".bmp", 8, 0)
+		//		sop := reader.Dataset.SOPInstanceUID()
+		err = img.WriteBMP(c.in+".bmp", 8, 0)
 		if err != nil {
 			t.Errorf("WriteBMP() %s", err.Error())
 		}

@@ -2,6 +2,7 @@ package core
 
 import (
 	"errors"
+	"log"
 )
 
 // DICOM3FILEIDENTIFIER is the DiCOM index in the file header.
@@ -54,7 +55,7 @@ func (reader *DcmReader) ReadFile(filename string) error {
 }
 
 // IsDicom3 is to check the file is supported by DICOM 3.0 or not.
-func (reader *DcmReader) IsDicom3() (bool, error) {
+func (reader DcmReader) IsDicom3() (bool, error) {
 	_, err := reader.fs.Skip(128)
 	if err != nil {
 		return false, err
@@ -68,4 +69,18 @@ func (reader *DcmReader) IsDicom3() (bool, error) {
 	}
 	reader.fs.Putback(132)
 	return true, nil
+}
+
+// IsCompressed check whether pixel data only exist in compressed format
+func (reader DcmReader) IsCompressed() (bool, error) {
+	var xfer DcmXfer
+	xfer.XferID = reader.Meta.TransferSyntaxUID()
+	err := xfer.GetDcmXferByID()
+	if err != nil {
+		return false, err
+	}
+	if xfer.IsCompressed() {
+		log.Println(xfer.XferName)
+	}
+	return xfer.IsCompressed(), nil
 }

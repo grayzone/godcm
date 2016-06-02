@@ -13,29 +13,6 @@ type DcmMetaInfo struct {
 	isEndofMetaInfo bool
 }
 
-// FindDcmElement find the element by tag
-func (meta DcmMetaInfo) FindDcmElement(elem *DcmElement) error {
-	for _, v := range meta.Elements {
-		if v.Tag == elem.Tag {
-			*elem = v
-			return nil
-		}
-	}
-	err := "Not find the tag '" + elem.Tag.String() + "' in meta information."
-	return errors.New(err)
-}
-
-// GetTransferSyntaxUID return the transfer syntax string of the DICOM file.
-func (meta DcmMetaInfo) GetTransferSyntaxUID() (string, error) {
-	var elem DcmElement
-	elem.Tag = DCMTransferSyntaxUID
-	err := meta.FindDcmElement(&elem)
-	if err != nil {
-		return "", err
-	}
-	return elem.GetValueString(), nil
-}
-
 // ReadOneElement read one DICOM element in meta information.
 func (meta *DcmMetaInfo) ReadOneElement(stream *DcmFileStream) error {
 	var elem DcmElement
@@ -103,7 +80,7 @@ func (meta *DcmMetaInfo) Read(stream *DcmFileStream) error {
 
 // IsExplicitVR is to check if the tag is Explicit VR structure
 func (meta DcmMetaInfo) IsExplicitVR() (bool, error) {
-	uid, err := meta.GetTransferSyntaxUID()
+	uid, err := meta.getTransferSyntaxUID()
 	if err != nil {
 		return false, err
 	}
@@ -118,7 +95,7 @@ func (meta DcmMetaInfo) IsExplicitVR() (bool, error) {
 
 // GetByteOrder get the byte orber of the file
 func (meta DcmMetaInfo) GetByteOrder() (EByteOrder, error) {
-	uid, err := meta.GetTransferSyntaxUID()
+	uid, err := meta.getTransferSyntaxUID()
 	if err != nil {
 		return EBOunknown, err
 	}
@@ -151,6 +128,16 @@ func (meta DcmMetaInfo) getElementValue(tag DcmTag) string {
 		return ""
 	}
 	return elem.GetValueString()
+}
+
+func (meta DcmMetaInfo) getTransferSyntaxUID() (string, error) {
+	var elem DcmElement
+	elem.Tag = DCMTransferSyntaxUID
+	err := meta.FindElement(&elem)
+	if err != nil {
+		return "", err
+	}
+	return elem.GetValueString(), nil
 }
 
 // FileMetaInformationGroupLength gets meta information group length

@@ -55,7 +55,8 @@ type DcmImage struct {
 	WindowCenter              float64
 	WindowWidth               float64
 
-	IsReverse bool
+	IsReverse    bool
+	IsCompressed bool
 
 	RescaleType          string
 	PresentationLUTShape string
@@ -81,6 +82,10 @@ func maxval(bits uint16, pos uint32) uint32 {
 
 // WriteBMP write pixel data to BMP file
 func (image DcmImage) WriteBMP(filename string, bits uint16, frame int) error {
+	if image.IsCompressed {
+		err := errors.New("not supported compressed format")
+		return err
+	}
 	switch bits {
 	case 8:
 	case 24:
@@ -138,11 +143,15 @@ func (image DcmImage) WriteBMP(filename string, bits uint16, frame int) error {
 	return nil
 }
 
-/*
 func (image DcmImage) clipHighBits(pixel int16) int16 {
 	if image.HighBit > 15 {
 		return pixel
 	}
+	/*
+		if image.BitsAllocated == image.BitsStored {
+			return pixel
+		}
+	*/
 	nMask := 0xffff << (image.HighBit + 1)
 	if image.PixelRepresentation != 0 {
 		nSignBit := 1 << image.HighBit
@@ -154,10 +163,12 @@ func (image DcmImage) clipHighBits(pixel int16) int16 {
 	pixel &= ^int16(nMask)
 	return pixel
 }
-*/
 
 func (image DcmImage) rescalePixel(pixel int16) int16 {
 	if image.RescaleSlope == 1.0 && image.RescaleIntercept == 0.0 {
+		return pixel
+	}
+	if image.RescaleSlope == 0 && image.RescaleIntercept == 0 {
 		return pixel
 	}
 	return image.getRescaling(pixel).(int16)
@@ -248,9 +259,21 @@ func (image DcmImage) convertTo8Bit() []uint8 {
 	gap := (4 - (image.Columns & 0x3)) & 0x3
 	for i := image.Rows; i > uint32(0); i-- {
 		for j := uint32(0); j < image.Columns; j++ {
-			p := binary.LittleEndian.Uint16(image.PixelData[2*image.Columns*i-2*image.Columns+2*j : 2*image.Columns*i-2*image.Columns+2*j+2])
-			pixel := int16(p)
-			//	pixel = image.clipHighBits(pixel)
+			var pixel int16
+			switch image.BitsAllocated {
+			case 16:
+				pixel = int16(binary.LittleEndian.Uint16(image.PixelData[2*image.Columns*i-2*image.Columns+2*j : 2*image.Columns*i-2*image.Columns+2*j+2]))
+			case 8:
+				pixel = int16(image.PixelData[image.Columns*i-image.Columns+j])
+			default:
+				log.Panic("unknow bits allocated : ", image.BitsAllocated)
+			}
+			/*
+				if pixel != 0 {
+					log.Println("pixel", pixel)
+				}
+			*/
+			pixel = image.clipHighBits(pixel)
 			pixel = image.rescalePixel(pixel)
 
 			b := image.rescaleWindowLevel(pixel)
@@ -312,16 +335,24 @@ func (image *DcmImage) determineMinMax() {
 	image.findAbsMaxMinValue()
 	count := image.Columns * image.Rows
 	for i := uint32(0); i < count; i++ {
-		p := int16(binary.LittleEndian.Uint16(image.PixelData[2*i : 2*i+2]))
+		var pixel int16
+
+		switch image.BitsAllocated {
+		case 16:
+			pixel = int16(binary.LittleEndian.Uint16(image.PixelData[2*i : 2*i+2]))
+		case 8:
+			pixel = int16(image.PixelData[i])
+		}
+
 		if i == 0 {
-			image.minValue = p
-			image.maxValue = p
+			image.minValue = pixel
+			image.maxValue = pixel
 		}
-		if p < image.minValue {
-			image.minValue = p
+		if pixel < image.minValue {
+			image.minValue = pixel
 		}
-		if p > image.maxValue {
-			image.maxValue = p
+		if pixel > image.maxValue {
+			image.maxValue = pixel
 		}
 	}
 

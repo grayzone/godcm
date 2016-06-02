@@ -35,9 +35,16 @@ func convert2bmp(filename string) {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	iscompressed, err := reader.IsCompressed()
+	if err != nil {
+		log.Println(err.Error())
+	}
+
 	pixeldata := reader.Dataset.PixelData()
 
 	var img image.DcmImage
+
+	img.IsCompressed = iscompressed
 
 	var num interface{}
 
@@ -82,35 +89,38 @@ func convert2bmp(filename string) {
 }
 
 var testfile = []string{
-	"./test/data/US-MONO2-8-8x-execho.dcm",
-	"./test/data/xr_tspine.dcm",
-	"./test/data/MR-MONO2-8-16x-heart.dcm",
-	"./test/data/xr_chest.dcm",
-	"./test/data/IM0.dcm",
-	"./test/data/image_09-12-2013_4.dcm",
-	"./test/data/CT-MONO2-16-ankle",
-	"./test/data/IM-0001-0010.dcm",
-	"./test/data/GH195.dcm",
-	"./test/data/GH064.dcm",
-	"./test/data/GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm",
-	"./test/data/GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm",
-	"./test/data/xr_chicken2.dcm",
-	"./test/data/T23/IM-0001-0001.dcm",
+	"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm",
+	"MR-MONO2-8-16x-heart.dcm",
+	"US-MONO2-8-8x-execho.dcm",
+	"xr_tspine.dcm",
+	"xr_chest.dcm",
+	"IM0.dcm",
+	"image_09-12-2013_4.dcm",
+	"CT-MONO2-16-ankle",
+	"xr_chicken2.dcm",
+	"T23/IM-0001-0001.dcm",
+	"IM-0001-0010.dcm",
+	"GH195.dcm",
+	"GH064.dcm",
+	"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm",
 }
 
+var folder = "./test/data/"
+
 func testParseDcm() {
+
 	var index int
 	var isReadValue bool
 	switch len(os.Args) {
 	case 1:
-		readdicmfile(testfile[0], true)
+		readdicmfile(folder+testfile[0], true)
 	case 2:
 		index, _ = strconv.Atoi(os.Args[1])
-		readdicmfile(testfile[index], isReadValue)
+		readdicmfile(folder+testfile[index], isReadValue)
 	case 3:
 		index, _ = strconv.Atoi(os.Args[1])
 		isReadValue, _ = strconv.ParseBool(os.Args[2])
-		readdicmfile(testfile[index], isReadValue)
+		readdicmfile(folder+testfile[index], isReadValue)
 	}
 }
 
@@ -118,10 +128,10 @@ func testdcm2bmp() {
 	var index int
 	switch len(os.Args) {
 	case 1:
-		convert2bmp(testfile[0])
+		convert2bmp(folder + testfile[0])
 	case 2:
 		index, _ = strconv.Atoi(os.Args[1])
-		convert2bmp(testfile[index])
+		convert2bmp(folder + testfile[index])
 	}
 }
 
