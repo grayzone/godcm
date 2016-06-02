@@ -4,9 +4,3 @@
 [![Coverage Status](https://coveralls.io/repos/github/grayzone/godcm/badge.svg?branch=master)](https://coveralls.io/github/grayzone/godcm?branch=master)
 [![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/grayzone/godcm/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
 
-
-
-<!--[![BuildStatus](https://drone.io/github.com/grayzone/godcm/status.png)](https://drone.io/github.com/grayzone/godcm/latest)  -->
-
-[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/grayzone/godcm/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
-
