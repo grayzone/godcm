@@ -19,22 +19,23 @@ func gettestdatafolder() string {
 
 func TestWrite8BMP(t *testing.T) {
 	cases := []struct {
-		in string
+		in   string
+		want bool
 	}{
-		{"MR-MONO2-8-16x-heart.dcm"},
-		{"US-MONO2-8-8x-execho.dcm"},
-		{"xr_tspine.dcm"},
-		{"xr_chest.dcm"},
-		{"IM0.dcm"},
-		{"image_09-12-2013_4.dcm"},
-		{"CT-MONO2-16-ankle"},
-		{"xr_chicken2.dcm"},
-		{"T23/IM-0001-0001.dcm"},
-		{"IM-0001-0010.dcm"},
-		{"GH195.dcm"},
-		{"GH064.dcm"},
-		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm"},
-		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm"},
+		{"MR-MONO2-8-16x-heart.dcm", false},
+		{"US-MONO2-8-8x-execho.dcm", false},
+		{"xr_tspine.dcm", false},
+		{"xr_chest.dcm", false},
+		{"IM0.dcm", false},
+		{"image_09-12-2013_4.dcm", false},
+		{"CT-MONO2-16-ankle", false},
+		{"xr_chicken2.dcm", true},
+		{"T23/IM-0001-0001.dcm", true},
+		{"IM-0001-0010.dcm", true},
+		{"GH195.dcm", true},
+		{"GH064.dcm", true},
+		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", false},
+		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", false},
 	}
 	for _, c := range cases {
 		var reader core.DcmReader
@@ -52,6 +53,9 @@ func TestWrite8BMP(t *testing.T) {
 		var img DcmImage
 
 		img.IsCompressed = isCompressed
+		if c.want != img.IsCompressed {
+			t.Errorf("WriteBMP(%s), isCompressed want %v got %v", c.in, c.want, isCompressed)
+		}
 
 		var num interface{}
 
@@ -89,7 +93,7 @@ func TestWrite8BMP(t *testing.T) {
 		//		sop := reader.Dataset.SOPInstanceUID()
 		err = img.WriteBMP(c.in+".bmp", 8, 0)
 		if err != nil {
-			t.Errorf("WriteBMP() %s", err.Error())
+			//		t.Errorf("WriteBMP() %s", err.Error())
 		}
 	}
 }
