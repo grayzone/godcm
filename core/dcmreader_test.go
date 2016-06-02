@@ -860,3 +860,30 @@ func TestIsCompressed(t *testing.T) {
 		}
 	}
 }
+
+func TestIsBigEndian(t *testing.T) {
+	cases := []struct {
+		in   string
+		want bool
+	}{
+		{gettestdatafolder() + "GH178.dcm", false},
+		{gettestdatafolder() + "xr_chest.dcm", false},
+		{gettestdatafolder() + "xr_chicken2.dcm", false},
+		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", false},
+		{gettestdatafolder() + "IM-0001-0010.dcm", false},
+		{gettestdatafolder() + "T23/IM-0001-0001.dcm", false},
+		{gettestdatafolder() + "T14/IM-0001-0001.dcm", false},
+		{gettestdatafolder() + "IM0.dcm", false},
+		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", true},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		reader.IsReadPixel = false
+		reader.ReadFile(c.in)
+		got, _ := reader.IsBigEndian()
+		if got != c.want {
+			t.Errorf("IsBigEndian() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}

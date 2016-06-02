@@ -49,6 +49,11 @@ func TestWrite8BMP(t *testing.T) {
 			t.Errorf("WriteBMP() %s", err.Error())
 		}
 
+		isBigEndian, err := reader.IsBigEndian()
+		if err != nil {
+			t.Errorf("WriteBMP() %s", err.Error())
+		}
+
 		pixeldata := reader.Dataset.PixelData()
 
 		var img DcmImage
@@ -57,6 +62,8 @@ func TestWrite8BMP(t *testing.T) {
 		if c.want != img.IsCompressed {
 			t.Errorf("WriteBMP(%s), isCompressed want %v got %v", c.in, c.want, isCompressed)
 		}
+
+		img.IsBigEndian = isBigEndian
 
 		var num interface{}
 

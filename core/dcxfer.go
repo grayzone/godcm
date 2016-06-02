@@ -547,5 +547,9 @@ func (xfer DcmXfer) IsExplicitVR() bool {
 // IsCompressed check whether pixel data only exist in compressed format
 func (xfer DcmXfer) IsCompressed() bool {
 	return xfer.Encapsulated == EJEEncapsulated
+}
 
+// IsBigEndian check whether pixel data need to be swapped
+func (xfer DcmXfer) IsBigEndian() bool {
+	return xfer.ByteOrder == EBOBigEndian
 }

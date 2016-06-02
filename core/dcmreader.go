@@ -80,7 +80,21 @@ func (reader DcmReader) IsCompressed() (bool, error) {
 		return false, err
 	}
 	if xfer.IsCompressed() {
-		log.Println(xfer.XferName)
+		log.Println("XferName: ", xfer.XferName)
 	}
 	return xfer.IsCompressed(), nil
+}
+
+// IsBigEndian check whether pixel data need to be swapped
+func (reader DcmReader) IsBigEndian() (bool, error) {
+	var xfer DcmXfer
+	xfer.XferID = reader.Meta.TransferSyntaxUID()
+	err := xfer.GetDcmXferByID()
+	if err != nil {
+		return false, err
+	}
+	if xfer.IsBigEndian() {
+		log.Println("ByteOrder: ", xfer.ByteOrder.String())
+	}
+	return xfer.IsBigEndian(), nil
 }

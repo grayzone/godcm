@@ -35,7 +35,12 @@ func convert2bmp(filename string) {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-	iscompressed, err := reader.IsCompressed()
+	isCompressed, err := reader.IsCompressed()
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	isBigEndian, err := reader.IsBigEndian()
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -44,7 +49,8 @@ func convert2bmp(filename string) {
 
 	var img image.DcmImage
 
-	img.IsCompressed = iscompressed
+	img.IsCompressed = isCompressed
+	img.IsBigEndian = isBigEndian
 
 	var num interface{}
 

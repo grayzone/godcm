@@ -57,6 +57,7 @@ type DcmImage struct {
 
 	IsReverse    bool
 	IsCompressed bool
+	IsBigEndian  bool
 
 	RescaleType          string
 	PresentationLUTShape string
@@ -205,7 +206,6 @@ func (image *DcmImage) checkRescaling() {
 	image.AbsMaximum = image.getRescaling(image.AbsMaximum).(float64)
 }
 */
-
 func (image DcmImage) nowindow(pixel int16) uint8 {
 	//	var outrange float64
 	//	outrange = image.high - image.low + 1
@@ -262,7 +262,11 @@ func (image DcmImage) convertTo8Bit() []uint8 {
 			var pixel int16
 			switch image.BitsAllocated {
 			case 16:
-				pixel = int16(binary.LittleEndian.Uint16(image.PixelData[2*image.Columns*i-2*image.Columns+2*j : 2*image.Columns*i-2*image.Columns+2*j+2]))
+				if image.IsBigEndian {
+					pixel = int16(binary.BigEndian.Uint16(image.PixelData[2*image.Columns*i-2*image.Columns+2*j : 2*image.Columns*i-2*image.Columns+2*j+2]))
+				} else {
+					pixel = int16(binary.LittleEndian.Uint16(image.PixelData[2*image.Columns*i-2*image.Columns+2*j : 2*image.Columns*i-2*image.Columns+2*j+2]))
+				}
 			case 8:
 				pixel = int16(image.PixelData[image.Columns*i-image.Columns+j])
 			}
@@ -337,7 +341,12 @@ func (image *DcmImage) determineMinMax() {
 
 		switch image.BitsAllocated {
 		case 16:
-			pixel = int16(binary.LittleEndian.Uint16(image.PixelData[2*i : 2*i+2]))
+			if image.IsBigEndian {
+				pixel = int16(binary.BigEndian.Uint16(image.PixelData[2*i : 2*i+2]))
+			} else {
+				pixel = int16(binary.LittleEndian.Uint16(image.PixelData[2*i : 2*i+2]))
+			}
+
 		case 8:
 			pixel = int16(image.PixelData[i])
 		}
