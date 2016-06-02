@@ -17,7 +17,7 @@ func gettestdatafolder() string {
 	return result
 }
 
-func TestWrite8BMP(t *testing.T) {
+func convert2bmp(t *testing.T, bits uint16) {
 	cases := []struct {
 		in   string
 		want bool
@@ -98,28 +98,26 @@ func TestWrite8BMP(t *testing.T) {
 
 		img.PixelData = pixeldata
 
-		//		sop := reader.Dataset.SOPInstanceUID()
-		bmpfile := c.in + ".bmp"
-		err = img.WriteBMP(bmpfile, 8, 0)
+		bmpfile := c.in + "_ " + strconv.Itoa(int(bits)) + ".bmp"
+		err = img.WriteBMP(bmpfile, bits, 0)
 		defer os.Remove(bmpfile)
 		if err != nil {
 			//		t.Errorf("WriteBMP() %s", err.Error())
 		}
 	}
+
 }
 
-func TestWrite16BMP(t *testing.T) {
-	filename := "16.bmp"
+func TestWrite8BMP(t *testing.T) {
 
-	var di DcmImage
+	convert2bmp(t, 8)
 
-	di.Columns = 512
-	di.Rows = 512
-	di.BitsAllocated = 16
-	di.BitsStored = 12
-	di.HighBit = 11
-	err := di.WriteBMP(filename, 16, 0)
-	if err == nil {
-		t.Errorf("WriteBMP() %s", err.Error())
-	}
+}
+
+func TestWrite24BMP(t *testing.T) {
+	convert2bmp(t, 24)
+}
+
+func TestWrite32BMP(t *testing.T) {
+	convert2bmp(t, 32)
 }

@@ -137,7 +137,7 @@ func (image DcmImage) WriteBMP(filename string, bits uint16, frame int) error {
 		binary.Write(buf, binary.LittleEndian, palette)
 	}
 
-	data := image.convertTo8Bit()
+	data := image.convertTo8Bit(bits)
 
 	binary.Write(buf, binary.LittleEndian, data)
 	f.Write(buf.Bytes())
@@ -169,9 +169,11 @@ func (image DcmImage) rescalePixel(pixel int16) int16 {
 	if image.RescaleSlope == 1.0 && image.RescaleIntercept == 0.0 {
 		return pixel
 	}
+
 	if image.RescaleSlope == 0 && image.RescaleIntercept == 0 {
 		return pixel
 	}
+
 	return image.getRescaling(pixel).(int16)
 }
 
@@ -251,43 +253,48 @@ func (image DcmImage) rescaleWindowLevel(pixel int16) uint8 {
 	return image.window(pixel)
 }
 
-func (image DcmImage) convertTo8Bit() []uint8 {
+func (image DcmImage) convertTo8Bit(bits uint16) []uint8 {
 	image.determineMinMax()
 	//	image.determinHighLow()
 	image.determinReverse()
 	var result []uint8
-	gap := (4 - (image.Columns & 0x3)) & 0x3
+
+	rgbplane := bits / 8
+
+	gap := rgbplane * uint16((4-(image.Columns&0x3))&0x3)
 	for i := image.Rows; i > uint32(0); i-- {
 		for j := uint32(0); j < image.Columns; j++ {
 			var pixel int16
-			switch image.BitsAllocated {
-			case 16:
+
+			if image.BitsAllocated > 8 {
+				b := image.PixelData[2*image.Columns*i-2*image.Columns+2*j : 2*image.Columns*i-2*image.Columns+2*j+2]
 				if image.IsBigEndian {
-					pixel = int16(binary.BigEndian.Uint16(image.PixelData[2*image.Columns*i-2*image.Columns+2*j : 2*image.Columns*i-2*image.Columns+2*j+2]))
+					pixel = int16(binary.BigEndian.Uint16(b))
 				} else {
-					pixel = int16(binary.LittleEndian.Uint16(image.PixelData[2*image.Columns*i-2*image.Columns+2*j : 2*image.Columns*i-2*image.Columns+2*j+2]))
+					pixel = int16(binary.LittleEndian.Uint16(b))
 				}
-			case 8:
+			} else {
 				pixel = int16(image.PixelData[image.Columns*i-image.Columns+j])
 			}
-			/*
-				if pixel != 0 {
-					log.Println("pixel", pixel)
-				}
-			*/
+
 			pixel = image.clipHighBits(pixel)
 			pixel = image.rescalePixel(pixel)
 
 			b := image.rescaleWindowLevel(pixel)
 			//b := image.nowindow(pixel)
 			if image.IsReverse {
-				result = append(result, 255-uint8(b))
-			} else {
+				b = 255 - b
+			}
+
+			for i := uint16(0); i < rgbplane; i++ {
 				result = append(result, uint8(b))
 			}
+
 		}
-		for i := uint32(0); i < gap; i++ {
-			result = append(result, uint8(0))
+		if bits != 32 {
+			for i := uint16(0); i < gap; i++ {
+				result = append(result, uint8(0))
+			}
 		}
 	}
 	return result
@@ -338,16 +345,14 @@ func (image *DcmImage) determineMinMax() {
 	count := image.Columns * image.Rows
 	for i := uint32(0); i < count; i++ {
 		var pixel int16
-
-		switch image.BitsAllocated {
-		case 16:
+		if image.BitsAllocated > 8 {
+			b := image.PixelData[2*i : 2*i+2]
 			if image.IsBigEndian {
-				pixel = int16(binary.BigEndian.Uint16(image.PixelData[2*i : 2*i+2]))
+				pixel = int16(binary.BigEndian.Uint16(b))
 			} else {
-				pixel = int16(binary.LittleEndian.Uint16(image.PixelData[2*i : 2*i+2]))
+				pixel = int16(binary.LittleEndian.Uint16(b))
 			}
-
-		case 8:
+		} else {
 			pixel = int16(image.PixelData[i])
 		}
 

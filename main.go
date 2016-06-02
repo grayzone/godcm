@@ -88,18 +88,18 @@ func convert2bmp(filename string) {
 
 	img.PixelData = pixeldata
 
-	err = img.WriteBMP("test.bmp", 8, 0)
+	err = img.WriteBMP("test.bmp", 32, 0)
 	if err != nil {
 		log.Println(err.Error())
 	}
 }
 
 var testfile = []string{
+	"xr_chest.dcm",
 	"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm",
 	"MR-MONO2-8-16x-heart.dcm",
 	"US-MONO2-8-8x-execho.dcm",
 	"xr_tspine.dcm",
-	"xr_chest.dcm",
 	"IM0.dcm",
 	"image_09-12-2013_4.dcm",
 	"CT-MONO2-16-ankle",
