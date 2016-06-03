@@ -93,7 +93,11 @@ func (dataset DcmDataset) WindowWidth() string {
 
 // NumberOfFrames gets the frame number
 func (dataset DcmDataset) NumberOfFrames() string {
-	return dataset.getElementValue(DCMNumberOfFrames)
+	result := dataset.getElementValue(DCMNumberOfFrames)
+	if len(result) == 0 {
+		result = "1"
+	}
+	return result
 }
 
 /*

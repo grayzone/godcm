@@ -31,6 +31,21 @@ type BitmapInfoHeader struct {
 	biClrImportant  uint32
 }
 
+func (di DcmImage) getPixelDataOfFrame(frame int) ([]byte, error) {
+	size := int(di.Columns * di.Rows * uint32(di.SamplesPerPixel))
+	if size == 0 {
+		err := errors.New("getPixelDataOfFrame : SamplesPerPixel is zero")
+		return nil, err
+	}
+	num := len(di.PixelData) / size
+
+	if frame > num {
+		err := errors.New("getPixelDataOfFrame : out of range")
+		return nil, err
+	}
+	return di.PixelData[size*frame : size*frame+size], nil
+}
+
 // WriteBMP write pixel data to BMP file
 func (di DcmImage) WriteBMP(filename string, bits uint16, frame int) error {
 	if di.IsCompressed {
@@ -45,6 +60,13 @@ func (di DcmImage) WriteBMP(filename string, bits uint16, frame int) error {
 		err := errors.New("not supported BMP format")
 		return err
 	}
+
+	pixelData, err := di.getPixelDataOfFrame(frame)
+	if err != nil {
+		return err
+	}
+	d := di.convertTo8Bit(pixelData)
+
 	var fileHeader BitmapFileHeader
 	fileHeader.bfType[0] = 'B'
 	fileHeader.bfType[1] = 'M'
@@ -87,15 +109,13 @@ func (di DcmImage) WriteBMP(filename string, bits uint16, frame int) error {
 		binary.Write(buf, binary.LittleEndian, palette)
 	}
 
-	di.convertTo8Bit()
-
 	rgbplane := bits / 8
 
 	gap := rgbplane * uint16((4-(di.Columns&0x3))&0x3)
 
 	for i := di.Rows; i > uint32(0); i-- {
 		for j := uint32(0); j < di.Columns; j++ {
-			pixel := di.Data[di.Columns*(i-1)+j : di.Columns*(i-1)+j+1]
+			pixel := d[di.Columns*(i-1)+j : di.Columns*(i-1)+j+1]
 
 			for k := uint16(0); k < rgbplane; k++ {
 				binary.Write(buf, binary.LittleEndian, pixel)

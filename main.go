@@ -27,14 +27,6 @@ func readdicmfile(filename string, isReadValue bool) {
 
 }
 
-func convert2bmp(filename string) {
-	img := getimageinfo(filename)
-	err := img.WriteBMP("test.bmp", 8, 0)
-	if err != nil {
-		log.Println(err.Error())
-	}
-}
-
 func getimageinfo(filename string) dcmimage.DcmImage {
 	var reader core.DcmReader
 	reader.IsReadPixel = true
@@ -94,32 +86,61 @@ func getimageinfo(filename string) dcmimage.DcmImage {
 
 	img.PhotometricInterpretation = reader.Dataset.PhotometricInterpretation()
 
+	num, _ = strconv.ParseUint(reader.Dataset.NumberOfFrames(), 10, 64)
+	img.NumberOfFrames = int(num.(uint64))
+
+	num, _ = strconv.ParseUint(reader.Dataset.SamplesPerPixel(), 10, 16)
+	img.SamplesPerPixel = uint16(num.(uint64))
+
 	img.PixelData = pixeldata
 
 	return img
 
 }
 
+func convert2bmp(filename string) {
+	img := getimageinfo(filename)
+
+	frame := img.NumberOfFrames
+	for i := 0; i < frame; i++ {
+		newfile := filename + "_" + strconv.FormatUint(uint64(i), 10) + ".bmp"
+		err := img.WriteBMP(newfile, 8, i)
+		if err != nil {
+			log.Println(err.Error())
+		}
+	}
+}
+
 func convert2png(filename string) {
 	img := getimageinfo(filename)
-	err := img.ConvertToPNG("test.png")
-	if err != nil {
-		log.Println(err.Error())
+
+	frame := img.NumberOfFrames
+	for i := 0; i < frame; i++ {
+		newfile := filename + "_" + strconv.FormatUint(uint64(i), 10) + ".png"
+		err := img.ConvertToPNG(newfile, i)
+		if err != nil {
+			log.Println(err.Error())
+		}
 	}
 }
 
 func convert2jpg(filename string) {
 	img := getimageinfo(filename)
-	err := img.ConvertToJPG("test.jpg")
-	if err != nil {
-		log.Println(err.Error())
+
+	frame := img.NumberOfFrames
+	for i := 0; i < frame; i++ {
+		newfile := filename + "_" + strconv.FormatUint(uint64(i), 10) + ".jpg"
+		err := img.ConvertToJPG(newfile, i)
+		if err != nil {
+			log.Println(err.Error())
+		}
 	}
 }
 
 var testfile = []string{
+	"MR-MONO2-8-16x-heart.dcm",
 	"xr_chest.dcm",
 	"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm",
-	"MR-MONO2-8-16x-heart.dcm",
 	"US-MONO2-8-8x-execho.dcm",
 	"xr_tspine.dcm",
 	"IM0.dcm",
@@ -231,7 +252,7 @@ func testdcm2jpg16() {
 */
 func main() {
 	//	testParseDcm()
-	//	testdcm2bmp()
+	testdcm2bmp()
 	testdcm2png()
 	testdcm2jpg()
 }

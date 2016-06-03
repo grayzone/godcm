@@ -44,8 +44,8 @@ type DcmImage struct {
 	high float64
 	low  float64
 
-	PixelData []byte
-	Data      []uint8
+	NumberOfFrames int
+	PixelData      []byte
 }
 
 func maxval(bits uint16, pos uint32) uint32 {
@@ -125,22 +125,23 @@ func (di DcmImage) rescaleWindowLevel(pixel int16) uint8 {
 	return di.window(pixel)
 }
 
-func (di *DcmImage) byteTouint8() {
-	di.Data = nil
-	for i := range di.PixelData {
-		b := uint8(di.PixelData[i])
+func (di DcmImage) byteTouint8(pixelData []byte) []uint8 {
+	var result []uint8
+	for i := range pixelData {
+		b := uint8(pixelData[i])
 		if di.IsReverse {
 			b = uint8(di.high) - b
 		}
-		di.Data = append(di.Data, b)
+		result = append(result, b)
 	}
+	return result
 }
 
-func (di *DcmImage) int16Touint8() {
-	di.Data = nil
+func (di DcmImage) int16Touint8(pixelData []byte) []uint8 {
+	var result []uint8
 	count := di.Columns * di.Rows
 	for i := uint32(0); i < count; i++ {
-		b := di.PixelData[2*i : 2*i+2]
+		b := pixelData[2*i : 2*i+2]
 		var pixel int16
 		if di.IsBigEndian {
 			pixel = int16(binary.BigEndian.Uint16(b))
@@ -153,18 +154,18 @@ func (di *DcmImage) int16Touint8() {
 		if di.IsReverse {
 			p = uint8(di.high) - p
 		}
-		di.Data = append(di.Data, p)
+		result = append(result, p)
 	}
+	return result
 }
 
-func (di *DcmImage) convertTo8Bit() {
+func (di DcmImage) convertTo8Bit(pixel []byte) []uint8 {
 	di.determinReverse()
 	if di.BitsAllocated <= 8 {
-		di.byteTouint8()
-		return
+		return di.byteTouint8(pixel)
 	}
 	di.determineMinMax()
-	di.int16Touint8()
+	return di.int16Touint8(pixel)
 
 	/*
 

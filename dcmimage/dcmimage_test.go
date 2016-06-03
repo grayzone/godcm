@@ -76,6 +76,12 @@ func readpixel(t *testing.T, filename string, want bool) DcmImage {
 
 	img.PhotometricInterpretation = reader.Dataset.PhotometricInterpretation()
 
+	num, _ = strconv.ParseUint(reader.Dataset.NumberOfFrames(), 10, 64)
+	img.NumberOfFrames = int(num.(uint64))
+
+	num, _ = strconv.ParseUint(reader.Dataset.SamplesPerPixel(), 10, 16)
+	img.SamplesPerPixel = uint16(num.(uint64))
+
 	img.PixelData = pixeldata
 
 	return img
@@ -104,11 +110,15 @@ func convert2BMP(t *testing.T, bits uint16) {
 	for _, c := range cases {
 		img := readpixel(t, c.in, c.want)
 
-		bmpfile := c.in + "_" + strconv.Itoa(int(bits)) + ".bmp"
-		err := img.WriteBMP(bmpfile, bits, 0)
-		defer os.Remove(bmpfile)
-		if err != nil {
-			//		t.Errorf("WriteBMP() %s", err.Error())
+		for i := 0; i < img.NumberOfFrames; i++ {
+			newfile := c.in + "_" + strconv.Itoa(int(bits)) + "_" + strconv.FormatUint(uint64(i), 10) + ".bmp"
+			err := img.WriteBMP(newfile, bits, i)
+
+			if err != nil {
+				//		t.Errorf("ConvertToPNG() %s", err.Error())
+			}
+
+			defer os.Remove(newfile)
 		}
 	}
 }
@@ -147,11 +157,15 @@ func TestWritePNG(t *testing.T) {
 	}
 	for _, c := range cases {
 		img := readpixel(t, c.in, c.want)
-		pngfile := c.in + ".png"
-		err := img.ConvertToPNG(pngfile)
-		defer os.Remove(pngfile)
-		if err != nil {
-			//		t.Errorf("ConvertToPNG() %s", err.Error())
+		for i := 0; i < img.NumberOfFrames; i++ {
+			newfile := c.in + "_" + strconv.FormatUint(uint64(i), 10) + ".png"
+			err := img.ConvertToPNG(newfile, i)
+
+			if err != nil {
+				//		t.Errorf("ConvertToPNG() %s", err.Error())
+			}
+
+			defer os.Remove(newfile)
 		}
 	}
 }
@@ -178,11 +192,16 @@ func TestWriteJPG(t *testing.T) {
 	}
 	for _, c := range cases {
 		img := readpixel(t, c.in, c.want)
-		jpgfile := c.in + ".jpg"
-		err := img.ConvertToJPG(jpgfile)
-		defer os.Remove(jpgfile)
-		if err != nil {
-			//		t.Errorf("ConvertToJPG() %s", err.Error())
+
+		for i := 0; i < img.NumberOfFrames; i++ {
+			newfile := c.in + "_" + strconv.FormatUint(uint64(i), 10) + ".jpg"
+			err := img.ConvertToJPG(newfile, i)
+
+			if err != nil {
+				//			t.Errorf("ConvertToJPG() %s", err.Error())
+			}
+
+			defer os.Remove(newfile)
 		}
 	}
 }

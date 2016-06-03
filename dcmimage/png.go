@@ -9,7 +9,7 @@ import (
 )
 
 // ConvertToPNG convert dicom file to png file.
-func (di DcmImage) ConvertToPNG(filepath string) error {
+func (di DcmImage) ConvertToPNG(filepath string, frame int) error {
 	if di.IsCompressed {
 		err := errors.New("not supported compressed format")
 		return err
@@ -20,13 +20,17 @@ func (di DcmImage) ConvertToPNG(filepath string) error {
 	}
 	defer outfile.Close()
 
-	di.convertTo8Bit()
+	pixelData, err := di.getPixelDataOfFrame(frame)
+	if err != nil {
+		return err
+	}
+	d := di.convertTo8Bit(pixelData)
 
 	m := image.NewGray(image.Rect(int(di.Columns), int(di.Rows), 0, 0))
 	var index int
 	for y := 0; y < int(di.Rows); y++ {
 		for x := 0; x < int(di.Columns); x++ {
-			r := di.Data[index]
+			r := d[index]
 			index++
 			c := color.Gray{r}
 			m.SetGray(x, y, c)
