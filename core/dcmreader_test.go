@@ -580,13 +580,13 @@ func TestNumberOfFrames(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "GH178.dcm", ""},
-		{gettestdatafolder() + "xr_chest.dcm", ""},
-		{gettestdatafolder() + "xr_chicken2.dcm", ""},
+		{gettestdatafolder() + "GH178.dcm", "1"},
+		{gettestdatafolder() + "xr_chest.dcm", "1"},
+		{gettestdatafolder() + "xr_chicken2.dcm", "1"},
 		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "16"},
-		{gettestdatafolder() + "IM-0001-0010.dcm", ""},
-		{gettestdatafolder() + "T23/IM-0001-0001.dcm", ""},
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", ""},
+		{gettestdatafolder() + "IM-0001-0010.dcm", "1"},
+		{gettestdatafolder() + "T23/IM-0001-0001.dcm", "1"},
+		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "1"},
 		{gettestdatafolder() + "IM0.dcm", "1"},
 	}
 	for _, c := range cases {
