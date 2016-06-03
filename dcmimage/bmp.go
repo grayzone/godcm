@@ -31,21 +31,6 @@ type BitmapInfoHeader struct {
 	biClrImportant  uint32
 }
 
-func (di DcmImage) getPixelDataOfFrame(frame int) ([]byte, error) {
-	size := int(di.Columns * di.Rows * uint32(di.SamplesPerPixel))
-	if size == 0 {
-		err := errors.New("getPixelDataOfFrame : SamplesPerPixel is zero")
-		return nil, err
-	}
-	num := len(di.PixelData) / size
-
-	if frame > num {
-		err := errors.New("getPixelDataOfFrame : out of range")
-		return nil, err
-	}
-	return di.PixelData[size*frame : size*frame+size], nil
-}
-
 // WriteBMP write pixel data to BMP file
 func (di DcmImage) WriteBMP(filename string, bits uint16, frame int) error {
 	if di.IsCompressed {

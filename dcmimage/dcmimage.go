@@ -2,6 +2,7 @@ package dcmimage
 
 import (
 	"encoding/binary"
+	"errors"
 	"log" // for debug
 	"strings"
 )
@@ -289,4 +290,19 @@ func (di *DcmImage) determineMinMax() {
 	}
 
 	log.Println("min", di.minValue, "max", di.maxValue)
+}
+
+func (di DcmImage) getPixelDataOfFrame(frame int) ([]byte, error) {
+	size := int(di.Columns * di.Rows * uint32(di.SamplesPerPixel))
+	if size == 0 {
+		err := errors.New("getPixelDataOfFrame : SamplesPerPixel is zero")
+		return nil, err
+	}
+	num := len(di.PixelData) / size
+
+	if frame > num {
+		err := errors.New("getPixelDataOfFrame : out of range")
+		return nil, err
+	}
+	return di.PixelData[size*frame : size*frame+size], nil
 }

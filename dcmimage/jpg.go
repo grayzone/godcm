@@ -36,5 +36,9 @@ func (di DcmImage) ConvertToJPG(filepath string, frame int) error {
 			m.SetGray(x, y, c)
 		}
 	}
+	/*
+		o := new(jpeg.Options)
+		o.Quality = 100
+	*/
 	return jpeg.Encode(outfile, m, nil)
 }

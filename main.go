@@ -10,10 +10,12 @@ import (
 	"github.com/grayzone/godcm/dcmimage"
 )
 
+var folder = "./test/data/"
+
 func readdicmfile(filename string, isReadValue bool) {
 	var reader core.DcmReader
 	reader.IsReadValue = isReadValue
-	err := reader.ReadFile(filename)
+	err := reader.ReadFile(folder + filename)
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -99,7 +101,7 @@ func getimageinfo(filename string) dcmimage.DcmImage {
 }
 
 func convert2bmp(filename string) {
-	img := getimageinfo(filename)
+	img := getimageinfo(folder + filename)
 
 	frame := img.NumberOfFrames
 	for i := 0; i < frame; i++ {
@@ -112,7 +114,7 @@ func convert2bmp(filename string) {
 }
 
 func convert2png(filename string) {
-	img := getimageinfo(filename)
+	img := getimageinfo(folder + filename)
 
 	frame := img.NumberOfFrames
 	for i := 0; i < frame; i++ {
@@ -125,7 +127,7 @@ func convert2png(filename string) {
 }
 
 func convert2jpg(filename string) {
-	img := getimageinfo(filename)
+	img := getimageinfo(folder + filename)
 
 	frame := img.NumberOfFrames
 	for i := 0; i < frame; i++ {
@@ -138,6 +140,7 @@ func convert2jpg(filename string) {
 }
 
 var testfile = []string{
+	"US-RGB-8-esopecho.dcm",
 	"MR-MONO2-8-16x-heart.dcm",
 	"xr_chest.dcm",
 	"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm",
@@ -154,22 +157,20 @@ var testfile = []string{
 	"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm",
 }
 
-var folder = "./test/data/"
-
 func testParseDcm() {
 
 	var index int
 	var isReadValue bool
 	switch len(os.Args) {
 	case 1:
-		readdicmfile(folder+testfile[0], true)
+		readdicmfile(testfile[0], true)
 	case 2:
 		index, _ = strconv.Atoi(os.Args[1])
-		readdicmfile(folder+testfile[index], isReadValue)
+		readdicmfile(testfile[index], isReadValue)
 	case 3:
 		index, _ = strconv.Atoi(os.Args[1])
 		isReadValue, _ = strconv.ParseBool(os.Args[2])
-		readdicmfile(folder+testfile[index], isReadValue)
+		readdicmfile(testfile[index], isReadValue)
 	}
 }
 
@@ -177,10 +178,10 @@ func testdcm2bmp() {
 	var index int
 	switch len(os.Args) {
 	case 1:
-		convert2bmp(folder + testfile[0])
+		convert2bmp(testfile[0])
 	case 2:
 		index, _ = strconv.Atoi(os.Args[1])
-		convert2bmp(folder + testfile[index])
+		convert2bmp(testfile[index])
 	}
 }
 
@@ -188,10 +189,10 @@ func testdcm2png() {
 	var index int
 	switch len(os.Args) {
 	case 1:
-		convert2png(folder + testfile[0])
+		convert2png(testfile[0])
 	case 2:
 		index, _ = strconv.Atoi(os.Args[1])
-		convert2png(folder + testfile[index])
+		convert2png(testfile[index])
 	}
 }
 
@@ -199,10 +200,10 @@ func testdcm2jpg() {
 	var index int
 	switch len(os.Args) {
 	case 1:
-		convert2jpg(folder + testfile[0])
+		convert2jpg(testfile[0])
 	case 2:
 		index, _ = strconv.Atoi(os.Args[1])
-		convert2jpg(folder + testfile[index])
+		convert2jpg(testfile[index])
 	}
 }
 
@@ -252,7 +253,7 @@ func testdcm2jpg16() {
 */
 func main() {
 	//	testParseDcm()
-	testdcm2bmp()
-	testdcm2png()
+	//	testdcm2bmp()
+	//	testdcm2png()
 	testdcm2jpg()
 }
