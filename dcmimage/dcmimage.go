@@ -48,24 +48,18 @@ type DcmImage struct {
 	Data      []uint8
 }
 
-/*
 func maxval(bits uint16, pos uint32) uint32 {
 	if bits > MAXBITS {
 		return uint32(1<<bits - 1)
 	}
 	return uint32(1<<bits - pos)
 }
-*/
 
 func (di DcmImage) clipHighBits(pixel int16) int16 {
 	if di.HighBit > 15 {
 		return pixel
 	}
-	/*
-		if di.BitsAllocated == di.BitsStored {
-			return pixel
-		}
-	*/
+
 	nMask := 0xffff << (di.HighBit + 1)
 	if di.PixelRepresentation != 0 {
 		nSignBit := 1 << di.HighBit
@@ -87,49 +81,14 @@ func (di DcmImage) rescalePixel(pixel int16) int16 {
 		return pixel
 	}
 
-	return di.getRescaling(pixel).(int16)
+	return int16(float64(pixel)*di.RescaleSlope + di.RescaleIntercept)
 }
 
-func (di DcmImage) getRescaling(value interface{}) interface{} {
-	switch value.(type) {
-	case int16:
-		return int16(float64(value.(int16))*di.RescaleSlope + di.RescaleIntercept)
-	case float64:
-		return value.(float64)*di.RescaleSlope + di.RescaleIntercept
-	}
-	return 0
-}
-
-/*
-func (di *DcmImage) checkRescaling() {
-
-	if di.RescaleSlope < 0 {
-		var tmp interface{}
-		tmp = di.minValue
-		di.minValue = di.getRescaling(di.maxValue).(int16)
-		di.maxValue = di.getRescaling(tmp).(int16)
-
-		tmp = di.AbsMinimum
-		di.AbsMinimum = di.getRescaling(di.AbsMaximum).(float64)
-		di.AbsMaximum = di.getRescaling(tmp).(float64)
-		return
-	}
-	di.minValue = di.getRescaling(di.minValue).(int16)
-	di.maxValue = di.getRescaling(di.maxValue).(int16)
-
-	di.AbsMinimum = di.getRescaling(di.AbsMinimum).(float64)
-	di.AbsMaximum = di.getRescaling(di.AbsMaximum).(float64)
-}
-*/
 func (di DcmImage) nowindow(pixel int16) uint8 {
-	//	var outrange float64
-	//	outrange = di.high - di.low + 1
-
-	//	ocnt := di.getAbsMaxRange()
-	gradient := 255.0 / float64(di.maxValue-di.minValue)
+	gradient := (di.high - di.low) / float64(di.maxValue-di.minValue)
 	value := float64(pixel-di.minValue) * gradient
-	if value > 255 {
-		return 255
+	if value > di.high {
+		return uint8(di.high)
 	}
 	if value < 0 {
 		return 0
@@ -140,17 +99,17 @@ func (di DcmImage) nowindow(pixel int16) uint8 {
 func (di DcmImage) window(pixel int16) uint8 {
 	min := di.WindowCenter - di.WindowWidth/2.0 + 0.5
 	max := di.WindowCenter + di.WindowWidth/2.0 + 0.5
-	slope := 255.0 / di.WindowWidth
+	gradient := (di.high - di.low) / di.WindowWidth
 	value := float64(pixel)
 	if value < min {
 		return 0
 	} else if value > max {
-		return 255
+		return uint8(di.high)
 	}
-	value = (value - min) * slope
+	value = (value - min) * gradient
 
-	if value > 255 {
-		return 255
+	if value > di.high {
+		return uint8(di.high)
 	}
 	if value < 0 {
 		return 0
@@ -171,7 +130,7 @@ func (di *DcmImage) byteTouint8() {
 	for i := range di.PixelData {
 		b := uint8(di.PixelData[i])
 		if di.IsReverse {
-			b = 255 - b
+			b = uint8(di.high) - b
 		}
 		di.Data = append(di.Data, b)
 	}
@@ -180,7 +139,6 @@ func (di *DcmImage) byteTouint8() {
 func (di *DcmImage) int16Touint8() {
 	di.Data = nil
 	count := di.Columns * di.Rows
-
 	for i := uint32(0); i < count; i++ {
 		b := di.PixelData[2*i : 2*i+2]
 		var pixel int16
@@ -193,7 +151,7 @@ func (di *DcmImage) int16Touint8() {
 		pixel = di.rescalePixel(pixel)
 		p := di.rescaleWindowLevel(pixel)
 		if di.IsReverse {
-			p = 255 - p
+			p = uint8(di.high) - p
 		}
 		di.Data = append(di.Data, p)
 	}
@@ -292,6 +250,10 @@ func (di *DcmImage) determinReverse() {
 }
 
 func (di *DcmImage) determineMinMax() {
+
+	di.high = float64(maxval(8, 1))
+	di.low = 0
+
 	// skip to find the max/min value if window level is not 0
 
 	if (di.WindowCenter != 0.0) || (di.WindowWidth != 0.0) {
@@ -326,6 +288,4 @@ func (di *DcmImage) determineMinMax() {
 	}
 
 	log.Println("min", di.minValue, "max", di.maxValue)
-	//	di.checkRescaling()
-	//	log.Println("min2", di.minValue, "max2", di.maxValue)
 }

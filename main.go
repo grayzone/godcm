@@ -28,6 +28,14 @@ func readdicmfile(filename string, isReadValue bool) {
 }
 
 func convert2bmp(filename string) {
+	img := getimageinfo(filename)
+	err := img.WriteBMP("test.bmp", 8, 0)
+	if err != nil {
+		log.Println(err.Error())
+	}
+}
+
+func getimageinfo(filename string) dcmimage.DcmImage {
 	var reader core.DcmReader
 	reader.IsReadPixel = true
 	reader.IsReadValue = true
@@ -88,7 +96,21 @@ func convert2bmp(filename string) {
 
 	img.PixelData = pixeldata
 
-	err = img.WriteBMP("test.bmp", 8, 0)
+	return img
+
+}
+
+func convert2png(filename string) {
+	img := getimageinfo(filename)
+	err := img.ConvertToPNG("test.png")
+	if err != nil {
+		log.Println(err.Error())
+	}
+}
+
+func convert2jpg(filename string) {
+	img := getimageinfo(filename)
+	err := img.ConvertToJPG("test.jpg")
 	if err != nil {
 		log.Println(err.Error())
 	}
@@ -141,7 +163,75 @@ func testdcm2bmp() {
 	}
 }
 
+func testdcm2png() {
+	var index int
+	switch len(os.Args) {
+	case 1:
+		convert2png(folder + testfile[0])
+	case 2:
+		index, _ = strconv.Atoi(os.Args[1])
+		convert2png(folder + testfile[index])
+	}
+}
+
+func testdcm2jpg() {
+	var index int
+	switch len(os.Args) {
+	case 1:
+		convert2jpg(folder + testfile[0])
+	case 2:
+		index, _ = strconv.Atoi(os.Args[1])
+		convert2jpg(folder + testfile[index])
+	}
+}
+
+/*
+
+
+func convert2png16(filename string) {
+	img := getimageinfo(filename)
+	err := img.ConvertToPNG16("test16.png")
+	if err != nil {
+		log.Println(err.Error())
+	}
+}
+
+
+func convert2jpg16(filename string) {
+	img := getimageinfo(filename)
+	err := img.ConvertToJPG16("test16.jpg")
+	if err != nil {
+		log.Println(err.Error())
+	}
+}
+
+
+func testdcm2png16() {
+	var index int
+	switch len(os.Args) {
+	case 1:
+		convert2png16(folder + testfile[0])
+	case 2:
+		index, _ = strconv.Atoi(os.Args[1])
+		convert2png16(folder + testfile[index])
+	}
+}
+
+
+func testdcm2jpg16() {
+	var index int
+	switch len(os.Args) {
+	case 1:
+		convert2jpg16(folder + testfile[0])
+	case 2:
+		index, _ = strconv.Atoi(os.Args[1])
+		convert2jpg16(folder + testfile[index])
+	}
+}
+*/
 func main() {
 	//	testParseDcm()
-	testdcm2bmp()
+	//	testdcm2bmp()
+	testdcm2png()
+	testdcm2jpg()
 }

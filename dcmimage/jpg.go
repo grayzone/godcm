@@ -8,7 +8,8 @@ import (
 	"os"
 )
 
-func (di DcmImage) convertToJPG(filepath string) error {
+// ConvertToJPG convert dicom file to jpg file
+func (di DcmImage) ConvertToJPG(filepath string) error {
 	if di.IsCompressed {
 		err := errors.New("not supported compressed format")
 		return err

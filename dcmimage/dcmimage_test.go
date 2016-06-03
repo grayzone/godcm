@@ -81,7 +81,7 @@ func readpixel(t *testing.T, filename string, want bool) DcmImage {
 	return img
 }
 
-func convert2bmp(t *testing.T, bits uint16) {
+func convert2BMP(t *testing.T, bits uint16) {
 	cases := []struct {
 		in   string
 		want bool
@@ -114,15 +114,15 @@ func convert2bmp(t *testing.T, bits uint16) {
 }
 
 func TestWrite8BMP(t *testing.T) {
-	convert2bmp(t, 8)
+	convert2BMP(t, 8)
 }
 
 func TestWrite24BMP(t *testing.T) {
-	convert2bmp(t, 24)
+	convert2BMP(t, 24)
 }
 
 func TestWrite32BMP(t *testing.T) {
-	convert2bmp(t, 32)
+	convert2BMP(t, 32)
 }
 
 func TestWritePNG(t *testing.T) {
@@ -148,10 +148,10 @@ func TestWritePNG(t *testing.T) {
 	for _, c := range cases {
 		img := readpixel(t, c.in, c.want)
 		pngfile := c.in + ".png"
-		err := img.convertToPNG(pngfile)
+		err := img.ConvertToPNG(pngfile)
 		defer os.Remove(pngfile)
 		if err != nil {
-			//		t.Errorf("WriteBMP() %s", err.Error())
+			//		t.Errorf("ConvertToPNG() %s", err.Error())
 		}
 	}
 }
@@ -179,10 +179,76 @@ func TestWriteJPG(t *testing.T) {
 	for _, c := range cases {
 		img := readpixel(t, c.in, c.want)
 		jpgfile := c.in + ".jpg"
-		err := img.convertToJPG(jpgfile)
+		err := img.ConvertToJPG(jpgfile)
 		defer os.Remove(jpgfile)
 		if err != nil {
-			//		t.Errorf("WriteBMP() %s", err.Error())
+			//		t.Errorf("ConvertToJPG() %s", err.Error())
 		}
 	}
 }
+
+/*
+
+func TestWritePNG16(t *testing.T) {
+	cases := []struct {
+		in   string
+		want bool
+	}{
+		{"MR-MONO2-8-16x-heart.dcm", false},
+		{"US-MONO2-8-8x-execho.dcm", false},
+		{"xr_tspine.dcm", false},
+		{"xr_chest.dcm", false},
+		{"IM0.dcm", false},
+		{"image_09-12-2013_4.dcm", false},
+		{"CT-MONO2-16-ankle", false},
+		{"xr_chicken2.dcm", true},
+		{"T23/IM-0001-0001.dcm", true},
+		{"IM-0001-0010.dcm", true},
+		{"GH195.dcm", true},
+		{"GH064.dcm", true},
+		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", false},
+		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", false},
+	}
+	for _, c := range cases {
+		img := readpixel(t, c.in, c.want)
+		pngfile := c.in + "_16.png"
+		err := img.convertToPNG16(pngfile)
+		//		defer os.Remove(pngfile)
+		if err != nil {
+			//		t.Errorf("ConvertToPNG() %s", err.Error())
+		}
+	}
+}
+
+
+func TestWriteJPG16(t *testing.T) {
+	cases := []struct {
+		in   string
+		want bool
+	}{
+		{"MR-MONO2-8-16x-heart.dcm", false},
+		{"US-MONO2-8-8x-execho.dcm", false},
+		{"xr_tspine.dcm", false},
+		{"xr_chest.dcm", false},
+		{"IM0.dcm", false},
+		{"image_09-12-2013_4.dcm", false},
+		{"CT-MONO2-16-ankle", false},
+		{"xr_chicken2.dcm", true},
+		{"T23/IM-0001-0001.dcm", true},
+		{"IM-0001-0010.dcm", true},
+		{"GH195.dcm", true},
+		{"GH064.dcm", true},
+		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", false},
+		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", false},
+	}
+	for _, c := range cases {
+		img := readpixel(t, c.in, c.want)
+		jpgfile := c.in + "_16.jpg"
+		err := img.convertToJPG16(jpgfile)
+		defer os.Remove(jpgfile)
+		if err != nil {
+			//		t.Errorf("ConvertToJPG() %s", err.Error())
+		}
+	}
+}
+*/
