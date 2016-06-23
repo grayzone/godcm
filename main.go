@@ -257,7 +257,7 @@ func testdcm2jpg16() {
 */
 func main() {
 	//	testParseDcm()
-	testdcm2bmp()
+	// testdcm2bmp()
 	// testdcm2png()
-	//	testdcm2jpg()
+	testdcm2jpg()
 }

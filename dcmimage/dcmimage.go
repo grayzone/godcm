@@ -3,7 +3,9 @@ package dcmimage
 import (
 	"encoding/binary"
 	"errors"
-	"log" // for debug
+	"image"
+	"image/color"
+	_ "log" // for debug
 )
 
 var (
@@ -166,52 +168,6 @@ func (di DcmImage) convertTo8Bit(pixel []byte) []uint8 {
 	}
 	di.determineMinMax()
 	return di.int16Touint8(pixel)
-
-	/*
-
-		var result []uint8
-
-		rgbplane := bits / 8
-
-		gap := rgbplane * uint16((4-(di.Columns&0x3))&0x3)
-		for i := di.Rows; i > uint32(0); i-- {
-			for j := uint32(0); j < di.Columns; j++ {
-				var pixel int16
-
-				if di.BitsAllocated > 8 {
-					b := di.PixelData[2*di.Columns*i-2*di.Columns+2*j : 2*di.Columns*i-2*di.Columns+2*j+2]
-					if di.IsBigEndian {
-						pixel = int16(binary.BigEndian.Uint16(b))
-					} else {
-						pixel = int16(binary.LittleEndian.Uint16(b))
-					}
-				} else {
-					pixel = int16(di.PixelData[di.Columns*i-di.Columns+j])
-				}
-
-				pixel = di.clipHighBits(pixel)
-				pixel = di.rescalePixel(pixel)
-
-				b := di.rescaleWindowLevel(pixel)
-				//b := di.nowindow(pixel)
-				if di.IsReverse {
-					b = 255 - b
-				}
-
-				for i := uint16(0); i < rgbplane; i++ {
-					result = append(result, uint8(b))
-				}
-
-			}
-			if bits != 32 {
-				for i := uint16(0); i < gap; i++ {
-					result = append(result, uint8(0))
-				}
-			}
-		}
-		return result
-
-	*/
 }
 
 /*
@@ -293,7 +249,7 @@ func (di *DcmImage) determineMinMax() {
 		}
 	}
 
-	log.Println("min", di.minValue, "max", di.maxValue)
+	//	log.Println("min", di.minValue, "max", di.maxValue)
 }
 
 func (di DcmImage) getPixelDataOfFrame(frame int) ([]byte, error) {
@@ -309,4 +265,46 @@ func (di DcmImage) getPixelDataOfFrame(frame int) ([]byte, error) {
 		return nil, err
 	}
 	return di.PixelData[size*frame : size*frame+size], nil
+}
+
+func (di DcmImage) convertToImage(frame int) (image.Image, error) {
+	if di.IsCompressed {
+		err := errors.New("not supported compressed format")
+		return nil, err
+	}
+	pixelData, err := di.getPixelDataOfFrame(frame)
+	if err != nil {
+		return nil, err
+	}
+	//	log.Println("pixel data length:", len(pixelData))
+	d := di.convertTo8Bit(pixelData)
+
+	if !di.IsMonochrome() {
+		m := image.NewRGBA(image.Rect(int(di.Columns), int(di.Rows), 0, 0))
+		var index int
+		for y := 0; y < int(di.Rows); y++ {
+			for x := 0; x < int(di.Columns); x++ {
+				r := d[index]
+				index++
+				g := d[index]
+				index++
+				b := d[index]
+				index++
+				c := color.RGBA{r, g, b, 0}
+				m.Set(x, y, c)
+			}
+		}
+		return m, nil
+	}
+	m := image.NewGray(image.Rect(int(di.Columns), int(di.Rows), 0, 0))
+	var index int
+	for y := 0; y < int(di.Rows); y++ {
+		for x := 0; x < int(di.Columns); x++ {
+			r := d[index]
+			index++
+			c := color.Gray{r}
+			m.SetGray(x, y, c)
+		}
+	}
+	return m, nil
 }

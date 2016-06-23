@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 	"errors"
-	"log" // for debug
+	_ "log" // for debug
 	"os"
 )
 
@@ -47,7 +47,7 @@ func (di DcmImage) WriteBMP(filename string, bits uint16, frame int) error {
 	case 24:
 	case 32:
 	default:
-		err := errors.New("not support BMP format")
+		err := errors.New("not support BMP bits")
 		return err
 	}
 
@@ -57,7 +57,7 @@ func (di DcmImage) WriteBMP(filename string, bits uint16, frame int) error {
 	}
 	d := di.convertTo8Bit(pixelData)
 
-	log.Println("pixel data length", len(d))
+	//	log.Println("pixel data length", len(d))
 
 	var fileHeader BitmapFileHeader
 	fileHeader.bfType[0] = 'B'
@@ -122,10 +122,8 @@ func (di DcmImage) WriteBMP(filename string, bits uint16, frame int) error {
 					binary.Write(buf, binary.LittleEndian, b)
 					binary.Write(buf, binary.LittleEndian, g)
 					binary.Write(buf, binary.LittleEndian, r)
-
 				} else {
-					var p uint32
-					p = uint32(r[0])<<16 | uint32(g[0])<<8 | uint32(b[0])
+					p := uint32(r[0])<<16 | uint32(g[0])<<8 | uint32(b[0])
 					binary.Write(buf, binary.LittleEndian, p)
 				}
 			}
