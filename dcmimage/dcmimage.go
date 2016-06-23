@@ -4,7 +4,6 @@ import (
 	"encoding/binary"
 	"errors"
 	"log" // for debug
-	"strings"
 )
 
 var (
@@ -245,8 +244,13 @@ func (di *DcmImage) determinHighLow() {
 }
 */
 
+// IsMonochrome check whether image is monochrome or not.
+func (di DcmImage) IsMonochrome() bool {
+	return di.PhotometricInterpretation == "MONOCHROME1" || di.PhotometricInterpretation == "MONOCHROME2"
+}
+
 func (di *DcmImage) determinReverse() {
-	if strings.ToUpper(di.PhotometricInterpretation) == "MONOCHROME1" {
+	if di.PhotometricInterpretation == "MONOCHROME1" {
 		di.IsReverse = true
 	}
 }

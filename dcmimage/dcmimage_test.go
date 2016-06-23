@@ -106,6 +106,7 @@ func convert2BMP(t *testing.T, bits uint16) {
 		{"GH064.dcm", true},
 		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", false},
 		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", false},
+		{"US-RGB-8-esopecho.dcm", false},
 	}
 	for _, c := range cases {
 		img := readpixel(t, c.in, c.want)
@@ -135,6 +136,10 @@ func TestWrite32BMP(t *testing.T) {
 	convert2BMP(t, 32)
 }
 
+func TestWrite16BMP(t *testing.T) {
+	convert2BMP(t, 16)
+}
+
 func TestWritePNG(t *testing.T) {
 	cases := []struct {
 		in   string
@@ -154,6 +159,7 @@ func TestWritePNG(t *testing.T) {
 		{"GH064.dcm", true},
 		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", false},
 		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", false},
+		{"US-RGB-8-esopecho.dcm", false},
 	}
 	for _, c := range cases {
 		img := readpixel(t, c.in, c.want)
@@ -189,6 +195,7 @@ func TestWriteJPG(t *testing.T) {
 		{"GH064.dcm", true},
 		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", false},
 		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", false},
+		{"US-RGB-8-esopecho.dcm", false},
 	}
 	for _, c := range cases {
 		img := readpixel(t, c.in, c.want)

@@ -100,13 +100,13 @@ func getimageinfo(filename string) dcmimage.DcmImage {
 
 }
 
-func convert2bmp(filename string) {
+func convert2bmp(filename string, bits uint16) {
 	img := getimageinfo(folder + filename)
 
 	frame := img.NumberOfFrames
 	for i := 0; i < frame; i++ {
 		newfile := filename + "_" + strconv.FormatUint(uint64(i), 10) + ".bmp"
-		err := img.WriteBMP(newfile, 8, i)
+		err := img.WriteBMP(newfile, bits, i)
 		if err != nil {
 			log.Println(err.Error())
 		}
@@ -178,10 +178,14 @@ func testdcm2bmp() {
 	var index int
 	switch len(os.Args) {
 	case 1:
-		convert2bmp(testfile[0])
+		convert2bmp(testfile[0], 32)
 	case 2:
 		index, _ = strconv.Atoi(os.Args[1])
-		convert2bmp(testfile[index])
+		convert2bmp(testfile[index], 8)
+	case 3:
+		index, _ = strconv.Atoi(os.Args[1])
+		bits, _ := strconv.Atoi(os.Args[2])
+		convert2bmp(testfile[index], uint16(bits))
 	}
 }
 
@@ -253,7 +257,7 @@ func testdcm2jpg16() {
 */
 func main() {
 	//	testParseDcm()
-	//	testdcm2bmp()
-	//	testdcm2png()
-	testdcm2jpg()
+	testdcm2bmp()
+	// testdcm2png()
+	//	testdcm2jpg()
 }

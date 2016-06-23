@@ -3,6 +3,7 @@ package core
 import (
 	"errors"
 	_ "log" // for debug
+	"strings"
 )
 
 // DcmDataset is to contain the DICOM dataset from file
@@ -122,7 +123,8 @@ func (dataset DcmDataset) HighBit() string {
 
 // PhotometricInterpretation gets photometric interpretation
 func (dataset DcmDataset) PhotometricInterpretation() string {
-	return dataset.getElementValue(DCMPhotometricInterpretation)
+	s := dataset.getElementValue(DCMPhotometricInterpretation)
+	return strings.ToUpper(s)
 }
 
 // SamplesPerPixel gets samples per pixel
