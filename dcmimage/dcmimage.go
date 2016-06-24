@@ -9,10 +9,11 @@ import (
 )
 
 var (
+	// MAXBITS defines the image maxinum bits
 	MAXBITS uint16 = 32
 )
 
-// DcmImage provide the "DICOM image toolkit"
+// DcmImage provides the "DICOM image toolkit"
 type DcmImage struct {
 	Rows                      uint32
 	Columns                   uint32
@@ -170,6 +171,23 @@ func (di DcmImage) convertTo8Bit(pixel []byte) []uint8 {
 	return di.int16Touint8(pixel)
 }
 
+func (di DcmImage) convertToImageData(data []uint8) []uint8 {
+	if !di.IsMonochrome() { // RGB
+		return data
+	}
+	// grayscale
+	var result []uint8
+	for _, p := range data {
+		r := p
+		g := p
+		b := p
+		result = append(result, r)
+		result = append(result, g)
+		result = append(result, b)
+	}
+	return result
+}
+
 /*
 func (di *DcmImage) findAbsMaxMinValue() {
 	if di.PixelRepresentation == 1 {
@@ -200,7 +218,7 @@ func (di *DcmImage) determinHighLow() {
 }
 */
 
-// IsMonochrome check whether image is monochrome or not.
+// IsMonochrome checks whether image is monochrome or not.
 func (di DcmImage) IsMonochrome() bool {
 	return di.PhotometricInterpretation == "MONOCHROME1" || di.PhotometricInterpretation == "MONOCHROME2"
 }
@@ -277,33 +295,21 @@ func (di DcmImage) convertToImage(frame int) (image.Image, error) {
 		return nil, err
 	}
 	//	log.Println("pixel data length:", len(pixelData))
-	d := di.convertTo8Bit(pixelData)
+	pixel := di.convertTo8Bit(pixelData)
+	d := di.convertToImageData(pixel)
 
-	if !di.IsMonochrome() {
-		m := image.NewRGBA(image.Rect(int(di.Columns), int(di.Rows), 0, 0))
-		var index int
-		for y := 0; y < int(di.Rows); y++ {
-			for x := 0; x < int(di.Columns); x++ {
-				r := d[index]
-				index++
-				g := d[index]
-				index++
-				b := d[index]
-				index++
-				c := color.RGBA{r, g, b, 0}
-				m.Set(x, y, c)
-			}
-		}
-		return m, nil
-	}
-	m := image.NewGray(image.Rect(int(di.Columns), int(di.Rows), 0, 0))
+	m := image.NewRGBA(image.Rect(int(di.Columns), int(di.Rows), 0, 0))
 	var index int
 	for y := 0; y < int(di.Rows); y++ {
 		for x := 0; x < int(di.Columns); x++ {
 			r := d[index]
 			index++
-			c := color.Gray{r}
-			m.SetGray(x, y, c)
+			g := d[index]
+			index++
+			b := d[index]
+			index++
+			c := color.RGBA{r, g, b, 255}
+			m.Set(x, y, c)
 		}
 	}
 	return m, nil

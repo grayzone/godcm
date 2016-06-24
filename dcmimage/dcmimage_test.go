@@ -17,6 +17,32 @@ func gettestdatafolder() string {
 	return result
 }
 
+type testCase struct {
+	in   string
+	want bool
+}
+
+func gettestdataset() []testCase {
+	result := []testCase{
+		{"MR-MONO2-8-16x-heart.dcm", false},
+		{"US-MONO2-8-8x-execho.dcm", false},
+		{"xr_tspine.dcm", false},
+		{"xr_chest.dcm", false},
+		{"IM0.dcm", false},
+		{"image_09-12-2013_4.dcm", false},
+		{"CT-MONO2-16-ankle", false},
+		{"xr_chicken2.dcm", true},
+		{"T23/IM-0001-0001.dcm", true},
+		{"IM-0001-0010.dcm", true},
+		{"GH195.dcm", true},
+		{"GH064.dcm", true},
+		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", false},
+		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", false},
+		{"US-RGB-8-esopecho.dcm", false},
+	}
+	return result
+}
+
 func readpixel(t *testing.T, filename string, want bool) DcmImage {
 	var reader core.DcmReader
 	reader.IsReadPixel = true
@@ -88,26 +114,7 @@ func readpixel(t *testing.T, filename string, want bool) DcmImage {
 }
 
 func convert2BMP(t *testing.T, bits uint16) {
-	cases := []struct {
-		in   string
-		want bool
-	}{
-		{"MR-MONO2-8-16x-heart.dcm", false},
-		{"US-MONO2-8-8x-execho.dcm", false},
-		{"xr_tspine.dcm", false},
-		{"xr_chest.dcm", false},
-		{"IM0.dcm", false},
-		{"image_09-12-2013_4.dcm", false},
-		{"CT-MONO2-16-ankle", false},
-		{"xr_chicken2.dcm", true},
-		{"T23/IM-0001-0001.dcm", true},
-		{"IM-0001-0010.dcm", true},
-		{"GH195.dcm", true},
-		{"GH064.dcm", true},
-		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", false},
-		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", false},
-		{"US-RGB-8-esopecho.dcm", false},
-	}
+	cases := gettestdataset()
 	for _, c := range cases {
 		img := readpixel(t, c.in, c.want)
 
@@ -141,26 +148,7 @@ func TestWrite16BMP(t *testing.T) {
 }
 
 func TestWritePNG(t *testing.T) {
-	cases := []struct {
-		in   string
-		want bool
-	}{
-		{"MR-MONO2-8-16x-heart.dcm", false},
-		{"US-MONO2-8-8x-execho.dcm", false},
-		{"xr_tspine.dcm", false},
-		{"xr_chest.dcm", false},
-		{"IM0.dcm", false},
-		{"image_09-12-2013_4.dcm", false},
-		{"CT-MONO2-16-ankle", false},
-		{"xr_chicken2.dcm", true},
-		{"T23/IM-0001-0001.dcm", true},
-		{"IM-0001-0010.dcm", true},
-		{"GH195.dcm", true},
-		{"GH064.dcm", true},
-		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", false},
-		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", false},
-		{"US-RGB-8-esopecho.dcm", false},
-	}
+	cases := gettestdataset()
 	for _, c := range cases {
 		img := readpixel(t, c.in, c.want)
 		for i := 0; i < img.NumberOfFrames; i++ {
@@ -177,26 +165,7 @@ func TestWritePNG(t *testing.T) {
 }
 
 func TestWriteJPG(t *testing.T) {
-	cases := []struct {
-		in   string
-		want bool
-	}{
-		{"MR-MONO2-8-16x-heart.dcm", false},
-		{"US-MONO2-8-8x-execho.dcm", false},
-		{"xr_tspine.dcm", false},
-		{"xr_chest.dcm", false},
-		{"IM0.dcm", false},
-		{"image_09-12-2013_4.dcm", false},
-		{"CT-MONO2-16-ankle", false},
-		{"xr_chicken2.dcm", true},
-		{"T23/IM-0001-0001.dcm", true},
-		{"IM-0001-0010.dcm", true},
-		{"GH195.dcm", true},
-		{"GH064.dcm", true},
-		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", false},
-		{"GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", false},
-		{"US-RGB-8-esopecho.dcm", false},
-	}
+	cases := gettestdataset()
 	for _, c := range cases {
 		img := readpixel(t, c.in, c.want)
 

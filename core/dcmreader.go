@@ -93,8 +93,10 @@ func (reader DcmReader) IsBigEndian() (bool, error) {
 	if err != nil {
 		return false, err
 	}
+	/*
 	if xfer.IsBigEndian() {
 		log.Println("ByteOrder: ", xfer.ByteOrder.String())
 	}
+	*/
 	return xfer.IsBigEndian(), nil
 }

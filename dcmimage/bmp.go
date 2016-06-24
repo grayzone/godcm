@@ -55,7 +55,8 @@ func (di DcmImage) WriteBMP(filename string, bits uint16, frame int) error {
 	if err != nil {
 		return err
 	}
-	d := di.convertTo8Bit(pixelData)
+	pixel := di.convertTo8Bit(pixelData)
+	d := di.convertToImageData(pixel)
 
 	//	log.Println("pixel data length", len(d))
 
@@ -107,25 +108,20 @@ func (di DcmImage) WriteBMP(filename string, bits uint16, frame int) error {
 
 	for i := di.Rows; i > uint32(0); i-- {
 		for j := uint32(0); j < di.Columns; j++ {
-			if di.IsMonochrome() {
-				pixel := d[di.Columns*(i-1)+j : di.Columns*(i-1)+j+1]
+			r := d[3*di.Columns*(i-1)+3*j : 3*di.Columns*(i-1)+3*j+1]
+			g := d[3*di.Columns*(i-1)+3*j+1 : 3*di.Columns*(i-1)+3*j+2]
+			b := d[3*di.Columns*(i-1)+3*j+2 : 3*di.Columns*(i-1)+3*j+3]
 
-				for k := uint16(0); k < rgbplane; k++ {
-					binary.Write(buf, binary.LittleEndian, pixel)
-				}
-			} else { // RGB
-				r := d[3*di.Columns*(i-1)+3*j : 3*di.Columns*(i-1)+3*j+1]
-				g := d[3*di.Columns*(i-1)+3*j+1 : 3*di.Columns*(i-1)+3*j+2]
-				b := d[3*di.Columns*(i-1)+3*j+2 : 3*di.Columns*(i-1)+3*j+3]
-
-				if bits == 24 {
-					binary.Write(buf, binary.LittleEndian, b)
-					binary.Write(buf, binary.LittleEndian, g)
-					binary.Write(buf, binary.LittleEndian, r)
-				} else {
-					p := uint32(r[0])<<16 | uint32(g[0])<<8 | uint32(b[0])
-					binary.Write(buf, binary.LittleEndian, p)
-				}
+			switch bits {
+			case 8:
+				binary.Write(buf, binary.LittleEndian, r)
+			case 24:
+				binary.Write(buf, binary.LittleEndian, b)
+				binary.Write(buf, binary.LittleEndian, g)
+				binary.Write(buf, binary.LittleEndian, r)
+			case 32:
+				p := uint32(r[0])<<16 | uint32(g[0])<<8 | uint32(b[0])
+				binary.Write(buf, binary.LittleEndian, p)
 			}
 
 		}
