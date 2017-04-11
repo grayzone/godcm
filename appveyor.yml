@@ -1,5 +1,5 @@
 version: 1.0.{build}
-image: Visual Studio 2015
+image: Visual Studio 2017
 platform: x64
 
 branches:  
@@ -14,9 +14,12 @@ environment:
 install:  
   - echo %PATH%
   - echo %GOPATH%
-  - set PATH=%GOPATH%\bin;c:\go\bin;C:\MinGW\bin;%PATH%
+  - choco upgrade all -y
+  - choco install mingw
+  - set PATH=%GOPATH%\bin;c:\go\bin;C:\tools\MinGW64\bin;%PATH%
   - go version
   - go env
+
   - go get -v -d -t github.com/grayzone/godcm/...
 
 build_script:  
