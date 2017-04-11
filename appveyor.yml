@@ -1,0 +1,23 @@
+version: 1.0.{build}
+image: Visual Studio 2017
+platform: x64
+
+branches:  
+  only:
+    - master
+
+clone_folder: 'c:\workspace\go\src\github.com\grayzone'
+environment:
+  GOROOT: c:\go
+  GOPATH: c:\workspace\go
+
+install:  
+  - echo %PATH%
+  - echo %GOPATH%
+  - set PATH=%GOPATH%\bin;c:\go\bin;%PATH%
+  - go version
+  - go env
+  - go get -v -d -t ./...
+
+build_script:  
+  - go test -v -cover ./...
