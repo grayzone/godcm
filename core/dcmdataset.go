@@ -42,7 +42,7 @@ func (dataset DcmDataset) FindElement(e *DcmElement) error {
 	return errors.New(str)
 }
 
-func (dataset DcmDataset) getElementValue(tag DcmTag) string {
+func (dataset DcmDataset) GetElementValue(tag DcmTag) string {
 	var elem DcmElement
 	elem.Tag = tag
 	err := dataset.FindElement(&elem)
@@ -54,52 +54,52 @@ func (dataset DcmDataset) getElementValue(tag DcmTag) string {
 
 // PatientID get the patient ID from the dicom file
 func (dataset DcmDataset) PatientID() string {
-	return dataset.getElementValue(DCMPatientID)
+	return dataset.GetElementValue(DCMPatientID)
 }
 
 // PatientName get the patient name from the dicom file
 func (dataset DcmDataset) PatientName() string {
-	return dataset.getElementValue(DCMPatientName)
+	return dataset.GetElementValue(DCMPatientName)
 }
 
 // Modality get the modality of the dicom image
 func (dataset DcmDataset) Modality() string {
-	return dataset.getElementValue(DCMModality)
+	return dataset.GetElementValue(DCMModality)
 }
 
 // StudyInstanceUID get the Study Instance UID of the dicom image
 func (dataset DcmDataset) StudyInstanceUID() string {
-	return dataset.getElementValue(DCMStudyInstanceUID)
+	return dataset.GetElementValue(DCMStudyInstanceUID)
 }
 
 // SOPInstanceUID get the SOP Instance UID of the dicom image
 func (dataset DcmDataset) SOPInstanceUID() string {
-	return dataset.getElementValue(DCMSOPInstanceUID)
+	return dataset.GetElementValue(DCMSOPInstanceUID)
 }
 
 // Rows get the rows of the dicom image
 func (dataset DcmDataset) Rows() string {
-	return dataset.getElementValue(DCMRows)
+	return dataset.GetElementValue(DCMRows)
 }
 
 // Columns get the columns of the dicom image
 func (dataset DcmDataset) Columns() string {
-	return dataset.getElementValue(DCMColumns)
+	return dataset.GetElementValue(DCMColumns)
 }
 
 // WindowCenter gets the window center of the dicom image
 func (dataset DcmDataset) WindowCenter() string {
-	return dataset.getElementValue(DCMWindowCenter)
+	return dataset.GetElementValue(DCMWindowCenter)
 }
 
 // WindowWidth gets the window width of the dicom image
 func (dataset DcmDataset) WindowWidth() string {
-	return dataset.getElementValue(DCMWindowWidth)
+	return dataset.GetElementValue(DCMWindowWidth)
 }
 
 // NumberOfFrames gets the frame number
 func (dataset DcmDataset) NumberOfFrames() string {
-	result := dataset.getElementValue(DCMNumberOfFrames)
+	result := dataset.GetElementValue(DCMNumberOfFrames)
 	if len(result) == 0 {
 		result = "1"
 	}
@@ -113,50 +113,50 @@ func (dataset DcmDataset) NumberOfFrames() string {
 
 // BitsAllocated gets the bits allocated value
 func (dataset DcmDataset) BitsAllocated() string {
-	return dataset.getElementValue(DCMBitsAllocated)
+	return dataset.GetElementValue(DCMBitsAllocated)
 }
 
 // BitsStored gets the bits stored
 func (dataset DcmDataset) BitsStored() string {
-	return dataset.getElementValue(DCMBitsStored)
+	return dataset.GetElementValue(DCMBitsStored)
 }
 
 // HighBit gets the high bit
 func (dataset DcmDataset) HighBit() string {
-	return dataset.getElementValue(DCMHighBit)
+	return dataset.GetElementValue(DCMHighBit)
 }
 
 // PhotometricInterpretation gets photometric interpretation
 func (dataset DcmDataset) PhotometricInterpretation() string {
-	s := dataset.getElementValue(DCMPhotometricInterpretation)
+	s := dataset.GetElementValue(DCMPhotometricInterpretation)
 	return strings.ToUpper(s)
 }
 
 // SamplesPerPixel gets samples per pixel
 func (dataset DcmDataset) SamplesPerPixel() string {
-	return dataset.getElementValue(DCMSamplesPerPixel)
+	return dataset.GetElementValue(DCMSamplesPerPixel)
 }
 
 // PixelRepresentation gets pixel representation
 // unsigned (0) or signed (1), the default is unsigned
 func (dataset DcmDataset) PixelRepresentation() string {
-	return dataset.getElementValue(DCMPixelRepresentation)
+	return dataset.GetElementValue(DCMPixelRepresentation)
 }
 
 // PlanarConfiguration gets planar configuration
 // the default is interlaced, 0 meaning the channels are interlaced which is the common way of serializing color pixels or 1 meaning its separated
 func (dataset DcmDataset) PlanarConfiguration() string {
-	return dataset.getElementValue(DCMPlanarConfiguration)
+	return dataset.GetElementValue(DCMPlanarConfiguration)
 }
 
 // RescaleIntercept gets rescale intercept
 func (dataset DcmDataset) RescaleIntercept() string {
-	return dataset.getElementValue(DCMRescaleIntercept)
+	return dataset.GetElementValue(DCMRescaleIntercept)
 }
 
 // RescaleSlope gets rescale slope
 func (dataset DcmDataset) RescaleSlope() string {
-	return dataset.getElementValue(DCMRescaleSlope)
+	return dataset.GetElementValue(DCMRescaleSlope)
 }
 
 // PixelData get the pixel data of the dicom image.

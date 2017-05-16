@@ -1,18 +1,8 @@
 package core
 
 import (
-	"os"
 	"testing"
 )
-
-func gettestdatafolder() string {
-	cur, err := os.Getwd()
-	if err != nil {
-		return ""
-	}
-	result := cur + "/../test/data/"
-	return result
-}
 
 func TestDcmReaderReadFileNONDICOM(t *testing.T) {
 	cases := []struct {
@@ -20,11 +10,12 @@ func TestDcmReaderReadFileNONDICOM(t *testing.T) {
 		want DcmDataset
 	}{
 		{"", DcmDataset{}},
-		{gettestdatafolder() + "minimumdict.xml", DcmDataset{}},
+		{util.GetTestDataFolder() + "minimumdict.xml", DcmDataset{}},
 	}
 	for _, c := range cases {
 		var reader DcmReader
 		err := reader.ReadFile(c.in)
+
 		if err == nil {
 			t.Errorf("DcmReader.ReadFile(): %s", err.Error())
 			return
@@ -37,25 +28,25 @@ func TestDcmReaderReadFileDICOMWithoutReadValue(t *testing.T) {
 		in   string
 		want DcmDataset
 	}{
-		{gettestdatafolder() + "GH220.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH178.dcm", DcmDataset{}},
-		{gettestdatafolder() + "xr_chest.dcm", DcmDataset{}},
-		{gettestdatafolder() + "xr_chicken2.dcm", DcmDataset{}},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", DcmDataset{}},
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH184.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH064.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH133.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH179A.dcm", DcmDataset{}},
-		{gettestdatafolder() + "CT1_J2KI", DcmDataset{}},
-		{gettestdatafolder() + "GH223.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH195.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", DcmDataset{}},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH220.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH178.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "xr_chest.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "CT-MONO2-16-ankle", DcmDataset{}},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH184.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH064.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH133.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH179A.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "CT1_J2KI", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH223.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH195.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", DcmDataset{}},
 
 		/*
-			{gettestdatafolder() + "GH179B.dcm", DcmDataset{}}, // incomplete file
+			{util.GetTestDataFolder() + "GH179B.dcm", DcmDataset{}}, // incomplete file
 		*/
 	}
 	for _, c := range cases {
@@ -73,25 +64,25 @@ func TestDcmReaderReadFileDICOM(t *testing.T) {
 		in   string
 		want DcmDataset
 	}{
-		{gettestdatafolder() + "GH220.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH178.dcm", DcmDataset{}},
-		{gettestdatafolder() + "xr_chest.dcm", DcmDataset{}},
-		{gettestdatafolder() + "xr_chicken2.dcm", DcmDataset{}},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", DcmDataset{}},
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH184.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH064.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH133.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH179A.dcm", DcmDataset{}},
-		{gettestdatafolder() + "CT1_J2KI", DcmDataset{}},
-		{gettestdatafolder() + "GH223.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH195.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", DcmDataset{}},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", DcmDataset{}},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH220.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH178.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "xr_chest.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "CT-MONO2-16-ankle", DcmDataset{}},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH184.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH064.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH133.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH179A.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "CT1_J2KI", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH223.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH195.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_ELE_undefinded_length.dcm", DcmDataset{}},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", DcmDataset{}},
 
 		/*
-			{gettestdatafolder() + "GH179B.dcm", DcmDataset{}}, // incomplete file
+			{util.GetTestDataFolder() + "GH179B.dcm", DcmDataset{}}, // incomplete file
 		*/
 	}
 	for _, c := range cases {
@@ -110,10 +101,10 @@ func TestFileMetaInformationGroupLength(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "194"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "132"},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", "192"},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "212"},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", "194"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", "132"},
+		{util.GetTestDataFolder() + "CT-MONO2-16-ankle", "192"},
+		{util.GetTestDataFolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "212"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -132,10 +123,10 @@ func TestFileMetaInformationVersion(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "0001"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "0001"},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", "0001"},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "0001"},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", "0001"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", "0001"},
+		{util.GetTestDataFolder() + "CT-MONO2-16-ankle", "0001"},
+		{util.GetTestDataFolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "0001"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -154,10 +145,10 @@ func TestMediaStorageSOPClassUID(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "1.2.840.10008.5.1.4.1.1.4"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "1.2.840.10008.5.1.4.1.1.4"},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", "1.2.840.10008.5.1.4.1.1.7"},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "1.2.840.10008.5.1.4.1.1.2"},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", "1.2.840.10008.5.1.4.1.1.4"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", "1.2.840.10008.5.1.4.1.1.4"},
+		{util.GetTestDataFolder() + "CT-MONO2-16-ankle", "1.2.840.10008.5.1.4.1.1.7"},
+		{util.GetTestDataFolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "1.2.840.10008.5.1.4.1.1.2"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -176,10 +167,10 @@ func TestMediaStorageSOPInstanceUID(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "1.3.12.2.1107.5.2.5.11090.5.0.582504825601085"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "999.999.2.19960619.163000.1.103"},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", "1.2.840.113619.2.1.2411.1031152382.365.1.736169244"},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "1.2.276.0.7230010.3.1.4.1787205428.2345.1071048146.1"},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", "1.3.12.2.1107.5.2.5.11090.5.0.582504825601085"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", "999.999.2.19960619.163000.1.103"},
+		{util.GetTestDataFolder() + "CT-MONO2-16-ankle", "1.2.840.113619.2.1.2411.1031152382.365.1.736169244"},
+		{util.GetTestDataFolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "1.2.276.0.7230010.3.1.4.1787205428.2345.1071048146.1"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -198,10 +189,10 @@ func TestTransferSyntaxUID(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "1.2.840.10008.1.2.4.91"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "1.2.840.10008.1.2.1"},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", "1.2.840.10008.1.2"},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "1.2.840.10008.1.2.2"},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", "1.2.840.10008.1.2.4.91"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", "1.2.840.10008.1.2.1"},
+		{util.GetTestDataFolder() + "CT-MONO2-16-ankle", "1.2.840.10008.1.2"},
+		{util.GetTestDataFolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "1.2.840.10008.1.2.2"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -220,10 +211,10 @@ func TestImplementationClassUID(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "1.3.6.1.4.1.19291.2.1"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "999.999"},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", "1.2.840.113619.6.5"},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "1.2.276.0.7230010.3.0.3.5.4"},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", "1.3.6.1.4.1.19291.2.1"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", "999.999"},
+		{util.GetTestDataFolder() + "CT-MONO2-16-ankle", "1.2.840.113619.6.5"},
+		{util.GetTestDataFolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "1.2.276.0.7230010.3.0.3.5.4"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -242,10 +233,10 @@ func TestImplementationVersionName(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "OSIRIX001"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", ""},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", "1_2_5"},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "OFFIS_DCMTK_354"},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", "OSIRIX001"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", ""},
+		{util.GetTestDataFolder() + "CT-MONO2-16-ankle", "1_2_5"},
+		{util.GetTestDataFolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "OFFIS_DCMTK_354"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -264,10 +255,10 @@ func TestSourceApplicationEntityTitle(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "OsiriX"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", ""},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", "CTN_STORAGE"},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "CLUNIE1"},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", "OsiriX"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", ""},
+		{util.GetTestDataFolder() + "CT-MONO2-16-ankle", "CTN_STORAGE"},
+		{util.GetTestDataFolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "CLUNIE1"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -286,10 +277,10 @@ func TestSendingApplicationEntityTitle(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", ""},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", ""},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", ""},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", ""},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", ""},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", ""},
+		{util.GetTestDataFolder() + "CT-MONO2-16-ankle", ""},
+		{util.GetTestDataFolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", ""},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -308,10 +299,10 @@ func TestReceivingApplicationEntityTitle(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", ""},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", ""},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", ""},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", ""},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", ""},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", ""},
+		{util.GetTestDataFolder() + "CT-MONO2-16-ankle", ""},
+		{util.GetTestDataFolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", ""},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -330,10 +321,10 @@ func TestPrivateInformationCreatorUID(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", ""},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", ""},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", ""},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", ""},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", ""},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", ""},
+		{util.GetTestDataFolder() + "CT-MONO2-16-ankle", ""},
+		{util.GetTestDataFolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", ""},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -352,10 +343,10 @@ func TestPrivateInformation(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", ""},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", ""},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", ""},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", ""},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", ""},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", ""},
+		{util.GetTestDataFolder() + "CT-MONO2-16-ankle", ""},
+		{util.GetTestDataFolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", ""},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -374,11 +365,11 @@ func TestPatientName(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "WRIX"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "Anonymized"},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", "Anonymized"},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "CompressedSamples^CT1"},
-		{gettestdatafolder() + "GH223.dcm", ""},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", "WRIX"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", "Anonymized"},
+		{util.GetTestDataFolder() + "CT-MONO2-16-ankle", "Anonymized"},
+		{util.GetTestDataFolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", "CompressedSamples^CT1"},
+		{util.GetTestDataFolder() + "GH223.dcm", ""},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -399,13 +390,13 @@ func TestPatientID(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "GH178.dcm", "55555"},
-		{gettestdatafolder() + "xr_chest.dcm", "234"},
-		{gettestdatafolder() + "xr_chicken2.dcm", "CHICKEN"},
-		{gettestdatafolder() + "GH220.dcm", ""},
-		{gettestdatafolder() + "CT-MONO2-16-ankle", ""},
-		{gettestdatafolder() + "GH223.dcm", ""},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", ""},
+		{util.GetTestDataFolder() + "GH178.dcm", "55555"},
+		{util.GetTestDataFolder() + "xr_chest.dcm", "234"},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", "CHICKEN"},
+		{util.GetTestDataFolder() + "GH220.dcm", ""},
+		{util.GetTestDataFolder() + "CT-MONO2-16-ankle", ""},
+		{util.GetTestDataFolder() + "GH223.dcm", ""},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", ""},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -426,10 +417,10 @@ func TestModality(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "GH178.dcm", "CT"},
-		{gettestdatafolder() + "xr_chest.dcm", "CR"},
-		{gettestdatafolder() + "xr_chicken2.dcm", "CR"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "MR"},
+		{util.GetTestDataFolder() + "GH178.dcm", "CT"},
+		{util.GetTestDataFolder() + "xr_chest.dcm", "CR"},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", "CR"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", "MR"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -447,10 +438,10 @@ func TestRows(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "GH178.dcm", "512"},
-		{gettestdatafolder() + "xr_chest.dcm", "2048"},
-		{gettestdatafolder() + "xr_chicken2.dcm", "3015"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "256"},
+		{util.GetTestDataFolder() + "GH178.dcm", "512"},
+		{util.GetTestDataFolder() + "xr_chest.dcm", "2048"},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", "3015"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", "256"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -468,10 +459,10 @@ func TestColumns(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "GH178.dcm", "512"},
-		{gettestdatafolder() + "xr_chest.dcm", "2495"},
-		{gettestdatafolder() + "xr_chicken2.dcm", "2505"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "256"},
+		{util.GetTestDataFolder() + "GH178.dcm", "512"},
+		{util.GetTestDataFolder() + "xr_chest.dcm", "2495"},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", "2505"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", "256"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -489,10 +480,10 @@ func TestWindowCenter(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "GH178.dcm", "-2"},
-		{gettestdatafolder() + "xr_chest.dcm", "2.04750000E+03"},
-		{gettestdatafolder() + "xr_chicken2.dcm", ""},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", ""},
+		{util.GetTestDataFolder() + "GH178.dcm", "-2"},
+		{util.GetTestDataFolder() + "xr_chest.dcm", "2.04750000E+03"},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", ""},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", ""},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -510,10 +501,10 @@ func TestWindowWidth(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "GH178.dcm", "1"},
-		{gettestdatafolder() + "xr_chest.dcm", "4.09500000E+03"},
-		{gettestdatafolder() + "xr_chicken2.dcm", ""},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", ""},
+		{util.GetTestDataFolder() + "GH178.dcm", "1"},
+		{util.GetTestDataFolder() + "xr_chest.dcm", "4.09500000E+03"},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", ""},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", ""},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -531,10 +522,10 @@ func TestSOPInstanceUID(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "GH178.dcm", "1.2.840.113619.2.284.3.17442826.413.1388989542.640"},
-		{gettestdatafolder() + "xr_chest.dcm", "1.3.51.0.7.99.2155959091.28444.877621460.2"},
-		{gettestdatafolder() + "xr_chicken2.dcm", "1.2.392.200036.9125.4.0.219104458.164963328.1055409964"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "999.999.2.19960619.163000.1.103"},
+		{util.GetTestDataFolder() + "GH178.dcm", "1.2.840.113619.2.284.3.17442826.413.1388989542.640"},
+		{util.GetTestDataFolder() + "xr_chest.dcm", "1.3.51.0.7.99.2155959091.28444.877621460.2"},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", "1.2.392.200036.9125.4.0.219104458.164963328.1055409964"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", "999.999.2.19960619.163000.1.103"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -552,12 +543,12 @@ func TestPixelData(t *testing.T) {
 		in   string
 		want int
 	}{
-		{gettestdatafolder() + "GH178.dcm", 0},
-		{gettestdatafolder() + "xr_chest.dcm", 10219520},
-		{gettestdatafolder() + "xr_chicken2.dcm", 659012},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", 1048576},
-		{gettestdatafolder() + "IM-0001-0010.dcm", 103518},
-		{gettestdatafolder() + "IM0.dcm", 524288},
+		{util.GetTestDataFolder() + "GH178.dcm", 0},
+		{util.GetTestDataFolder() + "xr_chest.dcm", 10219520},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", 659012},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", 1048576},
+		{util.GetTestDataFolder() + "IM-0001-0010.dcm", 103518},
+		{util.GetTestDataFolder() + "IM0.dcm", 524288},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -580,14 +571,14 @@ func TestNumberOfFrames(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "GH178.dcm", "1"},
-		{gettestdatafolder() + "xr_chest.dcm", "1"},
-		{gettestdatafolder() + "xr_chicken2.dcm", "1"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "16"},
-		{gettestdatafolder() + "IM-0001-0010.dcm", "1"},
-		{gettestdatafolder() + "T23/IM-0001-0001.dcm", "1"},
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "1"},
-		{gettestdatafolder() + "IM0.dcm", "1"},
+		{util.GetTestDataFolder() + "GH178.dcm", "1"},
+		{util.GetTestDataFolder() + "xr_chest.dcm", "1"},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", "1"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", "16"},
+		{util.GetTestDataFolder() + "IM-0001-0010.dcm", "1"},
+		{util.GetTestDataFolder() + "T23/IM-0001-0001.dcm", "1"},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", "1"},
+		{util.GetTestDataFolder() + "IM0.dcm", "1"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -606,14 +597,14 @@ func TestBitsAllocated(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "GH178.dcm", "16"},
-		{gettestdatafolder() + "xr_chest.dcm", "16"},
-		{gettestdatafolder() + "xr_chicken2.dcm", "16"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "8"},
-		{gettestdatafolder() + "IM-0001-0010.dcm", "16"},
-		{gettestdatafolder() + "T23/IM-0001-0001.dcm", "16"},
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "16"},
-		{gettestdatafolder() + "IM0.dcm", "16"},
+		{util.GetTestDataFolder() + "GH178.dcm", "16"},
+		{util.GetTestDataFolder() + "xr_chest.dcm", "16"},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", "16"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", "8"},
+		{util.GetTestDataFolder() + "IM-0001-0010.dcm", "16"},
+		{util.GetTestDataFolder() + "T23/IM-0001-0001.dcm", "16"},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", "16"},
+		{util.GetTestDataFolder() + "IM0.dcm", "16"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -632,14 +623,14 @@ func TestBitsStored(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "GH178.dcm", "16"},
-		{gettestdatafolder() + "xr_chest.dcm", "12"},
-		{gettestdatafolder() + "xr_chicken2.dcm", "12"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "8"},
-		{gettestdatafolder() + "IM-0001-0010.dcm", "12"},
-		{gettestdatafolder() + "T23/IM-0001-0001.dcm", "12"},
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "12"},
-		{gettestdatafolder() + "IM0.dcm", "13"},
+		{util.GetTestDataFolder() + "GH178.dcm", "16"},
+		{util.GetTestDataFolder() + "xr_chest.dcm", "12"},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", "12"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", "8"},
+		{util.GetTestDataFolder() + "IM-0001-0010.dcm", "12"},
+		{util.GetTestDataFolder() + "T23/IM-0001-0001.dcm", "12"},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", "12"},
+		{util.GetTestDataFolder() + "IM0.dcm", "13"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -658,14 +649,14 @@ func TestHighBit(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "GH178.dcm", "15"},
-		{gettestdatafolder() + "xr_chest.dcm", "11"},
-		{gettestdatafolder() + "xr_chicken2.dcm", "11"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "7"},
-		{gettestdatafolder() + "IM-0001-0010.dcm", "11"},
-		{gettestdatafolder() + "T23/IM-0001-0001.dcm", "11"},
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "11"},
-		{gettestdatafolder() + "IM0.dcm", "12"},
+		{util.GetTestDataFolder() + "GH178.dcm", "15"},
+		{util.GetTestDataFolder() + "xr_chest.dcm", "11"},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", "11"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", "7"},
+		{util.GetTestDataFolder() + "IM-0001-0010.dcm", "11"},
+		{util.GetTestDataFolder() + "T23/IM-0001-0001.dcm", "11"},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", "11"},
+		{util.GetTestDataFolder() + "IM0.dcm", "12"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -684,14 +675,14 @@ func TestPhotometricInterpretation(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "GH178.dcm", "MONOCHROME2"},
-		{gettestdatafolder() + "xr_chest.dcm", "MONOCHROME1"},
-		{gettestdatafolder() + "xr_chicken2.dcm", "MONOCHROME1"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "MONOCHROME2"},
-		{gettestdatafolder() + "IM-0001-0010.dcm", "MONOCHROME2"},
-		{gettestdatafolder() + "T23/IM-0001-0001.dcm", "MONOCHROME2"},
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "MONOCHROME2"},
-		{gettestdatafolder() + "IM0.dcm", "MONOCHROME2"},
+		{util.GetTestDataFolder() + "GH178.dcm", "MONOCHROME2"},
+		{util.GetTestDataFolder() + "xr_chest.dcm", "MONOCHROME1"},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", "MONOCHROME1"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", "MONOCHROME2"},
+		{util.GetTestDataFolder() + "IM-0001-0010.dcm", "MONOCHROME2"},
+		{util.GetTestDataFolder() + "T23/IM-0001-0001.dcm", "MONOCHROME2"},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", "MONOCHROME2"},
+		{util.GetTestDataFolder() + "IM0.dcm", "MONOCHROME2"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -710,14 +701,14 @@ func TestSamplesPerPixel(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "GH178.dcm", "1"},
-		{gettestdatafolder() + "xr_chest.dcm", "1"},
-		{gettestdatafolder() + "xr_chicken2.dcm", "1"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "1"},
-		{gettestdatafolder() + "IM-0001-0010.dcm", "1"},
-		{gettestdatafolder() + "T23/IM-0001-0001.dcm", "1"},
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "1"},
-		{gettestdatafolder() + "IM0.dcm", "1"},
+		{util.GetTestDataFolder() + "GH178.dcm", "1"},
+		{util.GetTestDataFolder() + "xr_chest.dcm", "1"},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", "1"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", "1"},
+		{util.GetTestDataFolder() + "IM-0001-0010.dcm", "1"},
+		{util.GetTestDataFolder() + "T23/IM-0001-0001.dcm", "1"},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", "1"},
+		{util.GetTestDataFolder() + "IM0.dcm", "1"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -736,14 +727,14 @@ func TestPixelRepresentation(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "GH178.dcm", "1"},
-		{gettestdatafolder() + "xr_chest.dcm", "0"},
-		{gettestdatafolder() + "xr_chicken2.dcm", "0"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", "0"},
-		{gettestdatafolder() + "IM-0001-0010.dcm", "0"},
-		{gettestdatafolder() + "T23/IM-0001-0001.dcm", "0"},
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", "0"},
-		{gettestdatafolder() + "IM0.dcm", "1"},
+		{util.GetTestDataFolder() + "GH178.dcm", "1"},
+		{util.GetTestDataFolder() + "xr_chest.dcm", "0"},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", "0"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", "0"},
+		{util.GetTestDataFolder() + "IM-0001-0010.dcm", "0"},
+		{util.GetTestDataFolder() + "T23/IM-0001-0001.dcm", "0"},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", "0"},
+		{util.GetTestDataFolder() + "IM0.dcm", "1"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -762,14 +753,14 @@ func TestPlanarConfiguration(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "GH178.dcm", ""},
-		{gettestdatafolder() + "xr_chest.dcm", ""},
-		{gettestdatafolder() + "xr_chicken2.dcm", ""},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", ""},
-		{gettestdatafolder() + "IM-0001-0010.dcm", ""},
-		{gettestdatafolder() + "T23/IM-0001-0001.dcm", ""},
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", ""},
-		{gettestdatafolder() + "IM0.dcm", ""},
+		{util.GetTestDataFolder() + "GH178.dcm", ""},
+		{util.GetTestDataFolder() + "xr_chest.dcm", ""},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", ""},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", ""},
+		{util.GetTestDataFolder() + "IM-0001-0010.dcm", ""},
+		{util.GetTestDataFolder() + "T23/IM-0001-0001.dcm", ""},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", ""},
+		{util.GetTestDataFolder() + "IM0.dcm", ""},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -788,14 +779,14 @@ func TestRescaleIntercept(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "GH178.dcm", "-1024"},
-		{gettestdatafolder() + "xr_chest.dcm", "0.00000000E+00"},
-		{gettestdatafolder() + "xr_chicken2.dcm", "0.000000"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", ""},
-		{gettestdatafolder() + "IM-0001-0010.dcm", ""},
-		{gettestdatafolder() + "T23/IM-0001-0001.dcm", ""},
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", ""},
-		{gettestdatafolder() + "IM0.dcm", "0"},
+		{util.GetTestDataFolder() + "GH178.dcm", "-1024"},
+		{util.GetTestDataFolder() + "xr_chest.dcm", "0.00000000E+00"},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", "0.000000"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", ""},
+		{util.GetTestDataFolder() + "IM-0001-0010.dcm", ""},
+		{util.GetTestDataFolder() + "T23/IM-0001-0001.dcm", ""},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", ""},
+		{util.GetTestDataFolder() + "IM0.dcm", "0"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -814,14 +805,14 @@ func TestRescaleSlope(t *testing.T) {
 		in   string
 		want string
 	}{
-		{gettestdatafolder() + "GH178.dcm", "1"},
-		{gettestdatafolder() + "xr_chest.dcm", "1.00000000E+00"},
-		{gettestdatafolder() + "xr_chicken2.dcm", "1.000000"},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", ""},
-		{gettestdatafolder() + "IM-0001-0010.dcm", ""},
-		{gettestdatafolder() + "T23/IM-0001-0001.dcm", ""},
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", ""},
-		{gettestdatafolder() + "IM0.dcm", "1"},
+		{util.GetTestDataFolder() + "GH178.dcm", "1"},
+		{util.GetTestDataFolder() + "xr_chest.dcm", "1.00000000E+00"},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", "1.000000"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", ""},
+		{util.GetTestDataFolder() + "IM-0001-0010.dcm", ""},
+		{util.GetTestDataFolder() + "T23/IM-0001-0001.dcm", ""},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", ""},
+		{util.GetTestDataFolder() + "IM0.dcm", "1"},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -840,14 +831,14 @@ func TestIsCompressed(t *testing.T) {
 		in   string
 		want bool
 	}{
-		{gettestdatafolder() + "GH178.dcm", false},
-		{gettestdatafolder() + "xr_chest.dcm", false},
-		{gettestdatafolder() + "xr_chicken2.dcm", true},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", false},
-		{gettestdatafolder() + "IM-0001-0010.dcm", true},
-		{gettestdatafolder() + "T23/IM-0001-0001.dcm", true},
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", true},
-		{gettestdatafolder() + "IM0.dcm", false},
+		{util.GetTestDataFolder() + "GH178.dcm", false},
+		{util.GetTestDataFolder() + "xr_chest.dcm", false},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", true},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", false},
+		{util.GetTestDataFolder() + "IM-0001-0010.dcm", true},
+		{util.GetTestDataFolder() + "T23/IM-0001-0001.dcm", true},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", true},
+		{util.GetTestDataFolder() + "IM0.dcm", false},
 	}
 	for _, c := range cases {
 		var reader DcmReader
@@ -866,15 +857,15 @@ func TestIsBigEndian(t *testing.T) {
 		in   string
 		want bool
 	}{
-		{gettestdatafolder() + "GH178.dcm", false},
-		{gettestdatafolder() + "xr_chest.dcm", false},
-		{gettestdatafolder() + "xr_chicken2.dcm", false},
-		{gettestdatafolder() + "MR-MONO2-8-16x-heart.dcm", false},
-		{gettestdatafolder() + "IM-0001-0010.dcm", false},
-		{gettestdatafolder() + "T23/IM-0001-0001.dcm", false},
-		{gettestdatafolder() + "T14/IM-0001-0001.dcm", false},
-		{gettestdatafolder() + "IM0.dcm", false},
-		{gettestdatafolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", true},
+		{util.GetTestDataFolder() + "GH178.dcm", false},
+		{util.GetTestDataFolder() + "xr_chest.dcm", false},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", false},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", false},
+		{util.GetTestDataFolder() + "IM-0001-0010.dcm", false},
+		{util.GetTestDataFolder() + "T23/IM-0001-0001.dcm", false},
+		{util.GetTestDataFolder() + "T14/IM-0001-0001.dcm", false},
+		{util.GetTestDataFolder() + "IM0.dcm", false},
+		{util.GetTestDataFolder() + "GH177_D_CLUNIE_CT1_IVRLE_BigEndian_undefined_length.dcm", true},
 	}
 	for _, c := range cases {
 		var reader DcmReader

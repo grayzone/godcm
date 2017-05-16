@@ -6,16 +6,8 @@ import (
 	"testing"
 
 	"github.com/grayzone/godcm/core"
+	"github.com/grayzone/godcm/util"
 )
-
-func gettestdatafolder() string {
-	cur, err := os.Getwd()
-	if err != nil {
-		return ""
-	}
-	result := cur + "/../test/data/"
-	return result
-}
 
 type testCase struct {
 	in   string
@@ -47,7 +39,7 @@ func readpixel(t *testing.T, filename string, want bool) DcmImage {
 	var reader core.DcmReader
 	reader.IsReadPixel = true
 	reader.IsReadValue = true
-	filepath := gettestdatafolder() + filename
+	filepath := util.GetTestDataFolder() + filename
 	err := reader.ReadFile(filepath)
 
 	isCompressed, err := reader.IsCompressed()

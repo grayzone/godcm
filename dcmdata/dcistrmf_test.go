@@ -6,16 +6,8 @@ import (
 	"testing"
 
 	"github.com/grayzone/godcm/ofstd"
+	"github.com/grayzone/godcm/util"
 )
-
-func gettestdatafolder() string {
-	cur, err := os.Getwd()
-	if err != nil {
-		return ""
-	}
-	result := cur + "/../test/data/"
-	return result
-}
 
 func TestNewDcmFileProducer(t *testing.T) {
 	cases := []struct {
@@ -24,9 +16,9 @@ func TestNewDcmFileProducer(t *testing.T) {
 		want *DcmFileProducer
 	}{
 		{"", 0, &DcmFileProducer{status_: ofstd.MakeOFCondition(OFM_dcmdata, 18, ofstd.OF_error, "open : The system cannot find the file specified."), size_: 0}},
-		{gettestdatafolder() + "GH220.dcm", 0, &DcmFileProducer{status_: ofstd.EC_Normal, size_: 454}},
-		{gettestdatafolder() + "GH223.dcm", 0, &DcmFileProducer{status_: ofstd.EC_Normal, size_: 702}},
-		{gettestdatafolder() + "GH133.dcm", 0, &DcmFileProducer{status_: ofstd.EC_Normal, size_: 2980438}},
+		{util.GetTestDataFolder() + "GH220.dcm", 0, &DcmFileProducer{status_: ofstd.EC_Normal, size_: 454}},
+		{util.GetTestDataFolder() + "GH223.dcm", 0, &DcmFileProducer{status_: ofstd.EC_Normal, size_: 702}},
+		{util.GetTestDataFolder() + "GH133.dcm", 0, &DcmFileProducer{status_: ofstd.EC_Normal, size_: 2980438}},
 	}
 	for _, c := range cases {
 		got := NewDcmFileProducer(c.in_1, c.in_2)
@@ -45,9 +37,9 @@ func TestDcmFileProducerGood(t *testing.T) {
 		want bool
 	}{
 		{NewDcmFileProducer("", 0), false},
-		{NewDcmFileProducer(gettestdatafolder()+"GH220.dcm", 0), true},
-		{NewDcmFileProducer(gettestdatafolder()+"GH223.dcm", 0), true},
-		{NewDcmFileProducer(gettestdatafolder()+"GH133.dcm", 0), true},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH220.dcm", 0), true},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH223.dcm", 0), true},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH133.dcm", 0), true},
 	}
 	for _, c := range cases {
 		got := c.in.Good()
@@ -66,9 +58,9 @@ func TestDcmFileProducerStatus(t *testing.T) {
 		want ofstd.OFCondition
 	}{
 		{NewDcmFileProducer("", 0), ofstd.MakeOFCondition(OFM_dcmdata, 18, ofstd.OF_error, "open : The system cannot find the file specified.")},
-		{NewDcmFileProducer(gettestdatafolder()+"GH220.dcm", 0), ofstd.EC_Normal},
-		{NewDcmFileProducer(gettestdatafolder()+"GH223.dcm", 0), ofstd.EC_Normal},
-		{NewDcmFileProducer(gettestdatafolder()+"GH133.dcm", 0), ofstd.EC_Normal},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH220.dcm", 0), ofstd.EC_Normal},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH223.dcm", 0), ofstd.EC_Normal},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH133.dcm", 0), ofstd.EC_Normal},
 	}
 	for _, c := range cases {
 		got := c.in.Status()
@@ -87,12 +79,12 @@ func TestDcmFileProducerEos(t *testing.T) {
 		want bool
 	}{
 		{NewDcmFileProducer("", 0), true},
-		{NewDcmFileProducer(gettestdatafolder()+"GH220.dcm", 0), false},
-		{NewDcmFileProducer(gettestdatafolder()+"GH223.dcm", 0), false},
-		{NewDcmFileProducer(gettestdatafolder()+"GH133.dcm", 0), false},
-		{NewDcmFileProducer(gettestdatafolder()+"GH220.dcm", 454), true},
-		{NewDcmFileProducer(gettestdatafolder()+"GH223.dcm", 702), true},
-		{NewDcmFileProducer(gettestdatafolder()+"GH133.dcm", 2980438), true},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH220.dcm", 0), false},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH223.dcm", 0), false},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH133.dcm", 0), false},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH220.dcm", 454), true},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH223.dcm", 702), true},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH133.dcm", 2980438), true},
 	}
 	for _, c := range cases {
 		got := c.in.Eos()
@@ -111,12 +103,12 @@ func TestDcmFileProducerAvail(t *testing.T) {
 		want int64
 	}{
 		{NewDcmFileProducer("", 0), 0},
-		{NewDcmFileProducer(gettestdatafolder()+"GH220.dcm", 0), 454},
-		{NewDcmFileProducer(gettestdatafolder()+"GH223.dcm", 0), 702},
-		{NewDcmFileProducer(gettestdatafolder()+"GH133.dcm", 0), 2980438},
-		{NewDcmFileProducer(gettestdatafolder()+"GH220.dcm", 10), 444},
-		{NewDcmFileProducer(gettestdatafolder()+"GH223.dcm", 100), 602},
-		{NewDcmFileProducer(gettestdatafolder()+"GH133.dcm", 1000), 2979438},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH220.dcm", 0), 454},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH223.dcm", 0), 702},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH133.dcm", 0), 2980438},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH220.dcm", 10), 444},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH223.dcm", 100), 602},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH133.dcm", 1000), 2979438},
 	}
 	for _, c := range cases {
 		got := c.in.Avail()
@@ -137,10 +129,10 @@ func TestDcmFileProducerRead(t *testing.T) {
 		want_2 int64
 	}{
 		{NewDcmFileProducer("", 0), 0, nil, 0},
-		{NewDcmFileProducer(gettestdatafolder()+"GH184.dcm", 0), 1, []byte{0x52}, 1},
-		{NewDcmFileProducer(gettestdatafolder()+"GH184.dcm", 0), 2, []byte{0x52, 0x5f}, 2},
-		{NewDcmFileProducer(gettestdatafolder()+"GH184.dcm", 0), 3, []byte{0x52, 0x5f, 0x31}, 3},
-		{NewDcmFileProducer(gettestdatafolder()+"GH184.dcm", 0), 4, []byte{0x52, 0x5f, 0x31, 0x46}, 4},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH184.dcm", 0), 1, []byte{0x52}, 1},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH184.dcm", 0), 2, []byte{0x52, 0x5f}, 2},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH184.dcm", 0), 3, []byte{0x52, 0x5f, 0x31}, 3},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH184.dcm", 0), 4, []byte{0x52, 0x5f, 0x31, 0x46}, 4},
 	}
 	for _, c := range cases {
 		got_1, got_2 := c.in_0.Read(c.in_1)
@@ -160,10 +152,10 @@ func TestDcmFileProducerSkip(t *testing.T) {
 		want int64
 	}{
 		{NewDcmFileProducer("", 0), 0, 0},
-		{NewDcmFileProducer(gettestdatafolder()+"GH220.dcm", 0), 1, 1},
-		{NewDcmFileProducer(gettestdatafolder()+"GH220.dcm", 0), 454, 454},
-		{NewDcmFileProducer(gettestdatafolder()+"GH220.dcm", 0), 453, 453},
-		{NewDcmFileProducer(gettestdatafolder()+"GH220.dcm", 0), 455, 454},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH220.dcm", 0), 1, 1},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH220.dcm", 0), 454, 454},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH220.dcm", 0), 453, 453},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH220.dcm", 0), 455, 454},
 	}
 	for _, c := range cases {
 		got := c.in_0.Skip(c.in_1)
@@ -183,12 +175,12 @@ func TestDcmFileProducerPutback(t *testing.T) {
 		want int64
 	}{
 		{NewDcmFileProducer("", 0), 0, 0},
-		{NewDcmFileProducer(gettestdatafolder()+"GH220.dcm", 100), 1, 99},
-		{NewDcmFileProducer(gettestdatafolder()+"GH220.dcm", 0), 454, 0},
-		{NewDcmFileProducer(gettestdatafolder()+"GH220.dcm", 100), 453, 100},
-		{NewDcmFileProducer(gettestdatafolder()+"GH220.dcm", 10), 455, 10},
-		{NewDcmFileProducer(gettestdatafolder()+"GH220.dcm", 100), 10, 90},
-		{NewDcmFileProducer(gettestdatafolder()+"GH220.dcm", 10), 9, 1},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH220.dcm", 100), 1, 99},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH220.dcm", 0), 454, 0},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH220.dcm", 100), 453, 100},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH220.dcm", 10), 455, 10},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH220.dcm", 100), 10, 90},
+		{NewDcmFileProducer(util.GetTestDataFolder()+"GH220.dcm", 10), 9, 1},
 	}
 	for _, c := range cases {
 		c.in_0.Putback(c.in_1)
@@ -209,9 +201,9 @@ func TestNewDcmInputFileStream(t *testing.T) {
 		want *DcmInputFileStream
 	}{
 		{"", 0, &DcmInputFileStream{status: ofstd.MakeOFCondition(OFM_dcmdata, 18, ofstd.OF_error, "open : The system cannot find the file specified."), size: 0}},
-		{gettestdatafolder() + "GH220.dcm", 0, &DcmInputFileStream{status: ofstd.EC_Normal, size: 454}},
-		{gettestdatafolder() + "GH223.dcm", 0, &DcmInputFileStream{status: ofstd.EC_Normal, size: 702}},
-		{gettestdatafolder() + "GH133.dcm", 0, &DcmInputFileStream{status: ofstd.EC_Normal, size: 2980438}},
+		{util.GetTestDataFolder() + "GH220.dcm", 0, &DcmInputFileStream{status: ofstd.EC_Normal, size: 454}},
+		{util.GetTestDataFolder() + "GH223.dcm", 0, &DcmInputFileStream{status: ofstd.EC_Normal, size: 702}},
+		{util.GetTestDataFolder() + "GH133.dcm", 0, &DcmInputFileStream{status: ofstd.EC_Normal, size: 2980438}},
 	}
 	for _, c := range cases {
 		got := NewDcmInputFileStream(c.in_1, c.in_2)
@@ -230,9 +222,9 @@ func TestDcmInputFileStreamGood(t *testing.T) {
 		want bool
 	}{
 		{NewDcmInputFileStream("", 0), false},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 0), true},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH223.dcm", 0), true},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH133.dcm", 0), true},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 0), true},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH223.dcm", 0), true},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH133.dcm", 0), true},
 	}
 	for _, c := range cases {
 		got := c.in.Good()
@@ -251,9 +243,9 @@ func TestDcmInputFileStreamStatus(t *testing.T) {
 		want ofstd.OFCondition
 	}{
 		{NewDcmInputFileStream("", 0), ofstd.MakeOFCondition(OFM_dcmdata, 18, ofstd.OF_error, "open : The system cannot find the file specified.")},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 0), ofstd.EC_Normal},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH223.dcm", 0), ofstd.EC_Normal},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH133.dcm", 0), ofstd.EC_Normal},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 0), ofstd.EC_Normal},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH223.dcm", 0), ofstd.EC_Normal},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH133.dcm", 0), ofstd.EC_Normal},
 	}
 	for _, c := range cases {
 		got := c.in.Status()
@@ -272,12 +264,12 @@ func TestDcmInputFileStreamEos(t *testing.T) {
 		want bool
 	}{
 		{NewDcmInputFileStream("", 0), true},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 0), false},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH223.dcm", 0), false},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH133.dcm", 0), false},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 454), true},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH223.dcm", 702), true},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH133.dcm", 2980438), true},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 0), false},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH223.dcm", 0), false},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH133.dcm", 0), false},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 454), true},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH223.dcm", 702), true},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH133.dcm", 2980438), true},
 	}
 	for _, c := range cases {
 		got := c.in.Eos()
@@ -296,12 +288,12 @@ func TestDcmInputFileStreamAvail(t *testing.T) {
 		want int64
 	}{
 		{NewDcmInputFileStream("", 0), 0},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 0), 454},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH223.dcm", 0), 702},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH133.dcm", 0), 2980438},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 10), 444},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH223.dcm", 100), 602},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH133.dcm", 1000), 2979438},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 0), 454},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH223.dcm", 0), 702},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH133.dcm", 0), 2980438},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 10), 444},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH223.dcm", 100), 602},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH133.dcm", 1000), 2979438},
 	}
 	for _, c := range cases {
 		got := c.in.Avail()
@@ -322,10 +314,10 @@ func TestDcmInputFileStreamRead(t *testing.T) {
 		want_2 int64
 	}{
 		{NewDcmInputFileStream("", 0), 0, nil, 0},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH184.dcm", 0), 1, []byte{0x52}, 1},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH184.dcm", 0), 2, []byte{0x52, 0x5f}, 2},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH184.dcm", 0), 3, []byte{0x52, 0x5f, 0x31}, 3},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH184.dcm", 0), 4, []byte{0x52, 0x5f, 0x31, 0x46}, 4},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH184.dcm", 0), 1, []byte{0x52}, 1},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH184.dcm", 0), 2, []byte{0x52, 0x5f}, 2},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH184.dcm", 0), 3, []byte{0x52, 0x5f, 0x31}, 3},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH184.dcm", 0), 4, []byte{0x52, 0x5f, 0x31, 0x46}, 4},
 	}
 	for _, c := range cases {
 		got_1, got_2 := c.in_0.Read(c.in_1)
@@ -345,10 +337,10 @@ func TestDcmInputFileStreamSkip(t *testing.T) {
 		want int64
 	}{
 		{NewDcmInputFileStream("", 0), 0, 0},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 0), 1, 1},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 0), 454, 454},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 0), 453, 453},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 0), 455, 454},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 0), 1, 1},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 0), 454, 454},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 0), 453, 453},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 0), 455, 454},
 	}
 	for _, c := range cases {
 		got := c.in_0.Skip(c.in_1)
@@ -368,12 +360,12 @@ func TestDcmInputFileStreamPutback1(t *testing.T) {
 		want int64
 	}{
 		{NewDcmInputFileStream("", 0), 0, 0},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 100), 1, 99},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 0), 454, 0},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 100), 453, 100},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 10), 455, 10},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 100), 10, 90},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 10), 9, 1},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 100), 1, 99},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 0), 454, 0},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 100), 453, 100},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 10), 455, 10},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 100), 10, 90},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 10), 9, 1},
 	}
 	for _, c := range cases {
 		c.in_0.Putback(c.in_1)
@@ -395,12 +387,12 @@ func TestDcmInputFileStreamPutback2(t *testing.T) {
 		want_2  int64
 	}{
 		{NewDcmInputFileStream("", 0), 0, 0, 0},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 100), 1, 1, 100},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 0), 454, 454, 0},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 100), 453, 354, 100},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 10), 455, 444, 10},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 100), 10, 10, 100},
-		{NewDcmInputFileStream(gettestdatafolder()+"GH220.dcm", 10), 9, 9, 10},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 100), 1, 1, 100},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 0), 454, 454, 0},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 100), 453, 354, 100},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 10), 455, 444, 10},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 100), 10, 10, 100},
+		{NewDcmInputFileStream(util.GetTestDataFolder()+"GH220.dcm", 10), 9, 9, 10},
 	}
 	for _, c := range cases {
 		c.in_0.Mark()
