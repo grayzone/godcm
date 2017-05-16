@@ -2,6 +2,8 @@ package core
 
 import (
 	"testing"
+
+	"github.com/grayzone/godcm/util"
 )
 
 func TestDcmReaderReadFileNONDICOM(t *testing.T) {
