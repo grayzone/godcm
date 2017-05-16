@@ -67,6 +67,11 @@ func (dataset DcmDataset) Modality() string {
 	return dataset.getElementValue(DCMModality)
 }
 
+// StudyInstanceUID get the Study Instance UID of the dicom image
+func (dataset DcmDataset) StudyInstanceUID() string {
+	return dataset.getElementValue(DCMStudyInstanceUID)
+}
+
 // SOPInstanceUID get the SOP Instance UID of the dicom image
 func (dataset DcmDataset) SOPInstanceUID() string {
 	return dataset.getElementValue(DCMSOPInstanceUID)
