@@ -24,4 +24,6 @@ script:
  - tail -n +2 profile_tmp.cov >> profile.cov
  - go test -v -covermode=count -coverprofile=profile_tmp.cov ./dcmimage
  - tail -n +2 profile_tmp.cov >> profile.cov
+ - go test -v -covermode=count -coverprofile=profile_tmp.cov ./models
+ - tail -n +2 profile_tmp.cov >> profile.cov
  - $HOME/gopath/bin/goveralls -coverprofile=profile.cov -service=travis-ci
