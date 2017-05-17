@@ -540,6 +540,27 @@ func TestSOPInstanceUID(t *testing.T) {
 	}
 }
 
+func TestStudyInstanceUID(t *testing.T) {
+	cases := []struct {
+		in   string
+		want string
+	}{
+		{util.GetTestDataFolder() + "GH178.dcm", "1.2.840.113681.1.99.2994400"},
+		{util.GetTestDataFolder() + "xr_chest.dcm", "1.3.51.0.7.99.2155959091.28444.877621460.0"},
+		{util.GetTestDataFolder() + "xr_chicken2.dcm", "1.2.392.200036.9125.2.36232624471.64658633050.171611"},
+		{util.GetTestDataFolder() + "MR-MONO2-8-16x-heart.dcm", "999.999.2.19960619.163000"},
+	}
+	for _, c := range cases {
+		var reader DcmReader
+		reader.IsReadValue = true
+		reader.ReadFile(c.in)
+		got := reader.Dataset.StudyInstanceUID()
+		if got != c.want {
+			t.Errorf("StudyInstanceUID() %s, want '%v' got '%v'", c.in, c.want, got)
+		}
+	}
+}
+
 func TestPixelData(t *testing.T) {
 	cases := []struct {
 		in   string

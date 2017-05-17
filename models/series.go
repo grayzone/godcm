@@ -16,7 +16,7 @@ func (this *Series) Parse(dataset core.DcmDataset) {
 	this.Modality = dataset.GetElementValue(core.DCMModality)
 	this.Laterality = dataset.GetElementValue(core.DCMLaterality)
 
-	for i := range this.Slice {
-		this.Slice[i].Parse(dataset)
-	}
+	var s Slice
+	s.Parse(dataset)
+	this.Slice = append(this.Slice, s)
 }

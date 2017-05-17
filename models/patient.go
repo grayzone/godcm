@@ -16,7 +16,7 @@ func (this *Patient) Parse(dataset core.DcmDataset) {
 	this.PatientBirthDate = dataset.GetElementValue(core.DCMPatientBirthDate)
 	this.PatientSex = dataset.GetElementValue(core.DCMPatientSex)
 
-	for i := range this.Study {
-		this.Study[i].Parse(dataset)
-	}
+	var s Study
+	s.Parse(dataset)
+	this.Study = append(this.Study, s)
 }

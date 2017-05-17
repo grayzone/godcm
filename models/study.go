@@ -20,7 +20,7 @@ func (this *Study) Parse(dataset core.DcmDataset) {
 	this.StudyID = dataset.GetElementValue(core.DCMStudyID)
 	this.AccessionNumber = dataset.GetElementValue(core.DCMAccessionNumber)
 
-	for i := range this.Series {
-		this.Series[i].Parse(dataset)
-	}
+	var s Series
+	s.Parse(dataset)
+	this.Series = append(this.Series, s)
 }
