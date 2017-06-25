@@ -72,6 +72,10 @@ func (dataset DcmDataset) StudyInstanceUID() string {
 	return dataset.GetElementValue(DCMStudyInstanceUID)
 }
 
+func (dataset DcmDataset) StudyDate() string {
+	return dataset.GetElementValue(DCMStudyDate)
+}
+
 // SOPInstanceUID get the SOP Instance UID of the dicom image
 func (dataset DcmDataset) SOPInstanceUID() string {
 	return dataset.GetElementValue(DCMSOPInstanceUID)
