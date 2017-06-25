@@ -1,4 +1,4 @@
-package models
+package dcmmodel
 
 import "github.com/grayzone/godcm/core"
 
