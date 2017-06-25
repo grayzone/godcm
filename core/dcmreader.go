@@ -120,9 +120,22 @@ func (reader *DcmReader) GetImageInfo() dcmimage.DcmImage {
 	return img
 }
 
-func (reader *DcmReader) Convert2PNG(newfilepath string, frame int) error {
+func (reader DcmReader) Convert2PNG(filepath string) error {
 	img := reader.GetImageInfo()
-	return img.ConvertToPNG(newfilepath, frame)
+	frame := img.NumberOfFrames
+	for i := 0; i < frame; i++ {
+		var newfile string
+		if frame == 1 {
+			newfile = filepath + ".png"
+		} else {
+			newfile = filepath + "_" + strconv.FormatUint(uint64(i), 10) + ".png"
+		}
+		err := img.ConvertToPNG(newfile, i)
+		if err != nil {
+			log.Println(err.Error())
+		}
+	}
+	return nil
 }
 
 // IsDicom3 is to check the file is supported by DICOM 3.0 or not.

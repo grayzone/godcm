@@ -271,6 +271,7 @@ func (di *DcmImage) determineMinMax() {
 }
 
 func (di DcmImage) getPixelDataOfFrame(frame int) ([]byte, error) {
+	//	fmt.Println(di)
 	size := int(di.Columns * di.Rows * uint32(di.SamplesPerPixel))
 	if size == 0 {
 		err := errors.New("getPixelDataOfFrame : SamplesPerPixel is zero")
