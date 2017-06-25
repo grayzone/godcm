@@ -3,7 +3,7 @@ package models
 import "github.com/grayzone/godcm/core"
 
 type Study struct {
-	StudyInstanceUID       string   `orm:"unique:column(studyinstanceuid)"`
+	StudyInstanceUID       string   `orm:"unique;column(studyinstanceuid)"`
 	StudyDate              string   `orm:"column(studydate)"`
 	StudyTime              string   `orm:"column(studytime)"`
 	ReferringPhysicianName string   `orm:"column(referringphysicianname)"`

@@ -3,7 +3,7 @@ package models
 import "github.com/grayzone/godcm/core"
 
 type Series struct {
-	SeriesInstanceUID string  `orm:"unique:column(seriesinstanceuid)"`
+	SeriesInstanceUID string  `orm:"unique;column(seriesinstanceuid)"`
 	SeriesNumber      string  `orm:"column(seriesnumber)"`
 	Modality          string  `orm:"column(modality)"`
 	Laterality        string  `orm:"column(laterality)"`

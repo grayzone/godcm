@@ -3,7 +3,7 @@ package models
 import "github.com/grayzone/godcm/core"
 
 type Slice struct {
-	SOPInstanceUID       string `orm:"unique:column(sopinstanceuid)"`
+	SOPInstanceUID       string `orm:"unique;column(sopinstanceuid)"`
 	SOPClassUID          string `orm:"column(sopclassuid)"`
 	SpecificCharacterSet string `orm:"column(specificcharacterset)"`
 	InstanceNumber       string `orm:"column(instancenumber)"`
