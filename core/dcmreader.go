@@ -3,6 +3,9 @@ package core
 import (
 	"errors"
 	"log"
+	"strconv"
+
+	"github.com/grayzone/godcm/dcmimage"
 )
 
 // DICOM3FILEIDENTIFIER is the DiCOM index in the file header.
@@ -54,6 +57,74 @@ func (reader *DcmReader) ReadFile(filename string) error {
 	return nil
 }
 
+func (reader *DcmReader) GetImageInfo() dcmimage.DcmImage {
+	isCompressed, err := reader.IsCompressed()
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	isBigEndian, err := reader.IsBigEndian()
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	pixeldata := reader.Dataset.PixelData()
+
+	var img dcmimage.DcmImage
+
+	img.IsCompressed = isCompressed
+	img.IsBigEndian = isBigEndian
+
+	var num interface{}
+
+	num, _ = strconv.ParseUint(reader.Dataset.BitsAllocated(), 10, 16)
+	img.BitsAllocated = uint16(num.(uint64))
+
+	num, _ = strconv.ParseUint(reader.Dataset.BitsStored(), 10, 16)
+	img.BitsStored = uint16(num.(uint64))
+
+	num, _ = strconv.ParseUint(reader.Dataset.Columns(), 10, 32)
+	img.Columns = uint32(num.(uint64))
+
+	num, _ = strconv.ParseUint(reader.Dataset.Rows(), 10, 32)
+	img.Rows = uint32(num.(uint64))
+
+	num, _ = strconv.ParseUint(reader.Dataset.HighBit(), 10, 16)
+	img.HighBit = uint16(num.(uint64))
+
+	num, _ = strconv.ParseFloat(reader.Dataset.WindowCenter(), 64)
+	img.WindowCenter = num.(float64)
+
+	num, _ = strconv.ParseFloat(reader.Dataset.WindowWidth(), 64)
+	img.WindowWidth = num.(float64)
+
+	num, _ = strconv.ParseFloat(reader.Dataset.RescaleIntercept(), 64)
+	img.RescaleIntercept = num.(float64)
+
+	num, _ = strconv.ParseFloat(reader.Dataset.RescaleSlope(), 64)
+	img.RescaleSlope = num.(float64)
+
+	num, _ = strconv.ParseUint(reader.Dataset.PixelRepresentation(), 10, 16)
+	img.PixelRepresentation = uint16(num.(uint64))
+
+	img.PhotometricInterpretation = reader.Dataset.PhotometricInterpretation()
+
+	num, _ = strconv.ParseUint(reader.Dataset.NumberOfFrames(), 10, 64)
+	img.NumberOfFrames = int(num.(uint64))
+
+	num, _ = strconv.ParseUint(reader.Dataset.SamplesPerPixel(), 10, 16)
+	img.SamplesPerPixel = uint16(num.(uint64))
+
+	img.PixelData = pixeldata
+
+	return img
+}
+
+func (reader *DcmReader) Convert2PNG(newfilepath string, frame int) error {
+	img := reader.GetImageInfo()
+	return img.ConvertToPNG(newfilepath, frame)
+}
+
 // IsDicom3 is to check the file is supported by DICOM 3.0 or not.
 func (reader DcmReader) IsDicom3() (bool, error) {
 	_, err := reader.fs.Skip(128)
@@ -94,9 +165,9 @@ func (reader DcmReader) IsBigEndian() (bool, error) {
 		return false, err
 	}
 	/*
-	if xfer.IsBigEndian() {
-		log.Println("ByteOrder: ", xfer.ByteOrder.String())
-	}
+		if xfer.IsBigEndian() {
+			log.Println("ByteOrder: ", xfer.ByteOrder.String())
+		}
 	*/
 	return xfer.IsBigEndian(), nil
 }
