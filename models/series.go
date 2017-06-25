@@ -3,11 +3,11 @@ package models
 import "github.com/grayzone/godcm/core"
 
 type Series struct {
-	SeriesInstanceUID string
-	SeriesNumber      string
-	Modality          string
-	Laterality        string
-	Slice             []Slice
+	SeriesInstanceUID string  `orm:"unique:column(seriesinstanceuid)"`
+	SeriesNumber      string  `orm:"column(seriesnumber)"`
+	Modality          string  `orm:"column(modality)"`
+	Laterality        string  `orm:"column(laterality)"`
+	Slice             []Slice `orm:"-"`
 }
 
 func (this *Series) Parse(dataset core.DcmDataset) {

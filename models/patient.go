@@ -3,11 +3,11 @@ package models
 import "github.com/grayzone/godcm/core"
 
 type Patient struct {
-	PatientName      string
-	PatientID        string
-	PatientBirthDate string
-	PatientSex       string
-	Study            []Study
+	PatientName      string  `orm:"column(patientname)"`
+	PatientID        string  `orm:"column(patientid)"`
+	PatientBirthDate string  `orm:"column(patientbirthdate)"`
+	PatientSex       string  `orm:"column(patientsex)"`
+	Study            []Study `orm:"-"`
 }
 
 func (this *Patient) Parse(dataset core.DcmDataset) {
