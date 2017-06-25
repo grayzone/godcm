@@ -4,7 +4,7 @@ import "github.com/grayzone/godcm/core"
 
 type Patient struct {
 	PatientName      string `orm:"column(patientname)"`
-	PatientID        string `orm:"column(patientid)"`
+	PatientID        string `orm:"unique;column(patientid)"`
 	PatientBirthDate string `orm:"column(patientbirthdate)"`
 	PatientSex       string `orm:"column(patientsex)"`
 	//	Study            []Study `orm:"-"`
