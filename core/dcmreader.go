@@ -132,7 +132,8 @@ func (reader DcmReader) Convert2PNG(filepath string) error {
 		}
 		err := img.ConvertToPNG(newfile, i)
 		if err != nil {
-			log.Println(err.Error())
+			log.Printf("failed to convert dicom to png:%v\n", err.Error())
+			return err
 		}
 	}
 	return nil
